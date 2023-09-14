@@ -12,9 +12,9 @@ sinfo(struct sysinfo *info) {
   }
 }
 
-//
-// use sbrk() to count how many free physical memory pages there are.
-//
+/* */
+/* use sbrk() to count how many free physical memory pages there are. */
+/* */
 int
 countfree()
 {
@@ -133,7 +133,7 @@ void testbad() {
       exit(0);
   }
   wait(&xstatus);
-  if(xstatus == -1)  // kernel killed child?
+  if(xstatus == -1)  /* kernel killed child? */
     exit(0);
   else {
     printf("sysinfotest: testbad succeeded %d\n", xstatus);
