@@ -1,0 +1,22 @@
+p1 Deliverables:
+PartA.design.txt
+PartB.design.txt
+partB.bash
+Skeleton programs
+- function headers + header files for interfacing between modules
+- only need functions to check for correct type and range of parameter values
+  - and print out "Go to procedure X" where X is the name of the procedure executing
+  - or "Error in procedure X: invalid parameter Y" if the caller passed in the wrong params
+- so main() must call every function to check error conditions and return proper error values
+Makefile
+- compiles Part A.1 and Part C
+  - Part C makes a library named liblist.a
+- uses if statements to check the OS and only compiles Linux or Windows code appropriately
+mytestlist.c
+mytestlist
+- executable compiled by Makefile
+332-style-guidelines-team14.txt
+- coding style guide
+git-log.txt
+- should include commits from both partners
+
