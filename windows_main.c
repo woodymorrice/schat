@@ -4,8 +4,10 @@
 #include <Windows.h>
 #include <stdio.h>
 
+#include "square.h"
+
 int main() {
-    printf("Success!");
+    printf(square(4));
     return EXIT_SUCCESS;
 }
 
