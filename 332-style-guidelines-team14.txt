@@ -91,9 +91,9 @@ void a_function(void) {
 
 **Declarations**
 
-Mixed declarations are generally not allowed; declarations should be
-at the beginning of blocks, except in the case of for loops, where
-the loop variable may be declared on the line before the loop begins.
+Mixed declarations are generally not allowed because ISO C90
+forbids it. Declarations should be always be at the beginning of 
+blocks.
 
 **Conditional Statements**
 
