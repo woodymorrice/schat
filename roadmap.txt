@@ -33,10 +33,24 @@ Files needed:
 	# function prototypes
 
 - list_adders.c
+	ListAdd()
+	ListInsert()
+	ListAppend()
+	ListPrepend()
+	ListConcat()
+
+- list_movers.c 
+	ListFirst()
+	ListLast()
+	ListNext()
+	ListPrev()
 
 - list_removers.c
 	ListCurr()
 	ListCount()
+	ListRemove()
+	ListFree()
+	ListTrim()
 
 - mytestlist.c
 	# main() -- only this file has main()
