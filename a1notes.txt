@@ -17,6 +17,7 @@ mytestlist
 - executable compiled by Makefile
 332-style-guidelines-team14.txt
 - coding style guide
+- use https://qemu-project.gitlab.io/qemu/devel/style.html ??
 git-log.txt
 - should include commits from both partners
 
