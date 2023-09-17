@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <list.h>
+
+#include "list.h"
 
 const int MAX_ITEM = 10;
 

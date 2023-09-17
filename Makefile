@@ -31,10 +31,10 @@ windows_main.exe: windows_main.o square.o
 
 # Compiling
 windows_main.o: windows_main.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o windows_main.o windows_main.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c windows_main.c -o windows_main.o
 
 square.o: square.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o square.o square.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c square.c -o square.o
 
 
 # Part C
@@ -46,16 +46,16 @@ liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -rs liblist.a list_adders.o list_movers.o list_removers.o
 
 list_adders.o: list_adders.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -O list_adders.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c list_adders.c -o list_adders.o
 
 list_movers.o: list_movers.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -O list_movers.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c list_movers.c -o list_movers.o
 
 list_removers.o: list_removers.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -O list_removers.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c list_removers.c -o list_removers.o
 
 mytestlist.o: mytestlist.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -O mytestlist.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c mytestlist.c -o mytestlist.o
 
 
 .PHONY: clean
