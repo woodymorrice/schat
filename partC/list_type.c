@@ -1,9 +1,9 @@
 #include <stdio.h>
-#include <list.h>
+#include "list.h"
 
-typedef struct {
+struct LIST{
     void *headPointer;
     void *tailPointer;
     void *currentItem;
     int totalItem;
-} LIST;
+};

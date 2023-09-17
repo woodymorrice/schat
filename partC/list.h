@@ -1,64 +1,72 @@
-#include <stdio.h>
-#include <stdlib.h>
+typedef struct {
+    void *headPointer;
+    void *tailPointer;
+    void *currentItem;
+    int totalItem;
+} LIST;
 
-extern LIST;
-extern NODE;
+typedef struct {
+    void *prevNode;
+    void *nextNode;
+    void *dataType;
+} NODE;
+
 /*
 Makes a new, empty list, and returns its reference on success. Returns a NULL pointer on failure 
 */
 
-LIST *ListCreate()
+LIST *ListCreate();
 
 /*
 Returns the number of items in list
 */
 
-int ListCount()
+int ListCount();
 
 /*
 Returns a pointer to the first item in list and makes the first item the currentitem 
 */
 
-void *ListFirst()
+void *ListFirst();
 
 /*
 Returns a pointer to the last item in list and makes the last item in the current one.
 */
 
-void *ListLast()
+void *ListLast();
 
 /*Advances the list's current node by one and returns a pointer to the new current item. Advance the end item in list, NULL pointer returned*/
 
-void *ListNext()
+void *ListNext();
 
 /*Backs up the list's current node by one and returns a pointer to the new current item. Back up beyond the start of list, NULL pointer returned*/
 
-void *ListPrev()
+void *ListPrev();
 
 /*Returns a pointer to the current item in list*/
 
-void *ListCurr()
+void *ListCurr();
 
 /*Adds the new item to list directly after the current item, and makes the new item the current item. At end of list, item added at the end
 
 Return 0 on success, -1 on failure
 */
 
-int ListAdd()
+int ListAdd();
 
-int ListInsert()
+int ListInsert();
 
-int ListAppend()
+int ListAppend();
 
-int ListPrepend()
+int ListPrepend();
 
-void *ListRemove()
+void *ListRemove();
 
-void ListConcat()
+void ListConcat();
 
-void ListFree()
+void ListFree();
 
-void *ListTrim()
+void *ListTrim();
 
-void *ListSearch()
+void *ListSearch();
 

@@ -7,9 +7,9 @@ const int MAX_ITEM = 10;
  
 LIST *ListCreate () {
     LIST *newList; 
-    newList->*headPointer = NULL;
-    newList->*tailPointer = NULL;
-    newList->*currentItem = NULL;
+    newList->headPointer = NULL;
+    newList->tailPointer = NULL;
+    newList->currentItem = NULL;
     newList->totalItem = 0;
     return newList;
 }
@@ -19,16 +19,16 @@ int ListCount (LIST *curList) {
 }
 
 int ListAppend (LIST *curList, NODE *item) {
-    NODE *prevTail = *(curList->*tailPointer); 
+    NODE *prevTail = curList->tailPointer; 
     /*
     * If the current pointer is at the end of list,
     * item is added at the end.
     */
     if (curList->totalItem < MAX_ITEM) {
         ListLast(curList);
-        curList->*tailPointer = item;
-        item->*prevNode = prevTail;
-        item->*nextNode = NULL;
+        curList->tailPointer = item;
+        item->prevNode = prevTail;
+        item->nextNode = NULL;
         /*
         * Making sure the tail is new item and current item
         * at the tail 
@@ -41,21 +41,21 @@ int ListAppend (LIST *curList, NODE *item) {
 }
 
 int ListPrepend (LIST *curList, NODE *item) {
-    NODE *prevHead = *(curList->*headPointer);
+    NODE *prevHead = curList->headPointer;
     /*
     * If the current pointer is at the head of list,
     * item is added at the end.
     */
     if (curList->totalItem < MAX_ITEM) {
         ListFirst(curList);
-        curList->*headPointer = item;
-        item->*prevNode = NULL;
-        item->*nextNode = prevHead;
+        curList->headPointer = item;
+        item->prevNode = NULL;
+        item->nextNode = prevHead;
         /*
         * Making sure the head is new item and current item
         * at the head
         */
-        LisFirst(curList);
+        ListFirst(curList);
         curList->totalItem += 1;
         return 0;
     }
@@ -64,18 +64,18 @@ int ListPrepend (LIST *curList, NODE *item) {
 
 int ListAdd(LIST *curList, NODE *item) {
     NODE *curItem = ListCurr(curList);
-    NODE *curNext = *(ListCurr(curList))->*nextNode;
+    NODE *curNext = (ListCurr(curList))->nextNode;
     if (curList->totalItem < MAX_ITEM) {
-        if (curList->*currentItem == curList->*tailPointer) {
+        if (curList->currentItem == curList->tailPointer) {
             /*
             * if current item is at tail
             */
             return ListAppend(curList, item);
         }
-        *(curList->*currentItem)->*nextNode = item; 
-        curNext->*prevNode = item;
-        item->*nextNode = curNext;
-        item->*prevNode = curItem;
+        *(NODE *)(curList->currentItem)->nextNode = item; 
+        curNext->prevNode = item;
+        item->nextNode = curNext;
+        item->prevNode = curItem;
         ListNext(curList);
         curList->totalItem += 1;
         return 0;    
@@ -85,18 +85,18 @@ int ListAdd(LIST *curList, NODE *item) {
 
 int ListInsert(LIST *curList, NODE *item) {
     NODE *curItem = ListCurr(curList);
-    NODE *curPrev = *(ListCurr(curList))->*prevNode;
+    NODE *curPrev = (ListCurr(curList))->prevNode;
     if (curList->totalItem < MAX_ITEM) {
         /*
         * if current item is at head
         */
-        if (curList->*currentItem == curList->*headPointer) {
+        if (curList->currentItem == curList->headPointer) {
             return ListPrepend(curList, item);
         }
-        *(curList->*currentItem)->*prevNode = item;
-        curPrev->*nextNode = item;
-        item->*prevNode = curPrev;
-        item->*nextNode = curItem;
+        *(NODE *)(curList->currentItem)->prevNode = item;
+        curPrev->nextNode = item;
+        item->prevNode = curPrev;
+        item->nextNode = curItem;
         ListPrev(curList);
         curList->totalItem += 1;
         return 0;
