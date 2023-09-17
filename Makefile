@@ -14,12 +14,15 @@ all: windows_main.exe
 # Windows
 
 # Linking
-windows_main.exe: windows_main.o
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o windows_main.exe windows_main.o
+windows_main.exe: windows_main.o square.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o windows_main.exe windows_main.o square.o
 
 # Compiling
 windows_main.o: windows_main.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o windows_main.o -c windows_main.c
+
+square.o: square.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o square.o -c square.c
 
 
 .PHONY: clean
