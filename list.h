@@ -1,7 +1,7 @@
 typedef struct LIST{
-    void *headPointer;
-    void *tailPointer;
-    void *currentItem;
+    struct NODE *headPointer;
+    struct NODE *tailPointer;
+    struct NODE *currentItem;
     int totalItem;
 } LIST;
 
