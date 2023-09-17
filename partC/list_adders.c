@@ -64,7 +64,7 @@ int ListPrepend (LIST *curList, struct NODE *item) {
 
 int ListAdd(LIST *curList, struct NODE *item) {
     struct NODE *curItem = ListCurr(curList);
-    struct NODE *curNext = *(struct NODE *)(ListCurr(curList))->nextNode;
+    struct NODE *curNext = curItem->nextNode;
     if (curList->totalItem < MAX_ITEM) {
         if (curList->totalItem == 0) {
             curList->headPointer = item;
@@ -77,7 +77,7 @@ int ListAdd(LIST *curList, struct NODE *item) {
             */
             return ListAppend(curList, item);
         }
-        curList->currentItem->nextNode = item; 
+        curItem->nextNode = item; 
         curNext->prevNode = item;
         item->nextNode = curNext;
         item->prevNode = curItem;
@@ -90,7 +90,7 @@ int ListAdd(LIST *curList, struct NODE *item) {
 
 int ListInsert(LIST *curList, struct NODE *item) {
     struct NODE *curItem = ListCurr(curList);
-    struct NODE *curPrev = (ListCurr(curList))->prevNode;
+    struct NODE *curPrev = curItem->prevNode;
     if (curList->totalItem < MAX_ITEM) {
         /*
         * if current item is at head
@@ -98,7 +98,7 @@ int ListInsert(LIST *curList, struct NODE *item) {
         if (curList->currentItem == curList->headPointer) {
             return ListPrepend(curList, item);
         }
-        (curList->currentItem)->prevNode = item;
+        curItem->prevNode = item;
         curPrev->nextNode = item;
         item->prevNode = curPrev;
         item->nextNode = curItem;
