@@ -18,8 +18,8 @@ int ListCount (LIST *curList) {
     return curList->totalItem;    
 }
 
-int ListAppend (LIST *curList, NODE *item) {
-    NODE *prevTail = curList->tailPointer; 
+int ListAppend (LIST *curList, struct NODE *item) {
+    struct NODE *prevTail = curList->tailPointer; 
     /*
     * If the current pointer is at the end of list,
     * item is added at the end.
@@ -40,8 +40,8 @@ int ListAppend (LIST *curList, NODE *item) {
     return -1;
 }
 
-int ListPrepend (LIST *curList, NODE *item) {
-    NODE *prevHead = curList->headPointer;
+int ListPrepend (LIST *curList, struct NODE *item) {
+    struct NODE *prevHead = curList->headPointer;
     /*
     * If the current pointer is at the head of list,
     * item is added at the end.
@@ -62,17 +62,22 @@ int ListPrepend (LIST *curList, NODE *item) {
     return -1;
 }
 
-int ListAdd(LIST *curList, NODE *item) {
-    NODE *curItem = ListCurr(curList);
-    NODE *curNext = (ListCurr(curList))->nextNode;
+int ListAdd(LIST *curList, struct NODE *item) {
+    struct NODE *curItem = ListCurr(curList);
+    struct NODE *curNext = *(struct NODE *)(ListCurr(curList))->nextNode;
     if (curList->totalItem < MAX_ITEM) {
+        if (curList->totalItem == 0) {
+            curList->headPointer = item;
+            curList->tailPointer = item;
+            ListFirst(curList);
+        }
         if (curList->currentItem == curList->tailPointer) {
             /*
             * if current item is at tail
             */
             return ListAppend(curList, item);
         }
-        *(NODE *)(curList->currentItem)->nextNode = item; 
+        curList->currentItem->nextNode = item; 
         curNext->prevNode = item;
         item->nextNode = curNext;
         item->prevNode = curItem;
@@ -83,9 +88,9 @@ int ListAdd(LIST *curList, NODE *item) {
     return -1;
 }
 
-int ListInsert(LIST *curList, NODE *item) {
-    NODE *curItem = ListCurr(curList);
-    NODE *curPrev = (ListCurr(curList))->prevNode;
+int ListInsert(LIST *curList, struct NODE *item) {
+    struct NODE *curItem = ListCurr(curList);
+    struct NODE *curPrev = (ListCurr(curList))->prevNode;
     if (curList->totalItem < MAX_ITEM) {
         /*
         * if current item is at head
@@ -93,7 +98,7 @@ int ListInsert(LIST *curList, NODE *item) {
         if (curList->currentItem == curList->headPointer) {
             return ListPrepend(curList, item);
         }
-        *(NODE *)(curList->currentItem)->prevNode = item;
+        (curList->currentItem)->prevNode = item;
         curPrev->nextNode = item;
         item->prevNode = curPrev;
         item->nextNode = curItem;
