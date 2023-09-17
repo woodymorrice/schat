@@ -3,11 +3,11 @@
 #include <list.h>
 
 void *ListFirst(LIST *curList) {
-    curList->currentItem = curList->headPointer;
+    return curList->currentItem = curList->headPointer;
 }
 
 void *ListLast(LIST *curList) {
-    curList->currentItem = curList->tailPointer;
+    return curList->currentItem = curList->tailPointer;
 }
 
 void *ListCurr(LIST *curList) {
@@ -15,20 +15,22 @@ void *ListCurr(LIST *curList) {
 }
 
 void *ListNext(LIST *curList) {
-    NODE *item1 = curList->currentItem;
+    struct NODE *item1 = curList->currentItem;
     /*
     * if the current item is at the tail of list
     * return NULL  
     */
     if (curList->currentItem == curList->tailPointer) {
         return NULL;
-}
-    curList->currentItem = *((curList->*currentItem)->nextNode);
-    (curList->currentItem)->prevNode = item1; 
+    }
+    curList->currentItem = item1->nextNode;
+    struct NODE *itemMoved = curList->currentItem;
+    itemMoved->prevNode = item1;
+    return curList->currentItem; 
 }
 
 void *ListPrev(LIST *curList) {
-    NODE *item1 = *(curList->currentItem);
+    struct NODE *item1 = curList->currentItem;
     /*
     * if the current item is at head of list
     * return NULL 
@@ -36,8 +38,10 @@ void *ListPrev(LIST *curList) {
     if (curList->currentItem == curList->headPointer) {
         return NULL;
 }
-    curList->currentItem = (curList->currentItem)->prevNode;
-    (curList->currentItem)->nextNode = item1;
+    curList->currentItem = item1->prevNode;
+    struct NODE *itemMoved = curList->currentItem;
+    itemMoved->nextNode = item1;
+    return curList->currentItem;
 }
 
 
