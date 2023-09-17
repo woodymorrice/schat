@@ -7,10 +7,19 @@ CC = gcc
 CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 LIBS = ./
+PLATFORM = $(shell uname -s)
 
 
 # Main Target
+ifeq ($(PLATFORM),Linux)
+all: mytestlist
+
+else ifeq ($(PLATFORM),MINGW64_NT-10.0-22621)
 all: windows_main.exe
+
+else
+	@echo makefile: $(PLATFORM) not supported
+endif
 
 # Part A
 
