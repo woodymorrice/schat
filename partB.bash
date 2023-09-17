@@ -50,6 +50,7 @@ do
             partA1)
                 # Windows
                 echo "executing Windows threads"
+                ./windows_main.exe $arg1 $arg2 $arg3
                 ;;
                 
             partA2)
