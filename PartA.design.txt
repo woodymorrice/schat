@@ -1,4 +1,11 @@
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
 # Design Documentation for Part A
+
+# Work Plan
+Woody will be in charge of design and implementation for part A.
 
 # Design Details
 The overall design for Part A is relatively simple and straightforward, with most of the details
@@ -19,3 +26,17 @@ The number of invocations of square() will be recorded in a global array of coun
 the counter will be increased by childThread() each time the while loop executes. childThread()
 will get the system time at the beginning of execution, then at the end, and print the
 difference.
+
+# Function Specifics
+# DWORD WINAPI parentThread(LPVOID lPtr)
+Preconditions: Command line parameters must be integers of an appropriate size. Appropriate size
+will be determined during implementation.
+Postconditions: Child threads must complete and call exit().
+
+# DWORD WINAPI childThread(LPVOID lPtr)
+Preconditions: Parameters passed from parentThread should be valid and appropriate.
+Postconditions: keepRunning global variable must be set to false.
+
+# int square(int n)
+Preconditions: n must be a positive integer.
+Postconditions: n == 0
