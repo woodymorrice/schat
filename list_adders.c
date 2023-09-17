@@ -7,7 +7,7 @@ const int MAX_ITEM = 10;
 
  
 LIST *ListCreate () {
-    LIST *newList; 
+    LIST *newList = {NULL};
     newList->headPointer = NULL;
     newList->tailPointer = NULL;
     newList->currentItem = NULL;
