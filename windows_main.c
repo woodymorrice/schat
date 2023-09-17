@@ -3,14 +3,22 @@
 
 #include <Windows.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "square.h"
 
-int main() {
-    printf(square(4));
+int main(int argc, char* argv[]) {
+
+    int i; /* counting variable for for loop */
+
+    printf("Number of arguments: %d\n", argc);
+    for (i = 0; i < argc; i++) {
+        printf("%s\n", argv[i]);
+    }
+    
     return EXIT_SUCCESS;
 }
 
-DWORD WINAPI parent_thread (LPVOID lPtr);
+DWORD WINAPI parentThread(LPVOID lPtr);
 
-DWORD WINAPI child_thread (LPVOID lPtr);
+DWORD WINAPI childThread(LPVOID lPtr);
