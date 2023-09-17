@@ -1,5 +1,8 @@
-EXTERN LIST
-EXTERN NODE
+#include <stdio.h>
+#include <stdlib.h>
+
+extern LIST;
+extern NODE;
 /*
 Makes a new, empty list, and returns its reference on success. Returns a NULL pointer on failure 
 */
