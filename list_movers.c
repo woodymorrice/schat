@@ -1,47 +1,54 @@
+/*
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
 
-void *ListFirst(LIST *curList) {
-    return curList->currentItem = curList->headPointer;
+
+void *ListFirst(LIST *list) {
+    return list->currentItem = list->headPointer;
 }
 
-void *ListLast(LIST *curList) {
-    return curList->currentItem = curList->tailPointer;
+void *ListLast(LIST *list) {
+    return list->currentItem = list->tailPointer;
 }
 
-void *ListCurr(LIST *curList) {
-    return curList->currentItem;
+void *ListCurr(LIST *list) {
+    return list->currentItem;
 }
 
-void *ListNext(LIST *curList) {
-    struct NODE *item1 = curList->currentItem;
+void *ListNext(LIST *list) {
+    struct NODE *item1 = list->currentItem;
     /*
     * if the current item is at the tail of list
     * return NULL  
     */
-    if (curList->currentItem == curList->tailPointer) {
+    if (list->currentItem == list->tailPointer) {
         return NULL;
     }
-    curList->currentItem = item1->nextNode;
-    struct NODE *itemMoved = curList->currentItem;
+    list->currentItem = item1->nextNode;
+    struct NODE *itemMoved = list->currentItem;
     itemMoved->prevNode = item1;
-    return curList->currentItem; 
+    return itemMoved->dataType; 
 }
 
-void *ListPrev(LIST *curList) {
-    struct NODE *item1 = curList->currentItem;
+void *ListPrev(LIST *list) {
+    struct NODE *item1 = list->currentItem;
     /*
     * if the current item is at head of list
     * return NULL 
     */
-    if (curList->currentItem == curList->headPointer) {
+    if (list->currentItem == list->headPointer) {
         return NULL;
 }
-    curList->currentItem = item1->prevNode;
-    struct NODE *itemMoved = curList->currentItem;
+    list->currentItem = item1->prevNode;
+    struct NODE *itemMoved = list->currentItem;
     itemMoved->nextNode = item1;
-    return curList->currentItem;
+    return itemMoved->dataType;
 }
 
 
