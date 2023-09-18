@@ -15,8 +15,10 @@ int main() {
     
     LIST *testList;
     int count;
-    int number = 6;
-    int *pointer = &number;
+    int number;
+    int *pointer;
+    number = 6;
+    pointer = &number;
     /*Test ListCreate()*/
     testList = ListCreate();
 
@@ -25,13 +27,15 @@ int main() {
     } else {
         printf("Got to procedure *ListCreate()\n");
     } 
-
+     
     /* Test ListCount() */
     count = ListCount(testList);
     printf("%d", count);
 
     /* Test ListAppend() */
     ListAppend(testList, pointer);
+    count = ListCount(testList);
+    printf("%d", count);
 
 
     return EXIT_SUCCESS;
