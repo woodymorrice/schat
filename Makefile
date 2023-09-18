@@ -8,13 +8,15 @@ CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 LIBS = ./
 PLATFORM = $(shell uname -s)
+MSYS = MSYS_NT-10.0-22621 MINGW64_NT-10.0-22621 \
+       MINGW32_NT-10.0-22621
 
 
 # Main Target
 ifeq ($(PLATFORM),Linux)
 all: mytestlist
 
-else ifeq ($(PLATFORM),MINGW64_NT-10.0-22621)
+else ifeq ($(PLATFORM),$(filter $(PLATFORM), $(MSYS)))
 all: windows_main.exe
 
 else
