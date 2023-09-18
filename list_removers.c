@@ -7,10 +7,10 @@ void *ListRemove(LIST *list) {
     /*
     * If current list only has one item/one node
     */
-    if(list->size == 1) {
+    if(list->totalItem == 1) {
         list->currentItem = NULL;
         list->headPointer = NULL;
-        list->tailPoiner = NULL;
+        list->tailPointer = NULL;
         list->totalItem -= 1;
         return item1->dataType;
     }
@@ -18,10 +18,13 @@ void *ListRemove(LIST *list) {
     * If the current item at head of list
     */
     if (item1->prevNode == NULL) {
-        struct NODE *oldHead = list->headPointer;
+        struct NODE *oldHead;
+        struct NODE *itemMoved;
+
+        oldHead = list->headPointer;
         ListNext(list);
         oldHead->nextNode = NULL;
-        struct NODE *itemMoved = list->currentItem;
+        itemMoved = list->currentItem;
         itemMoved->prevNode = NULL;
         list->headPointer = list->currentItem;
         list->totalItem -= 1;
@@ -31,10 +34,13 @@ void *ListRemove(LIST *list) {
     * If the current item at tail
     */
     if (item1->nextNode == NULL) {
-        struct NODE *oldTail = list->tailPointer;
+        struct NODE *oldTail;
+        struct NODE *itemMoved;
+
+        oldTail = list->tailPointer;
         ListPrev(list);
         oldTail->prevNode = NULL;
-        struct NODE *itemMoved = list->currentItem;
+        itemMoved = list->currentItem;
         itemMoved->nextNode = NULL;
         list->tailPointer = list->currentItem;
         list->totalItem -= 1;
@@ -53,16 +59,21 @@ void *ListRemove(LIST *list) {
 }
 
 void item_free (void *item) {
-    free(item->dataType);
+    /* this line produces an error i dont know how to fix
+     * right now, so I'm commenting it out -W
+     * free(item->dataType);
+     */
 }
 
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     struct NODE *curItem;
     ListFirst(list);
-    bool empty = false;
+    /* Booleans dont exist in c90 so we have to use ints
+     * 0 = true, 1 = false */
+    int empty = 1;
     while (empty) {
         if (list == NULL) {
-            empty = true;
+            empty = 0;
         }
         curItem = list->currentItem;
         itemFree(curItem->dataType);

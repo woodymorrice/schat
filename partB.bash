@@ -1,5 +1,10 @@
 #!/bin/bash
-#
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+OS=$(uname -s)
+
 
 # read each line from stdin one by one
 while read -r line;
@@ -49,6 +54,11 @@ do
         case $1 in
             partA1)
                 # Windows
+                if [ $OS = Linux ]
+                then
+                    echo "OS not compatible"
+                    exit 1
+                fi
                 echo "executing Windows threads"
                 ./windows_main.exe $arg1 $arg2 $arg3
                 ;;
@@ -56,23 +66,21 @@ do
             partA2)
                 # UBC pthreads
                 echo "executing UBC pthreads"
+                echo "... not yet implemented"
                 ;;
 
             partA3)
                 # Posix
                 echo "executing Posix threads"
+                echo "... not yet implemented"
                 ;;
 
             partA4)
                 # UNIX
                 echo "executing UNIX threads"
+                echo "...not yet implemented"
                 ;;
         esac
-
-        # echo "arguments:"
-        # echo $arg1
-        # echo $arg2
-        # echo $arg3
     fi
 done
 
