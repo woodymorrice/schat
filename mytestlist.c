@@ -8,29 +8,31 @@
 #define NODE_POOL_SIZE 50*sizeof(struct NODE)
 
 LIST listPool[LIST_POOL_SIZE];
-struct NODE nodePool[NODE_POOL_SIZE];
+NODE nodePool[NODE_POOL_SIZE];
 
 
-int main(int argc, char* argv[]) {
+int main() {
 
-    struct LIST *testList;
-    int count;
-    struct NODE *testNode;
+    /*
+     * struct LIST *testList;
+     * int count;
+     * struct NODE *testNode; */
 
     /* Test ListCreate() */
-    testList = ListCreate();
+    /* testList = ListCreate();
 
     if (testList == NULL) {
         printf("Error in procedure *ListCreate(): invalid parameter\n");
     } else {
         printf("Got to procedure *ListCreate()\n");
-    }
+    } 
+    */
 
     /* Test ListCount() */
-    count = ListCount(testList);
+    /* count = ListCount(testList); */
 
     /* Test ListAppend() */
-    //ListAppend(testList, testNode);
+    /* ListAppend(testList, testNode); */
 
 
     return EXIT_SUCCESS;
