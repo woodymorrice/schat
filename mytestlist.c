@@ -11,6 +11,15 @@ LIST listPool[LIST_POOL_SIZE];
 NODE nodePool[NODE_POOL_SIZE];
 
 
+<<<<<<< HEAD
+if (argc != 2) {
+    perror("Usage: perror. wrong number of arguments");
+    return -1;
+}
+
+
+return EXIT_SUCCESS;
+=======
 int main() {
 
     /*
@@ -36,4 +45,5 @@ int main() {
 
 
     return EXIT_SUCCESS;
+>>>>>>> a981bdfd6db6da28d1b11a2a7bb1259ba105756b
 }

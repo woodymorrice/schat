@@ -1,4 +1,13 @@
+<<<<<<< HEAD
+/*
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+*/
+typedef struct LIST{
+=======
 typedef struct LIST {
+>>>>>>> a981bdfd6db6da28d1b11a2a7bb1259ba105756b
     struct NODE *headPointer;
     struct NODE *tailPointer;
     struct NODE *currentItem;
@@ -21,52 +30,84 @@ LIST *ListCreate();
 Returns the number of items in list
 */
 
-int ListCount();
+int ListCount(LIST*);
 
 /*
 Returns a pointer to the first item in list and makes the first item the currentitem 
 */
 
-void *ListFirst();
+void *ListFirst(LIST*);
 
 /*
 Returns a pointer to the last item in list and makes the last item in the current one.
 */
 
-void *ListLast();
+void *ListLast(LIST*);
 
 /*Advances the list's current node by one and returns a pointer to the new current item. Advance the end item in list, NULL pointer returned*/
 
-void *ListNext();
+void *ListNext(LIST*);
 
 /*Backs up the list's current node by one and returns a pointer to the new current item. Back up beyond the start of list, NULL pointer returned*/
 
-void *ListPrev();
+void *ListPrev(LIST*);
 
 /*Returns a pointer to the current item in list*/
 
-void *ListCurr();
+void *ListCurr(LIST*);
 
 /*Adds the new item to list directly after the current item, and makes the new item the current item. At end of list, item added at the end
 
 Return 0 on success, -1 on failure
 */
 
-int ListAdd();
+int ListAdd(LIST*, void*);
 
-int ListInsert();
+/*
+Adds item to list directly before the current item, and makes the new item the current one. If the current pointer is at the start of the list, the itemis added at the start.  Returns 0 on success, -1 on failure.
+*/
 
-int ListAppend();
+int ListInsert(LIST*, void*);
 
-int ListPrepend();
+/*
+Adds item to the end of list, and makes the new item the current one. Returns 0 on success, -1 on failure
+*/
 
-void *ListRemove();
+int ListAppend(LIST*, void*);
 
-void ListConcat();
+/*
+Adds item to the front of list, and makes the new item the current one. Returns 0 on success, -1 on failure
+*/
 
-void ListFree();
+int ListPrepend(LIST*, void*);
 
-void *ListTrim();
+/*
+Return current item and take it out of list. Make the next item the current one
+*/
 
-void *ListSearch();
+void *ListRemove(LIST*);
+
+/*
+Adds list2 to the end of list1. The current pointer is set to the current pointer of list1. List2 no longer exists after the operation.
+*/
+
+void ListConcat(LIST*, LIST*);
+
+/*
+Delete list. itemFree is a pointer to a routine that frees an item. It should be invoked (within ListFree) as: (*itemFree)(itemToBeFreed);
+*/
+
+void ListFree(LIST*, void (*) (void*));
+
+/*
+Return last item and take it out of list. The current pointer shall be the new last item in the list.
+*/
+
+void *ListTrim(LIST*);
+
+/*
+Searches list starting at the current item until the end is reached or a match is found. In this context, a match is determined by the comparator parameter. This parameter is a pointer to a routine that takes as its first argument an item pointer, and as its second argument comparisonArg. Comparator returns 0 if the item and comparisonArg don't match (i.e. didn't find it), or 1 if they do (i.e. found it). Exactly what constitutes a match is up to the implementor of comparator. If a match is found, the current pointer is left at the matched item and the pointer to that item is returned. If no match is found, the current pointer is left at the end of the list and a NULL pointer is returned. 
+*/
+
+void *ListSearch(LIST*, int (*)(void*, void*), void*);
 
