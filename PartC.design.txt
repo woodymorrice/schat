@@ -274,4 +274,8 @@ void *ListTrim(LIST *list)
 
     the new last item in the list. 
      
+# mytestlist.c
 
+    Checking on if the function has enough arguments and use all 
+    
+    white-test and black-test cases for all possible inputs. 
