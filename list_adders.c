@@ -1,21 +1,19 @@
+/*
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "list.h"
 
- 
-<<<<<<< HEAD
+const int MAX_ITEM = 10;
+
 LIST *ListCreate () {
+
     LIST *newList = NULL;
-=======
-struct LIST *ListCreate () {
-
-    struct LIST *newList;
-
-    /* for testing --remove */
-    printf("Got to procedure ListCreate()\n");
-    
->>>>>>> a981bdfd6db6da28d1b11a2a7bb1259ba105756b
     newList->headPointer = NULL;
     newList->tailPointer = NULL;
     newList->currentItem = NULL;
@@ -24,34 +22,36 @@ struct LIST *ListCreate () {
     return newList;
 }
 
-<<<<<<< HEAD
-int ListCount (LIST *list) {
-    return list->totalItem;    
-}
 
-int ListAppend (LIST *list, void *item) {
+/*int ListCount (LIST *list) {
+    return list->totalItem;    
+}*/
+
+/*int ListAppend (LIST *list, void *item) {
     struct NODE *prevTail = list->tailPointer;
     struct NODE *newItem = NULL;
-    newItem->dataType = item;
+    newItem->dataType = item;*/
     /*
     * If the current pointer is at the end of list,
     * item is added at the end.
     */
-    if (list->totalItem < MAX_ITEM) {
+/*    if (list->totalItem < MAX_ITEM) {
         ListLast(list);
         list->tailPointer = newItem;
         newItem->prevNode = prevTail;
-        newItem->nextNode = NULL;
+        newItem->nextNode = NULL;*/
         /*
         * Making sure the tail is new item and current item
         * at the tail 
         */
-        ListLast(list);
+/*        ListLast(list);
         list->totalItem += 1;
-=======
-int ListCount (LIST *curList) {
+    }
+}*/
+
+int ListCount (LIST *list) {
     /* For testing -- remove */
-    if (curList == NULL) {
+    if (list == NULL) {
         printf("Error in procedure ListCount(): invalid parameter *curList\n");
     } else {
         printf("Got to procedure ListCount()\n");
@@ -61,47 +61,39 @@ int ListCount (LIST *curList) {
     /* return curList->totalItem; */
 }
 
-int ListAppend (LIST *curList, struct NODE *item) {
-    /* For testing -- remove */
-    if (curList == NULL) {
-        printf("Error in procedure ListAppend(): invalid parameter *curList\n");
-        return -1;
-    } else {
-        printf("Got to procedure ListCount()\n");
+int ListAppend (LIST *list, void *item) {
+    struct NODE *prevTail;
+    struct NODE *newItem;
+    newItem = NULL;
+    prevTail = list->tailPointer;
+    newItem->dataType = item; 
+    if(list->totalItem == 0) {
+        list->headPointer = newItem;
+        list->tailPointer = newItem;
+        newItem->prevNode = NULL;
+        newItem->nextNode = NULL;
+        list->totalItem += 1;
         return 0;
     }
-    if (curList == NULL) {
-        printf("Error in procedure ListAppend(): invalid parameter *item\n");
-        return -1;
-    } else {
-        printf("Got to procedure ListCount()\n");
-        return 0;
-    }
-
-    /* 
-     * struct NODE *prevTail = curList->tailPointer;
-    * If the current pointer is at the end of list,
-    * item is added at the end.
-    if (curList->totalItem < MAX_ITEM) {
-        ListLast(curList);
-        curList->tailPointer = item;
-        item->prevNode = prevTail;
-        item->nextNode = NULL;
-        * Making sure the tail is new item and current item
-        * at the tail 
-        ListLast(curList);
-        curList->totalItem += 1;
->>>>>>> a981bdfd6db6da28d1b11a2a7bb1259ba105756b
+    
+    if (list->totalItem < MAX_ITEM) {
+        ListLast(list);
+        list->tailPointer = newItem;
+        newItem->prevNode = prevTail;
+        newItem->nextNode = NULL;
+        ListLast(list);
+        list->totalItem += 1;
         return 0;
     }
     return -1; 
-    */
-    
 }
+    
 
 int ListPrepend (LIST *list, void *item) {
-    struct NODE *prevHead = list->headPointer;
-    struct NODE *newItem = NULL;
+    struct NODE *prevHead;
+    struct NODE *newItem;
+    prevHead = list->headPointer;
+    newItem = NULL;
     newItem->dataType = item;
     /*
     * If the current pointer is at the head of list,
@@ -124,9 +116,12 @@ int ListPrepend (LIST *list, void *item) {
 }
 
 int ListAdd(LIST *list, void *item) {
-    struct NODE *curItem = list->currentItem;
-    struct NODE *curNext = curItem->nextNode;
-    struct NODE *newItem = NULL;
+    struct NODE *curItem;
+    struct NODE *curNext;
+    struct NODE *newItem;
+    curItem = list->currentItem;
+    curNext = curItem->nextNode;
+    newItem = NULL;
     newItem->dataType = item;
     if (list->totalItem < MAX_ITEM) {
         if (list->totalItem == 0) {
@@ -154,16 +149,19 @@ int ListAdd(LIST *list, void *item) {
 }
 
 int ListInsert(LIST *list, void *item) {
-    struct NODE *curItem = list->currentItem;
-    struct NODE *curPrev = curItem->prevNode;
-    struct NODE *newItem = NULL;
+    struct NODE *curItem;
+    struct NODE *curPrev;
+    struct NODE *newItem;
+    curItem = list->currentItem;
+    curPrev = curItem->prevNode;
+    newItem = NULL;
     newItem->dataType = item;
-    if (curList->totalItem < MAX_ITEM) {
+    if (list->totalItem < MAX_ITEM) {
         /*
         * if current item is at head
         */
         if (list->currentItem == list->headPointer) {
-            return ListPrepend(curList, item);
+            return ListPrepend(list, item);
         }
         curItem->prevNode = newItem;
         curPrev->nextNode = newItem;
@@ -177,15 +175,15 @@ int ListInsert(LIST *list, void *item) {
 }
 
 void ListConcat(LIST *list1, LIST *list2) {
+    struct NODE *list1Tail;
+    struct NODE *list2Head;
     if (list1 == NULL) {
         return;
     } else if (list2 == NULL) {
         return;
     }
 
-    struct NODE *list1Tail;
     list1Tail = list1->tailPointer;
-    struct NODE *list2Head;
     list2Head = list2->headPointer;
     list1Tail->nextNode = list2->headPointer;
     list2Head->prevNode = list1->tailPointer;

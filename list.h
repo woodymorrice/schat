@@ -1,20 +1,18 @@
-<<<<<<< HEAD
+
 /*
 CMPT332 - Group 14
 Phong Thanh Nguyen (David) - wdz468 - 11310824
 Woody Morrice - wam553 - 11071060
 */
-typedef struct LIST{
-=======
-typedef struct LIST {
->>>>>>> a981bdfd6db6da28d1b11a2a7bb1259ba105756b
+
+typedef struct {
     struct NODE *headPointer;
     struct NODE *tailPointer;
     struct NODE *currentItem;
     int totalItem;
 } LIST;
 
-typedef struct NODE {
+typedef struct NODE{
     struct NODE *prevNode;
     struct NODE *nextNode;
     void *dataType;

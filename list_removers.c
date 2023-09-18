@@ -1,9 +1,19 @@
+/*
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
 
 void *ListRemove(LIST *list) {
-    struct NODE *item1 = list->currentItem;
+    struct NODE *item1;
+    struct NODE *rmItem;
+    struct NODE *nextItem;
+    struct NODE *rmPrev;
+    item1 = list->currentItem;
     /*
     * If current list only has one item/one node
     */
@@ -47,10 +57,10 @@ void *ListRemove(LIST *list) {
         return oldTail->dataType;
     }
     
-    struct NODE *rmItem = list->currentItem;
-    struct NODE *nextItem = rmItem->nextNode;
+    rmItem = list->currentItem;
+    nextItem = rmItem->nextNode;
+    rmPrev = rmItem->prevNode;
     nextItem->prevNode = rmItem->prevNode;
-    struct NODE *rmPrev = rmItem->prevNode;
     rmPrev->nextNode = list->currentItem; 
     rmItem->prevNode = NULL;
     rmItem->nextNode = NULL;
@@ -58,7 +68,7 @@ void *ListRemove(LIST *list) {
     return rmItem->dataType;
 }
 
-void item_free (void *item) {
+void item_free () {
     /* this line produces an error i dont know how to fix
      * right now, so I'm commenting it out -W
      * free(item->dataType);
@@ -67,11 +77,12 @@ void item_free (void *item) {
 
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     struct NODE *curItem;
+    int empty;
     ListFirst(list);
     /* Booleans dont exist in c90 so we have to use ints
      * 0 = true, 1 = false */
-    int empty = 1;
-    while (empty) {
+    empty = 1;
+    while (empty == 1) {
         if (list == NULL) {
             empty = 0;
         }
@@ -86,11 +97,13 @@ void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
 }
 
 void *ListTrim(LIST *list) {
+    struct NODE *oldTail;
+    struct NODE *newTail;
     if (list->totalItem == 0) {
         return NULL;
     }
-    struct NODE *oldTail = ListLast(list);
-    struct NODE *newTail = ListPrev(list);
+    oldTail = ListLast(list);
+    newTail = ListPrev(list);
     oldTail->prevNode = NULL;
     newTail->nextNode = NULL;
     list->totalItem -= 1;
