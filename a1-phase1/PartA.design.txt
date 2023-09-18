@@ -1,0 +1,42 @@
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+# Design Documentation for Part A
+
+# Work Plan
+Woody will be in charge of design and implementation for part A.
+
+# Design Details
+The overall design for Part A is relatively simple and straightforward, with most of the details
+outlined in the assignment spec. All that was really left up to us was to decide on the details
+of the implementation.
+Each portion (A.1, A.2, etc) will have its own source file and will be compiled into a separate
+executable so that they can each be run independently of each other, and will have no interface
+or interaction between them.
+The general code structure for each portion will be similar. The main function will check the 
+three required command line arguments for validity, and pass them to a parentThread() function,
+which will call a childThread() function as many times as specified by the command line argument
+to create the necessary threads. The child threads will each call square() in a while loop that
+checks the global variable keepRunning each loop. When keepRunning is false the loop ends, and
+the child threads will print the necessary information to stdout and exit.
+The square() function will be located in its own source file square.c and will be included via
+header file square.h in the different source files for each portion of part A.
+The number of invocations of square() will be recorded in a global array of counters sqCount[],
+the counter will be increased by childThread() each time the while loop executes. childThread()
+will get the system time at the beginning of execution, then at the end, and print the
+difference.
+
+# Function Specifics
+# DWORD WINAPI parentThread(LPVOID lPtr)
+Preconditions: Command line parameters must be integers of an appropriate size. Appropriate size
+will be determined during implementation.
+Postconditions: Child threads must complete and call exit().
+
+# DWORD WINAPI childThread(LPVOID lPtr)
+Preconditions: Parameters passed from parentThread should be valid and appropriate.
+Postconditions: keepRunning global variable must be set to false.
+
+# int square(int n)
+Preconditions: n must be a positive integer.
+Postconditions: n == 0
