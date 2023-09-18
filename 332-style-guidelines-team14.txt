@@ -115,8 +115,9 @@ their own lines:
 
 **Include Directives**
 
-System headers should be included before local headers:
+System headers should be included before local headers, but all
+headers should use angle brackets. "-I ." should be used during
+compilation when necessary.
 
 #include <...>
-#include "..."
 

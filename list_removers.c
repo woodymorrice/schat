@@ -6,7 +6,8 @@ Woody Morrice - wam553 - 11071060
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "list.h"
+
+#include <list.h>
 
 void *ListRemove(LIST *list) {
     struct NODE *item1;
