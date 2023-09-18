@@ -13,7 +13,6 @@ if (argc != 2) {
     return -1;
 }
 
-int test = atoi(argv[1]);
 
 return EXIT_SUCCESS;
 }
