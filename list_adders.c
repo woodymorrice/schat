@@ -6,39 +6,68 @@
 const int MAX_ITEM = 10;
 
  
-LIST *ListCreate () {
-    LIST *newList = {NULL};
+struct LIST *ListCreate () {
+
+    struct LIST *newList;
+
+    /* for testing --remove */
+    printf("Got to procedure ListCreate()\n");
+    
     newList->headPointer = NULL;
     newList->tailPointer = NULL;
     newList->currentItem = NULL;
     newList->totalItem = 0;
+
     return newList;
 }
 
 int ListCount (LIST *curList) {
-    return curList->totalItem;    
+    /* For testing -- remove */
+    if (curList == NULL) {
+        printf("Error in procedure ListCount(): invalid parameter *curList\n");
+    } else {
+        printf("Got to procedure ListCount()\n");
+    }
+    return 0;
+
+    /* return curList->totalItem; */
 }
 
 int ListAppend (LIST *curList, struct NODE *item) {
-    struct NODE *prevTail = curList->tailPointer; 
-    /*
+    /* For testing -- remove */
+    if (curList == NULL) {
+        printf("Error in procedure ListAppend(): invalid parameter *curList\n");
+        return -1;
+    } else {
+        printf("Got to procedure ListCount()\n");
+        return 0;
+    }
+    if (curList == NULL) {
+        printf("Error in procedure ListAppend(): invalid parameter *item\n");
+        return -1;
+    } else {
+        printf("Got to procedure ListCount()\n");
+        return 0;
+    }
+
+    /* 
+     * struct NODE *prevTail = curList->tailPointer;
     * If the current pointer is at the end of list,
     * item is added at the end.
-    */
     if (curList->totalItem < MAX_ITEM) {
         ListLast(curList);
         curList->tailPointer = item;
         item->prevNode = prevTail;
         item->nextNode = NULL;
-        /*
         * Making sure the tail is new item and current item
         * at the tail 
-        */
         ListLast(curList);
         curList->totalItem += 1;
         return 0;
     }
-    return -1;
+    return -1; 
+    */
+    
 }
 
 int ListPrepend (LIST *curList, struct NODE *item) {
@@ -112,4 +141,17 @@ int ListInsert(LIST *curList, struct NODE *item) {
 
 void ListConcat(LIST *list1, LIST *list2) {
     
+    /* for testing, remove after implementation */
+    if (list1 == NULL) {
+        printf("Error in procedure ListConcat: invalid parameter list1");
+    } else {
+        printf("Got to procedure ListConcat");
+    }
+
+    if (list2 == NULL) {
+        printf("Error in procedure ListConcat: invalid parameter list2");
+    } else {
+        printf("Got to procedure ListConcat");
+    }
+   
 }

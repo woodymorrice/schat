@@ -4,16 +4,34 @@
 #include "list.h"
 
 
+#define LIST_POOL_SIZE 50*sizeof(struct LIST)
+#define NODE_POOL_SIZE 50*sizeof(struct NODE)
+
+LIST listPool[LIST_POOL_SIZE];
+struct NODE nodePool[NODE_POOL_SIZE];
+
 
 int main(int argc, char* argv[]) {
 
+    struct LIST *testList;
+    int count;
+    struct NODE *testNode;
 
-if (argc != 2) {
-    perror("Usage: perror. wrong number of arguments");
-    return -1;
-}
+    /* Test ListCreate() */
+    testList = ListCreate();
 
-int test = atoi(argv[1]);
+    if (testList == NULL) {
+        printf("Error in procedure *ListCreate(): invalid parameter\n");
+    } else {
+        printf("Got to procedure *ListCreate()\n");
+    }
 
-return EXIT_SUCCESS;
+    /* Test ListCount() */
+    count = ListCount(testList);
+
+    /* Test ListAppend() */
+    //ListAppend(testList, testNode);
+
+
+    return EXIT_SUCCESS;
 }

@@ -15,7 +15,10 @@ void *ListCurr(LIST *curList) {
 }
 
 void *ListNext(LIST *curList) {
-    struct NODE *item1 = curList->currentItem;
+    struct NODE *item1;
+    struct NODE *itemMoved;
+
+    item1 = curList->currentItem;
     /*
     * if the current item is at the tail of list
     * return NULL  
@@ -24,13 +27,16 @@ void *ListNext(LIST *curList) {
         return NULL;
     }
     curList->currentItem = item1->nextNode;
-    struct NODE *itemMoved = curList->currentItem;
+    itemMoved = curList->currentItem;
     itemMoved->prevNode = item1;
     return curList->currentItem; 
 }
 
 void *ListPrev(LIST *curList) {
-    struct NODE *item1 = curList->currentItem;
+    struct NODE *item1;
+    struct NODE *itemMoved;
+    
+    item1 = curList->currentItem;
     /*
     * if the current item is at head of list
     * return NULL 
@@ -39,11 +45,8 @@ void *ListPrev(LIST *curList) {
         return NULL;
 }
     curList->currentItem = item1->prevNode;
-    struct NODE *itemMoved = curList->currentItem;
+    itemMoved = curList->currentItem;
     itemMoved->nextNode = item1;
     return curList->currentItem;
 }
-
-
-
 

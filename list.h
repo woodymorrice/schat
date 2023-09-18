@@ -1,15 +1,15 @@
-typedef struct LIST{
+typedef struct LIST {
     struct NODE *headPointer;
     struct NODE *tailPointer;
     struct NODE *currentItem;
     int totalItem;
 } LIST;
 
-struct NODE{
+typedef struct NODE {
     struct NODE *prevNode;
     struct NODE *nextNode;
     void *dataType;
-};
+} NODE;
 
 /*
 Makes a new, empty list, and returns its reference on success. Returns a NULL pointer on failure 
