@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "list.h"
+#include <list.h>
 
 
 #define LIST_POOL_SIZE 50*sizeof(LIST)

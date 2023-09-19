@@ -6,7 +6,7 @@ Woody Morrice - wam553 - 11071060
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "list.h"
+#include <list.h>
 
 
 void *ListFirst(LIST *list) {

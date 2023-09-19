@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "square.h"
+#include <square.h>
 
 /* the number of args to sent to parentThread */
 #define NUMARGS 3

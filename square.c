@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "square.h"
+#include <square.h>
 
 int square(int n) {
 
