@@ -5,15 +5,23 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <square.h>
 
 /* the number of args to sent to parentThread */
 #define NUMARGS 3
 
+/* global flag for child threads */
+bool keepRunning;
+
 DWORD WINAPI parentThread(LPVOID lPtr) {
     int* args;
+    int threads;
+    int i;
+
     args = (int*) lPtr;
+    threads = args[0];
 
     if (args[0] < 0) {
         printf("Error in procedure parentThread: invalid parameter threads");
@@ -28,6 +36,10 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
         return EXIT_FAILURE;
     } else {
         printf("Got to procedure parentThread()\n");
+    }
+
+    for (i = 0; i < threads; i++) {
+        CreateThread(NULL, 0, childThread, args, 0, NULL);
     }
 
     return EXIT_SUCCESS;
