@@ -15,6 +15,20 @@
 /* global flag for child threads */
 bool keepRunning;
 
+DWORD WINAPI childThread(LPVOID lPtr) {
+    int* args;
+    args = (int*) lPtr;
+
+    if (args[2] < 0) {
+        return EXIT_FAILURE;
+    } else {
+        square(args[2]);
+    }
+
+
+    return EXIT_SUCCESS;
+}
+
 DWORD WINAPI parentThread(LPVOID lPtr) {
     int* args;
     int threads;
@@ -45,21 +59,6 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
     return EXIT_SUCCESS;
 }
 
-DWORD WINAPI childThread(LPVOID lPtr) {
-    int* args;
-    args = (int*) lPtr;
-
-    if (args[2] < 0) {
-        printf("Error in procedure childThread: invalid parameter size");
-        return EXIT_FAILURE;
-    } else {
-        printf("Got to procedure childThread()\n");
-    }
-
-    return EXIT_SUCCESS;
-}
-
-
 int main(int argc, char* argv[]) {
 
     /* array of args to pass to parentThread */
@@ -69,6 +68,9 @@ int main(int argc, char* argv[]) {
     HANDLE winThread[2];
 
     int i;
+
+
+    keepRunning = true;
 
     if (argc != 4) {
         printf("Error in procedure main(): invalid number of parameters\n");
