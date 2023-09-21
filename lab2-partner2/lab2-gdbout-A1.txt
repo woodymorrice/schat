@@ -1,0 +1,48 @@
+Phong Thanh Nguyen
+wdz468
+11310824
+
+A.1
+Breakpoint 1, main (argc=1, argv=0x7fffffffde68) at program.c:39
+39		y = (*iPtr1) * 2;
+(gdb) info locals
+i = 0
+x = 0
+y = 0
+arrSize = 50
+iPtr1 = 0x4052a0
+iPtr2 = 0x0
+numbers = 0x4052a0
+heapNeighbour = 0x405370
+
+A.2
+41			*iPtr2 = x;
+1: numbers + (arrSize-1) = (int *) 0x405364
+2: iPtr1 = (int *) 0x4052b4
+3: iPtr2 = (int *) 0x405390
+(gdb) info locals
+i = 2
+x = 5
+y = 40
+arrSize = 50
+iPtr1 = 0x4052b4
+iPtr2 = 0x405390
+numbers = 0x4052a0
+heapNeighbour = 0x405370
+
+
+A.3.
+Breakpoint 3, main (argc=1, argv=0x7fffffffde68) at program.c:41
+41			*iPtr2 = x;
+1: numbers + (arrSize-1) = (int *) 0x405364
+2: iPtr2 = (int *) 0x405390
+(gdb) info locals
+i = 2
+x = 5
+y = 40
+arrSize = 50
+iPtr1 = 0x4052b4
+iPtr2 = 0x405390
+numbers = 0x4052a0
+heapNeighbour = 0x405370
+
