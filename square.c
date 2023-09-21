@@ -11,9 +11,6 @@ int square(int n) {
 
     if (n < 0) {
         printf("Error in procedure square(): invalid parameter n\n");
-        return EXIT_FAILURE;
-    } else {
-        printf("Got to procedure square()\n");
     }
 
     if (n == 0) {

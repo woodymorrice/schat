@@ -3,8 +3,8 @@
  * Woody Morrice - wam553 - 11071060 */
 
 #include <Windows.h>
-#include <sysinfoapi.h>
-#include <synchapi.h>
+/*#include <sysinfoapi.h>
+#include <synchapi.h> */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +24,8 @@ bool keepRunning;
 /* hashtable for storing invocations of square
  * for each thread */
 int sqCalls[HT_SIZE];
+
+DWORD threadIdArr[HT_SIZE];
 
 int hashFunc(unsigned long int threadId) {
     printf("%ld\n", threadId);
@@ -80,7 +82,8 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
     }
 
     for (i = 0; i < args[0]; i++) {
-        CreateThread(NULL, 0, childThread, args, 0, NULL);
+        CreateThread(NULL, 0, childThread, args, 0, &threadIdArr[i]);
+        hashFunc(threadIdArr[i]);
     }
 
     Sleep(args[1]);
@@ -97,9 +100,6 @@ int main(int argc, char* argv[]) {
 
     HANDLE pThread;
 
-    LPDWORD threadId;
-
-
     keepRunning = true;
 
     if (argc != 4) {
@@ -112,11 +112,7 @@ int main(int argc, char* argv[]) {
         args[2] = atoi(argv[3]);
     }
 
-    threadId = 0;
-
-    pThread = CreateThread(NULL, 0, parentThread, args, 0, threadId);
-
-    //printf("%ld\n", *threadId);
+    pThread = CreateThread(NULL, 0, parentThread, args, 0, NULL);
 
     if (pThread == NULL) {
         printf("Error creating parent thread\n");
