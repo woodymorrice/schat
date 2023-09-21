@@ -4,19 +4,23 @@
 
 # Variables
 CC = gcc
-CFLAGS = -g
+CFLAGS = -g -I.
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 LIBS = ./
 PLATFORM = $(shell uname -s)
-MSYS = MSYS_NT-10.0-22621 MINGW64_NT-10.0-22621 \
-       MINGW32_NT-10.0-22621
 
 
 # Main Target
 ifeq ($(PLATFORM),Linux)
 all: mytestlist
 
-else ifeq ($(PLATFORM),$(filter $(PLATFORM), $(MSYS)))
+else ifeq (MSYS,$(findstring MSYS,$(PLATFORM)))
+all: windows_main.exe
+
+else ifeq (MINGW32,$(findstring MINGW32,$(PLATFORM)))
+all: windows_main.exe
+
+else ifeq (MINGW64,$(findstring MINGW64,$(PLATFORM)))	
 all: windows_main.exe
 
 else
@@ -29,14 +33,14 @@ endif
 
 # Linking
 windows_main.exe: windows_main.o square.o
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o windows_main.exe windows_main.o square.o
+	$(CC) -o windows_main.exe windows_main.o square.o
 
 # Compiling
 windows_main.o: windows_main.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -c windows_main.c -o windows_main.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c windows_main.c -o windows_main.o
 
 square.o: square.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -c square.c -o square.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c square.c -o square.o
 
 
 # Part C
@@ -48,16 +52,16 @@ liblist.a : list_adders.o list_movers.o list_removers.o
 	ar -rs liblist.a list_adders.o list_movers.o list_removers.o
 
 list_adders.o: list_adders.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -c list_adders.c -o list_adders.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c list_adders.c -o list_adders.o
 
 list_movers.o: list_movers.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -c list_movers.c -o list_movers.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c list_movers.c -o list_movers.o
 
 list_removers.o: list_removers.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -c list_removers.c -o list_removers.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c list_removers.c -o list_removers.o
 
 mytestlist.o: mytestlist.c list.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -c mytestlist.c -o mytestlist.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c mytestlist.c -o mytestlist.o
 
 
 .PHONY: clean

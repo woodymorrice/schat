@@ -27,6 +27,26 @@ the counter will be increased by childThread() each time the while loop executes
 will get the system time at the beginning of execution, then at the end, and print the
 difference.
 
+# Time Keeping
+My classmate Juan Arguello Escalante mentioned on the class discussion board on Canvas that he
+read the documentation and found a better way to calculate the elapsed time, so I consulted the
+documentation for the Win32 GetSystemTime function, located at
+https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtime
+That led me to the documentation for the SYSTEMTIME structure documentation page:
+https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime
+That page mentions that "Because the system time can be adjusted either forward or backward, do
+not compare system time readings to determine elapsed time. Instead, use one of the methods 
+described in Windows Time." The Windows Time page
+(https://learn.microsoft.com/en-us/windows/win32/sysinfo/windows-time) suggests using some
+combination of the GetTickCount, GetTickCount64 and GetMessageTime functions. I chose to use the
+GetTickCount64 function because both GetTickCount functions "work by returning the number of
+milliseconds that have elapsed since the system was started" and "The elapsed time is stored as
+a DWORD value. Therefore, the time will wrap around to zero if the system is run continuously
+for 49.7 days." I don't know how often the Computers in Spinks are restarted, so I figure its
+better to be safe than sorry. So calculating the elapsed time is as simple as calling
+GetTickCount64 when the child thread begins execution, and then again just before it exits,
+and taking the difference.
+
 # Function Specifics
 # DWORD WINAPI parentThread(LPVOID lPtr)
 Preconditions: Command line parameters must be integers of an appropriate size. Appropriate size
