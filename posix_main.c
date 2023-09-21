@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <standards.h>
-#include <os.h>
+#include <pthread.h>
 
 #include <square.h>
 #include <htable.h>
@@ -15,7 +14,7 @@
 #define NUMARGS 3
 
 
-PROCESS childProcess(void *arg) {
+void childProcess(void *arg) {
     /* Declare variables
      * Record begin time
      * Cast argument and possibly dereference it
@@ -27,7 +26,7 @@ PROCESS childProcess(void *arg) {
 }
 
 
-PROCESS parentProcess(void *arg) {
+void parentProcess(void *arg) {
     /* Declare variables
      * Cast argument and possibly dereference it
      * Check arguments for validity
@@ -54,15 +53,14 @@ PROCESS parentProcess(void *arg) {
     }
     /*
     for (i = 0; i < args[0]; i++) {
-        childThread = Create( (void(*)()) childProcess, 32768,
-            "childThread", (void*) args, NORM, USR);
+        
     }
     */
 
 }
 
 
-int mainp(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     /* Declare variables
      * Check arguments for validity
      * Add arguments to array
@@ -71,7 +69,6 @@ int mainp(int argc, char* argv[]) {
      * Exit */
     /* array of args to pass to parentThread */
     int args[NUMARGS];
-    PID parentThread;
 
     if (argc != 4) {
         fprintf(stderr,
@@ -97,13 +94,14 @@ int mainp(int argc, char* argv[]) {
                 "Error in %s: Argument 3 \"size\" must be a positive integer\n", argv[0]);
     }
 
+    /*
     parentThread = Create( (void(*)()) parentProcess, 32768,
             "parentThread", (void*) args, NORM, USR);
 
     if (parentThread == PNUL) {
         fprintf(stderr,
                 "Error in %s: Failed to create parent thread\n", argv[0]);
-    }
+    } */
 
     return EXIT_SUCCESS;
 }

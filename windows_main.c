@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include <square.h>
+#include <htable.h>
 
 /* the number of args to sent to parentThread */
 #define NUMARGS 3
