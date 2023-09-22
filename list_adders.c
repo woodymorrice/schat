@@ -12,13 +12,12 @@ Woody Morrice - wam553 - 11071060
 const int MAX_ITEM = 10;
 
 LIST *ListCreate () {
-
-    LIST *newList = NULL;
+    LIST *newList = &openList;
+    openList++;
     newList->headPointer = NULL;
     newList->tailPointer = NULL;
     newList->currentItem = NULL;
     newList->totalItem = 0;
-
     return newList;
 }
 

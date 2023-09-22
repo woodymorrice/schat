@@ -18,6 +18,23 @@ typedef struct NODE{
     void *dataType;
 } NODE;
 
+#define LIST_POOL_SIZE 50
+#define NODE_POOL_SIZE 50
+
+extern LIST listPool[LIST_POOL_SIZE];
+extern struct NODE nodePool[NODE_POOL_SIZE];
+
+/*
+A list pointer which points to the available spot in list pool
+*/
+extern LIST *openList; 
+
+/*
+A node pointer which points to the available spot in node pool
+*/
+extern NODE *openNode;
+
+extern size_t memorySize;
 /*
 Makes a new, empty list, and returns its reference on success. Returns a NULL pointer on failure 
 */
