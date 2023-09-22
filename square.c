@@ -7,7 +7,23 @@
 
 #include <square.h>
 
+
 int square(int n) {
+    unsigned long int id;
+
+    #ifdef WINTHR
+    #endif
+
+    #ifdef UBCTHR
+    #endif
+
+    #ifdef POSTHR
+    id = (unsigned) MyPid();
+    #endif
+
+    #ifdef UNITHR
+    #endif
+
 
     if (n < 0) {
         printf("Error in procedure square(): invalid parameter n\n");
@@ -20,3 +36,23 @@ int square(int n) {
     }
 
 }
+
+
+int hashFunc(unsigned long int id) {
+    int index;
+
+    index = (int)(id % HT_SIZE);
+
+    return index;
+}
+/*
+int hInsert(struct htEntry item) {
+    int index;
+    index = hashFunc(item->
+    return EXIT_SUCCESS;
+}
+
+struct htEntry hSearch(unsigned long int id) {
+    return NULL;
+*/
+

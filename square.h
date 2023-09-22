@@ -5,6 +5,23 @@
 #ifndef _SQUARE_H_
 #define _SQUARE_H_
 
+#define HT_SIZE 64
+
+
+struct htEntry {
+    unsigned long int entryId;
+    int beginTime;
+    int sqCalls;
+};
+
+extern struct htEntry hTable[];
+
 int square(int n);
+
+int hashFunc(unsigned long int id);
+/*
+int hInsert(struct htEntry item);
+
+ *struct htEntry hSearch(unsigned long int id);*/
 
 #endif

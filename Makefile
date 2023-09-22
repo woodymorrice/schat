@@ -35,8 +35,8 @@ endif
 # Windows
 
 # Linking
-windows_main.exe: windows_main.o square.o htable.o
-	$(CC) -o windows_main.exe windows_main.o square.o htable.o
+windows_main.exe: windows_main.o square.o
+	$(CC) -o windows_main.exe windows_main.o square.o
 
 # Compiling
 windows_main.o: windows_main.c square.h
@@ -45,8 +45,8 @@ windows_main.o: windows_main.c square.h
 # Pthreads
 
 # Linking
-pthreads_main: pthreads_main.o square.o htable.o
-	$(CC) $(PTLIB) -o pthreads_main pthreads_main.o square.o htable.o
+pthreads_main: pthreads_main.o square.o
+	$(CC) $(PTLIB) -o pthreads_main pthreads_main.o square.o
 
 # Compiling
 pthreads_main.o: pthreads_main.c square.h
@@ -55,8 +55,8 @@ pthreads_main.o: pthreads_main.c square.h
 # Posix
 
 # Linking
-posix_main: posix_main.o square.o htable.o
-	$(CC) -o posix_main posix_main.o square.o htable.o
+posix_main: posix_main.o square.o
+	$(CC) -o posix_main posix_main.o square.o
 
 # Compiling
 posix_main.o: posix_main.c square.h
@@ -65,8 +65,8 @@ posix_main.o: posix_main.c square.h
 # UNIX
 
 # Linking
-unix_main: unix_main.o square.o htable.o
-	$(CC) -o unix_main unix_main.o square.o htable.o
+unix_main: unix_main.o square.o
+	$(CC) -o unix_main unix_main.o square.o
 
 # Compiling
 unix_main.o: unix_main.c square.h
@@ -75,9 +75,6 @@ unix_main.o: unix_main.c square.h
 # Universal Dependencies
 square.o: square.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c square.c -o square.o
-
-htable.o: htable.c htable.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c htable.c -o htable.o
 
 
 # Part C

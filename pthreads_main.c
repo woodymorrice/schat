@@ -9,10 +9,11 @@
 #include <os.h>
 
 #include <square.h>
-#include <htable.h>
 
 /* the number of args to sent to parentThread */
 #define NUMARGS 3
+
+struct htEntry hTable[HT_SIZE];
 
 
 PROCESS childProcess(void *arg) {
@@ -24,6 +25,8 @@ PROCESS childProcess(void *arg) {
      * Record end time
      * Calculate elapsed time
      * Exit */
+    
+
 }
 
 
@@ -36,7 +39,8 @@ PROCESS parentProcess(void *arg) {
      * Exit */
     int *args;
     int i;
-
+    PID childThread;
+    int index;
 
     args = (int*) arg;
 
@@ -52,12 +56,18 @@ PROCESS parentProcess(void *arg) {
         fprintf(stderr,
                 "Error in parentProcess: Argument 3 \"size\" must be a positive integer\n");
     }
-    /*
+
     for (i = 0; i < args[0]; i++) {
-        childThread = Create( (void(*)()) childProcess, 32768,
+        /* Create child thread */
+        childThread = Create( (void(*)()) childProcess, 16384,
             "childThread", (void*) args, NORM, USR);
+        /* Hash its index */
+        index = hashFunc(childThread);
+        /* Record it's threadId */
+        hTable[index].entryId = childThread;
+        hTable[index].sqCalls = 0;
+
     }
-    */
 
 }
 
@@ -72,6 +82,7 @@ int mainp(int argc, char* argv[]) {
     /* array of args to pass to parentThread */
     int args[NUMARGS];
     PID parentThread;
+
 
     if (argc != 4) {
         fprintf(stderr,

@@ -11,27 +11,19 @@
 #include <stdbool.h>
 
 #include <square.h>
-#include <htable.h>
 
 /* the number of args to sent to parentThread */
 #define NUMARGS 3
 
 /* hashtable size */
-#define HT_SIZE 50
+#define HT_SIZE 64
 
 /* global flag for child threads */
 bool keepRunning;
 
 /* hashtable for storing invocations of square
  * for each thread */
-int sqCalls[HT_SIZE];
-
-DWORD threadIdArr[HT_SIZE];
-
-int hashFunc(unsigned long int threadId) {
-    printf("%ld\n", threadId);
-    return EXIT_SUCCESS;
-}
+htEntry sqTable[HT_SIZE];
 
 
 DWORD WINAPI childThread(LPVOID lPtr) {
