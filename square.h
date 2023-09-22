@@ -1,6 +1,10 @@
 /* CMPT332 - Group 14
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <time.h>
 
 #ifndef _SQUARE_H_
 #define _SQUARE_H_
@@ -14,7 +18,7 @@ struct htEntry {
     int sqCalls;
 };
 
-extern struct htEntry hTable[];
+extern struct htEntry *hTable;
 
 int square(int n);
 

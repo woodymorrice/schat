@@ -1,10 +1,6 @@
 /* CMPT332 - Group 14
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <standards.h>
 #include <os.h>
 
@@ -13,10 +9,11 @@
 /* the number of args to sent to parentThread */
 #define NUMARGS 3
 
-struct htEntry hTable[HT_SIZE];
+struct htEntry *hTable;
 
+int args[NUMARGS];
 
-PROCESS childProcess(void *arg) {
+PROCESS childProcess() {
     /* Declare variables
      * Record begin time
      * Cast argument and possibly dereference it
@@ -25,47 +22,56 @@ PROCESS childProcess(void *arg) {
      * Record end time
      * Calculate elapsed time
      * Exit */
-    
+    unsigned long int id;
+    int index;
+    clock_t endTime;
+    int i;
+    int sqCalls;
+    printf("args: %d, %d, %d\n", args[0], args[1], args[2]);
 
+    id = MyPid();
+    index = hashFunc(id);
+    hTable[index].beginTime = clock();
+    hTable[index].sqCalls = 0;
+
+    for (i = 0; i < args[2]; i++) {
+        square(i);
+    }
+
+    endTime = hTable[index].beginTime - clock(); 
+    sqCalls = hTable[index].sqCalls;
+
+    printf("child %ld\n", id);
+    printf("time: %ld\n", endTime);
+    printf("square(): %d\n", sqCalls);
 }
 
 
-PROCESS parentProcess(void *arg) {
+PROCESS parentProcess() {
     /* Declare variables
      * Cast argument and possibly dereference it
      * Check arguments for validity
      * Loop to create child threads
      * Sleep until deadline
      * Exit */
-    int *args;
     int i;
     PID childThread;
     int index;
-
-    args = (int*) arg;
-
-    if (args[0] < 0) {
-        fprintf(stderr,
-                "Error in parentProcess: Argument 1 \"threads\" must be a positive integer\n");
-    }
-    if (args[1] < 0) {
-        fprintf(stderr,
-                "Error in parentProcess: Argument 2 \"deadline\" must be a positive integer\n");
-    }
-    if (args[2] < 0) {
-        fprintf(stderr,
-                "Error in parentProcess: Argument 3 \"size\" must be a positive integer\n");
-    }
+    printf("args: %d, %d, %d\n", args[0], args[1], args[2]);
+  
 
     for (i = 0; i < args[0]; i++) {
         /* Create child thread */
         childThread = Create( (void(*)()) childProcess, 16384,
-            "childThread", (void*) args, NORM, USR);
+            "childThread", NULL, NORM, USR);
+        if (childThread == PNUL) {    
+            fprintf(stderr,
+                "Error in parentThread: Failed to create child thread\n");
+        }
         /* Hash its index */
         index = hashFunc(childThread);
         /* Record it's threadId */
         hTable[index].entryId = childThread;
-        hTable[index].sqCalls = 0;
 
     }
 
@@ -80,7 +86,8 @@ int mainp(int argc, char* argv[]) {
      * Ensure parent thread not NULL
      * Exit */
     /* array of args to pass to parentThread */
-    int args[NUMARGS];
+   /*  int args[NUMARGS]; */
+    hTable = malloc(HT_SIZE*sizeof(struct htEntry));
     PID parentThread;
 
 
@@ -94,6 +101,8 @@ int mainp(int argc, char* argv[]) {
         args[1] = atoi(argv[2]);
         args[2] = atoi(argv[3]);
     }
+
+    printf("args: %d, %d, %d\n", args[0], args[1], args[2]);
 
     if (args[0] < 0) {
         fprintf(stderr,
@@ -109,7 +118,7 @@ int mainp(int argc, char* argv[]) {
     }
 
     parentThread = Create( (void(*)()) parentProcess, 32768,
-            "parentThread", (void*) args, NORM, USR);
+            "parentThread", NULL, NORM, USR);
 
     if (parentThread == PNUL) {
         fprintf(stderr,

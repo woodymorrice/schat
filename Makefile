@@ -5,7 +5,8 @@
 # Variables
 CC = gcc
 CFLAGS = -g -I.
-CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
+#CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
+CPPFLAGS = -std=gnu90 -Wall -pedantic
 LILIB = -L.
 PLATFORM = $(shell uname -s)
 PTLIB = -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
@@ -35,46 +36,54 @@ endif
 # Windows
 
 # Linking
-windows_main.exe: windows_main.o square.o
+windows_main.exe: windows_main.o square_win.o
 	$(CC) -o windows_main.exe windows_main.o square.o
 
 # Compiling
 windows_main.o: windows_main.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c windows_main.c -o windows_main.o
+	
+square_win.o: square.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -DWINTHR  -c square.c -o square.o
 
 # Pthreads
 
 # Linking
-pthreads_main: pthreads_main.o square.o
+pthreads_main: pthreads_main.o square_ubc.o
 	$(CC) $(PTLIB) -o pthreads_main pthreads_main.o square.o
 
 # Compiling
 pthreads_main.o: pthreads_main.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -c pthreads_main.c -o pthreads_main.o
 
+square_ubc.o: square.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -DUBCTHR  -c square.c -o square.o
+
 # Posix
 
 # Linking
-posix_main: posix_main.o square.o
+posix_main: posix_main.o square_pos.o
 	$(CC) -o posix_main posix_main.o square.o
 
 # Compiling
 posix_main.o: posix_main.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c posix_main.c -o posix_main.o
 
+square_pos.o: square.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -DPOSTHR  -c square.c -o square.o
+
 # UNIX
 
 # Linking
-unix_main: unix_main.o square.o
+unix_main: unix_main.o square_uni.o
 	$(CC) -o unix_main unix_main.o square.o
 
 # Compiling
 unix_main.o: unix_main.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c unix_main.c -o unix_main.o
 
-# Universal Dependencies
-square.o: square.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c square.c -o square.o
+square_uni.o: square.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -DUNITHR  -c square.c -o square.o
 
 
 # Part C

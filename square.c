@@ -2,28 +2,37 @@
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <square.h>
 
 
+#ifdef WINTHR
+#endif
+
+#ifdef UBCTHR
+#include <standards.h>
+#include <os.h>
+#endif
+
+#ifdef POSTHR
+#endif
+
+#ifdef UNITHR
+#endif
+
+extern struct htEntry *hTable;
+
 int square(int n) {
     unsigned long int id;
+    int index;
 
-    #ifdef WINTHR
-    #endif
+    id = 0;
 
     #ifdef UBCTHR
-    #endif
-
-    #ifdef POSTHR
     id = (unsigned) MyPid();
     #endif
 
-    #ifdef UNITHR
-    #endif
-
+    index = hashFunc(id);
+    hTable[index].sqCalls += 1;    
 
     if (n < 0) {
         printf("Error in procedure square(): invalid parameter n\n");
@@ -34,6 +43,7 @@ int square(int n) {
     } else {
         return (square(n-1) + n + n-1);
     }
+    
 
 }
 
