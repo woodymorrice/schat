@@ -46,3 +46,54 @@ iPtr2 = 0x405390
 numbers = 0x4052a0
 heapNeighbour = 0x405370
 
+A.4
+Breakpoint 2, main (argc=1, argv=0x7fffffffd6c8) at program.c:41                                                      │ 35     */
+41                      *iPtr2 = x;                                                                                   │ 36     for(i = 0; i < arrSize; i++) {
+(gdb) info local                                                                                                      │ 37         x = numbers[i];
+i = 2                                                                                                                 │ 38         iPtr1 = &numbers[x % arrSize];
+x = 5                                                                                                                 │ 39         y = (*iPtr1) * 2;
+y = 40                                                                                                                │ 40         iPtr2 = &numbers[(y % arrSize)+20];
+arrSize = 50                                                                                                          │ 41         *iPtr2 = x;
+iPtr1 = 0x4052b4                                                                                                      │ 42     }
+iPtr2 = 0x405390                                                                                                      │ 43 
+numbers = 0x4052a0                                                                                                    │ 44     free(numbers);
+heapNeighbour = 0x405370                                                                                              │ 45     free(heapNeighbour);
+(gdb) p *iPtr2                                                                                                        │ 46     return 0;
+$1 = 256                                                                                                              │ 47 }
+(gdb) p *heapNeighbour                                                                                                │~                                                                                                                     
+$2 = 1                                                                                                                │~                                                                                                                     
+(gdb) p *heapNeighbour@25                                                                                             │~                                                                                                                     
+$3 = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288,     │~                                                                                                                     
+  1048576, 2097152, 4194304, 8388608, 16777216}
+
+B1.
+
+<main.c>:<44> <scheduler()>
+
+  #2  0x000000008000037c in main () at kernel/main.c:44                                                                 │
+44        scheduler();                                                                                                │
+(gdb) print proc[0]                                                                                                   │
+$1 = {lock = {locked = 0, name = 0x800081b8 "proc", cpu = 0x0}, state = RUNNING, chan = 0x0, killed = 0, xstate = 0,  │
+  pid = 1, parent = 0x0, kstack = 274877894656, sz = 16384, pagetable = 0x87f6c000, trapframe = 0x87f74000,           │
+  context = {ra = 2147488950, sp = 274877898208, s0 = 274877898256, s1 = 2147519824, s2 = 2147518752, s3 = 1,         │
+    s4 = 2147554032, s5 = 3, s6 = 2147588592, s7 = 0, s8 = 2147588888, s9 = 66, s10 = 361700864190383365,             │
+    s11 = 361700864190383365}, ofile = {0x80018a50 <ftable+24>, 0x80018a50 <ftable+24>, 0x80018a50 <ftable+24>,       │
+    0x0 <repeats 13 times>}, cwd = 0x80016e60 <itable+24>, name = "init\000\000de\000\000\000\000\000\000\000"}       │
+(gdb) ptype proc                                                                                                      │
+type = struct proc {                                                                                                  │
+    struct spinlock lock;                                                                                             │
+    enum procstate state;                                                                                             │
+    void *chan;                                                                                                       │
+    int killed;                                                                                                       │
+    int xstate;                                                                                                       │
+    int pid;                                                                                                          │
+    struct proc *parent;                                                                                              │
+    uint64 kstack;                                                                                                    │
+    uint64 sz;                                                                                                        │
+    pagetable_t pagetable;                                                                                            │
+    struct trapframe *trapframe;                                                                                      │
+    struct context context;                                                                                           │
+    struct file *ofile[16];                                                                                           │
+    struct inode *cwd;                                                                                                │
+    char name[16];                                                                                                    │
+} [64]              
