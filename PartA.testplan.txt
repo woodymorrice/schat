@@ -1,0 +1,27 @@
+Test Plan for threading program
+value -> expected outcome
+
+
+# of Threads
+0 - not allowed
+1 - 
+below, at, above 75% hash table capacity - find the point where performance begins to degrade
+at 100% capacity? maybe unnecessary, may have to chance the hash increment to increase by 1 each iteration so that the table CAN actually fill
+
+Deadline
+0 - not allowed
+1 and other very small amounts of time - what is the minimum amount of time that the program can run for in order for something to actually happen/change? how do the amount of threads affect it?
+what should the max amount of time be? what is the ratio of increase of squares calculated to increase of time required?
+should not expect an input of more than 5 minutes (even taht is a high estimate)
+(think about the amount of time spent grading assignments)
+
+Size (of square calculation)
+- at what point does the stack overflow? what is a reasonable stack size?
+0 - no allowd or not?
+1 - simple fast output
+many - integer stores the number of iterations, what is the max value?
+
+for all: consider the max number that can be stored in an integer,
+how many milliseconds is that? how many seconds?
+consider the max number of threads that the hash table can handle
+consider the max number of square calculations that each threads stack can handle

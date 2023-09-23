@@ -13,38 +13,36 @@ bool keepRunning; /* global flag for threads */
 
 int args[NUMARGS]; /* args always in scope */
 
+DWORD WINAPI parentThread(LPVOID lPtr);
+DWORD WINAPI childThread(LPVOID lPtr);
+unsigned long int getThrId();
 
-DWORD WINAPI childThread(LPVOID lPtr) {
-    int i;              /* counting var  */
-    DWORD id;           /* thread ID     */
-    int index;
-    ULONGLONG elapsed;  /* time running  */
-    int *args;          /* ptr to args[] */
 
-    id = GetCurrentThreadId();
-    index = hashFunc(id);
-    hTable[index].entryId = id;
-    hTable[index].beginTime = GetTickCount64();
-    hTable[index].sqCalls = 0;
+int main(int argc, char* argv[]) {
+    HANDLE pThread;
 
-    args = (int*)lPtr;
-  
-    if (args[2] < 0) {
-        printf("Error in procedure parentThread: invalid parameter size\n");
-    }
-    
-    for (i = 0; i <= args[2] && keepRunning; i++) {
-        square(i);
+    keepRunning = true;
+
+    if (argc != 4) {
+        fprintf(stderr,
+                "Fatal error in main(): invalid number of parameters\n");
+        return EXIT_FAILURE;
+    } else {
+        args[0] = atoi(argv[1]);
+        args[1] = atoi(argv[2]);
+        args[2] = atoi(argv[3]);
     }
 
-    elapsed = GetTickCount64() - hTable[index].beginTime;
+    pThread = CreateThread(NULL, 0, parentThread, args, 0, NULL);
+    if (pThread == NULL) {
+        fprintf(stderr,
+                "Error in main: failed to create parent thread\n");
+    }
 
-    printf("Thread %ld\n", hTable[index].entryId);
-    printf("Square Calls: %d\n", hTable[index].sqCalls);
-    printf("Elapsed: %d ms\n", (unsigned)elapsed);
-        
+    Sleep(1000*args[1]+1000);
     return EXIT_SUCCESS;
 }
+
 
 DWORD WINAPI parentThread(LPVOID lPtr) {
     int *args;
@@ -81,28 +79,41 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
     return EXIT_SUCCESS;
 }
 
-int main(int argc, char* argv[]) {
-    HANDLE pThread;
 
-    keepRunning = true;
+DWORD WINAPI childThread(LPVOID lPtr) {
+    int i;              /* counting var  */
+    DWORD id;           /* thread ID     */
+    int index;
+    ULONGLONG elapsed;  /* time running  */
+    int *args;          /* ptr to args[] */
 
-    if (argc != 4) {
-        fprintf(stderr,
-                "Fatal error in main(): invalid number of parameters\n");
-        return EXIT_FAILURE;
-    } else {
-        args[0] = atoi(argv[1]);
-        args[1] = atoi(argv[2]);
-        args[2] = atoi(argv[3]);
+    id = GetCurrentThreadId();
+    index = hashFunc(id);
+    hTable[index].entryId = id;
+    hTable[index].beginTime = GetTickCount64();
+    hTable[index].sqCalls = 0;
+
+    args = (int*)lPtr;
+  
+    if (args[2] < 0) {
+        printf("Error in procedure parentThread: invalid parameter size\n");
+    }
+    
+    for (i = 1; i <= args[2] && keepRunning; i++) {
+        square(i);
     }
 
-    pThread = CreateThread(NULL, 0, parentThread, args, 0, NULL);
-    if (pThread == NULL) {
-        fprintf(stderr,
-                "Error in main: failed to create parent thread\n");
-    }
+    elapsed = GetTickCount64() - hTable[index].beginTime;
 
-    Sleep(1000*args[1]+1000);
+    printf("Thread %ld\n", hTable[index].entryId);
+    printf("Square Calls: %d\n", hTable[index].sqCalls);
+    printf("Elapsed: %d ms\n", (unsigned)elapsed);
+        
+    return EXIT_SUCCESS;
+}
+
+
+unsigned long int getThrId() {
     return EXIT_SUCCESS;
 }
 

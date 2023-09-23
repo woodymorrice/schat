@@ -18,8 +18,6 @@ struct htEntry {
     int sqCalls;
 };
 
-extern struct htEntry hTable[];
-
 int square(int n);
 
 int hashFunc(unsigned long int id);
@@ -30,3 +28,4 @@ int hashFunc(unsigned long int id);
 int hSearch(unsigned long int id);
 
 #endif
+
