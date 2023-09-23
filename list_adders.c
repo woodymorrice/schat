@@ -6,60 +6,33 @@ Woody Morrice - wam553 - 11071060
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
 #include <list.h>
 
-const int MAX_ITEM = 10;
-memoryUsed = 0; 
-bool isAllocated = false;
-LIST *memoryChunk;
-LIST *ListCreate () { 
+const int MAX_ITEM = 10; 
+bool isListAllocated = false;
+bool isNodeAllocated = false;
+size_t memoryUsed;
+LIST *memoryList;
+struct NODE *memoryNode;
 
-    openList = &(listPool[memoryUsed]);
-    openList->headPointer = NULL;
-    openList->tailPointer = NULL;
-    openList->currentItem = NULL;
-    openList->totalItem = 0;
+LIST *ListCreate () {
+    LIST *emptyList; 
+    if (isListAllocated == false) {
+        memoryList = malloc(sizeof(LIST) * LIST_POOL_SIZE);
+        isListAllocated = true;
+    }
+    emptyList = &memoryList[memoryUsed];
+    emptyList->headPointer = NULL;
+    emptyList->tailPointer = NULL;
+    emptyList->currentItem = NULL;
+    emptyList->totalItem = 0;
     memoryUsed += sizeof(LIST);
-    return openList;
+    return emptyList;
 }
     
-/*int ListCount (LIST *list) {
-    return list->totalItem;    
-}*/
-
-/*int ListAppend (LIST *list, void *item) {
-    struct NODE *prevTail = list->tailPointer;
-    struct NODE *newItem = NULL;
-    newItem->dataType = item;*/
-    /*
-    * If the current pointer is at the end of list,
-    * item is added at the end.
-    */
-/*    if (list->totalItem < MAX_ITEM) {
-        ListLast(list);
-        list->tailPointer = newItem;
-        newItem->prevNode = prevTail;
-        newItem->nextNode = NULL;*/
-        /*
-        * Making sure the tail is new item and current item
-        * at the tail 
-        */
-/*        ListLast(list);
-        list->totalItem += 1;
-    }
-}*/
-
 int ListCount (LIST *list) {
-    /* For testing -- remove */
-    if (list == NULL) {
-        printf("Error in procedure ListCount(): invalid parameter *curList\n");
-    } else {
-        printf("Got to procedure ListCount()\n");
-    }
-    return 0;
-
-    /* return curList->totalItem; */
+    return list->totalItem;    
 }
 
 int ListAppend (LIST *list, void *item) {
@@ -120,6 +93,10 @@ int ListAdd(LIST *list, void *item) {
     struct NODE *curItem;
     struct NODE *curNext;
     struct NODE *newItem;
+    if (isNodeAllocated == false) {
+        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
+        isNodeAllocated = true;
+    }
     curItem = list->currentItem;
     curNext = curItem->nextNode;
     newItem = NULL;
