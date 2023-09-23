@@ -34,7 +34,7 @@ A node pointer which points to the available spot in node pool
 */
 extern NODE *openNode;
 
-extern size_t memorySize;
+extern size_t memoryUsed;
 /*
 Makes a new, empty list, and returns its reference on success. Returns a NULL pointer on failure 
 */
