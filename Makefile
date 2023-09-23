@@ -5,8 +5,7 @@
 # Variables
 CC = gcc
 CFLAGS = -g -I.
-#CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
-CPPFLAGS = -std=gnu90 -Wall -pedantic
+CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 LILIB = -L.
 PLATFORM = $(shell uname -s)
 PTLIB = -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
@@ -15,16 +14,16 @@ POSINC = -lpthread
 
 # Main Target
 ifeq ($(PLATFORM),Linux)
-all: mytestlist pthreads_main posix_main unix_main
+all: mytestlist partA2 partA3 part A4
 
 else ifeq (MSYS,$(findstring MSYS,$(PLATFORM)))
-all: windows_main.exe
+all: partA1.exe
 
 else ifeq (MINGW32,$(findstring MINGW32,$(PLATFORM)))
-all: windows_main.exe
+all: partA1.exe
 
 else ifeq (MINGW64,$(findstring MINGW64,$(PLATFORM)))	
-all: windows_main.exe
+all: partA1.exe
 
 else
 	@echo makefile: $(PLATFORM) not supported
@@ -36,12 +35,12 @@ endif
 # Windows
 
 # Linking
-windows_main.exe: windows_main.o square_win.o
-	$(CC) -o windows_main.exe windows_main.o square.o
+partA1.exe: partA1.o square_win.o
+	$(CC) -o partA1.exe partA1.o square.o
 
 # Compiling
-windows_main.o: windows_main.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c windows_main.c -o windows_main.o
+partA1.o: partA1.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c partA1.c -o partA1.o
 	
 square_win.o: square.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -DWINTHR  -c square.c -o square.o
@@ -49,12 +48,12 @@ square_win.o: square.c square.h
 # Pthreads
 
 # Linking
-pthreads_main: pthreads_main.o square_ubc.o
-	$(CC) $(PTLIB) -o pthreads_main pthreads_main.o square.o
+partA2: partA2.o square_ubc.o
+	$(CC) $(PTLIB) -o pthreads_main partA2.o square.o
 
 # Compiling
-pthreads_main.o: pthreads_main.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -c pthreads_main.c -o pthreads_main.o
+partA2.o: partA2.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -c partA2.c -o partA2.o
 
 square_ubc.o: square.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -DUBCTHR  -c square.c -o square.o
@@ -62,12 +61,12 @@ square_ubc.o: square.c square.h
 # Posix
 
 # Linking
-posix_main: posix_main.o square_pos.o
-	$(CC) -o posix_main posix_main.o square.o
+partA3: partA3.o square_pos.o
+	$(CC) -o posix_main partA3.o square.o
 
 # Compiling
-posix_main.o: posix_main.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c posix_main.c -o posix_main.o
+partA3.o: partA3.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c partA3.c -o partA3.o
 
 square_pos.o: square.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -DPOSTHR  -c square.c -o square.o
@@ -75,12 +74,12 @@ square_pos.o: square.c square.h
 # UNIX
 
 # Linking
-unix_main: unix_main.o square_uni.o
-	$(CC) -o unix_main unix_main.o square.o
+partA4: partA4.o square_uni.o
+	$(CC) -o partA4 partA4.o square.o
 
 # Compiling
-unix_main.o: unix_main.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c unix_main.c -o unix_main.o
+partA4.o: partA4.c square.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c partA4_main.c -o partA4_main.o
 
 square_uni.o: square.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -DUNITHR  -c square.c -o square.o

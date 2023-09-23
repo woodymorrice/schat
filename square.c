@@ -4,8 +4,8 @@
 
 #include <square.h>
 
-
 #ifdef WINTHR
+#include <Windows.h>
 #endif
 
 #ifdef UBCTHR
@@ -19,20 +19,27 @@
 #ifdef UNITHR
 #endif
 
-extern struct htEntry *hTable;
+extern struct htEntry hTable[];
 
 int square(int n) {
     unsigned long int id;
+    /* struct htEntry curThr; */
     int index;
 
-    id = 0;
-
+    #ifdef WINTHR
+    id = GetCurrentThreadId();
+    #endif
     #ifdef UBCTHR
     id = (unsigned) MyPid();
     #endif
-
-    index = hashFunc(id);
-    hTable[index].sqCalls += 1;    
+    /* printf("%ld\n", id); */
+    /* printf("%ld\n", curThr.entryId); */
+    /* curThr = hSearch(id);
+    
+    curThr.sqCalls += 1; */
+    index = hSearch(id);
+    /* printf("%ld\n", hTable[index].entryId); */
+    hTable[index].sqCalls += 1;
 
     if (n < 0) {
         printf("Error in procedure square(): invalid parameter n\n");
@@ -43,8 +50,6 @@ int square(int n) {
     } else {
         return (square(n-1) + n + n-1);
     }
-    
-
 }
 
 
@@ -52,7 +57,9 @@ int hashFunc(unsigned long int id) {
     int index;
 
     index = (int)(id % HT_SIZE);
-
+    while (hTable[index].entryId != 0) {
+        index += (id % 13) + 1;
+    }
     return index;
 }
 /*
@@ -61,8 +68,25 @@ int hInsert(struct htEntry item) {
     index = hashFunc(item->
     return EXIT_SUCCESS;
 }
-
-struct htEntry hSearch(unsigned long int id) {
-    return NULL;
 */
+/*struct htEntry hSearch(unsigned long int id) {
+    int index;
+    
+    index = (int)(id % HT_SIZE);
+    while (hTable[index].entryId != id) {
+        index += (id % 13) + 1;
+    }
+    return hTable[index];
+}*/
+
+int hSearch(unsigned long int id) {
+    int index;
+    
+    index = (int)(id % HT_SIZE);
+    while (hTable[index].entryId != id) {
+        index += (id % 13) + 1;
+    }
+    return index;
+}
+
 
