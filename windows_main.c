@@ -3,66 +3,100 @@
  * Woody Morrice - wam553 - 11071060 */
 
 #include <Windows.h>
+/*#include <sysinfoapi.h>
+#include <synchapi.h> */
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <square.h>
 
 /* the number of args to sent to parentThread */
 #define NUMARGS 3
 
-DWORD WINAPI parentThread(LPVOID lPtr) {
-    int* args;
-    args = (int*) lPtr;
+/* hashtable size */
+#define HT_SIZE 64
 
-    if (args[0] < 0) {
-        printf("Error in procedure parentThread: invalid parameter threads");
-        return EXIT_FAILURE;
-    } else {
-        printf("Got to procedure parentThread()\n");
-    }
+/* global flag for child threads */
+bool keepRunning;
 
-    
-    if (args[1] < 0) {
-        printf("Error in procedure parentThread: invalid parameter deadline");
-        return EXIT_FAILURE;
-    } else {
-        printf("Got to procedure parentThread()\n");
-    }
+/* hashtable for storing invocations of square
+ * for each thread */
+htEntry sqTable[HT_SIZE];
 
-    return EXIT_SUCCESS;
-}
 
 DWORD WINAPI childThread(LPVOID lPtr) {
     int* args;
+    int i;
+    ULONGLONG beginTime;
+    ULONGLONG endTime;
+    ULONGLONG elapsed;
+
+    printf("childThread reached\n");
+
+    beginTime = GetTickCount64();
+    
     args = (int*) lPtr;
 
     if (args[2] < 0) {
-        printf("Error in procedure childThread: invalid parameter size");
-        return EXIT_FAILURE;
-    } else {
-        printf("Got to procedure childThread()\n");
+        printf("Error in procedure parentThread: invalid parameter size\n");
     }
 
+    while (keepRunning) {
+        for (i = 0; i <= args[2]; i++) {
+    /*  for (i = 1; i <= args[2]; i++) { // test this */
+            square(i);
+        }
+    }
+    
+    endTime = GetTickCount64();
+    elapsed = endTime - beginTime;
+
+    printf("Elapsed: %d\n", (unsigned)elapsed);
+        
     return EXIT_SUCCESS;
 }
 
+DWORD WINAPI parentThread(LPVOID lPtr) {
+    int* args;
+    int i;
+    
+    printf("parentThread reached\n");
+
+    args = (int*)lPtr;
+
+    if (args[0] < 0) {
+        printf("Error in procedure parentThread: invalid parameter threads\n");
+    }
+    
+    if (args[1] < 0) {
+        printf("Error in procedure parentThread: invalid parameter deadline\n");
+    }
+
+    for (i = 0; i < args[0]; i++) {
+        CreateThread(NULL, 0, childThread, args, 0, &threadIdArr[i]);
+        hashFunc(threadIdArr[i]);
+    }
+
+    Sleep(args[1]);
+
+    keepRunning = false;
+
+    return EXIT_SUCCESS;
+}
 
 int main(int argc, char* argv[]) {
 
     /* array of args to pass to parentThread */
     int args[NUMARGS];
 
-    /* handles for threads, 2 for testing */
-    HANDLE winThread[2];
+    HANDLE pThread;
 
-    int i;
+    keepRunning = true;
 
     if (argc != 4) {
         printf("Error in procedure main(): invalid number of parameters\n");
-        return EXIT_FAILURE;
-    } else {
-        printf("Got to procedure main()\n");
     }
 
     if (argc == 4) {
@@ -70,19 +104,14 @@ int main(int argc, char* argv[]) {
         args[1] = atoi(argv[2]);
         args[2] = atoi(argv[3]);
     }
-    
-    /* Test square() */
-    square(args[0]);
 
+    pThread = CreateThread(NULL, 0, parentThread, args, 0, NULL);
 
-    winThread[0] = CreateThread(NULL, 0, parentThread, args, 0, NULL);
-    winThread[1] = CreateThread(NULL, 0, childThread, args, 0, NULL);
-
-    for(i = 0; i < 2; i++) {
-        if (winThread[i] == NULL) {
-            printf("Error creating thread");
-        }
+    if (pThread == NULL) {
+        printf("Error creating parent thread\n");
     }
+
+    printf("Exiting main\n");
 
     return EXIT_SUCCESS;
 }
