@@ -10,19 +10,20 @@ Woody Morrice - wam553 - 11071060
 #include <list.h>
 
 const int MAX_ITEM = 10;
+memoryUsed = 0; 
+bool isAllocated = false;
+LIST *memoryChunk;
+LIST *ListCreate () { 
 
-LIST *ListCreate () {
-
-    LIST *newList = NULL;
-    newList->headPointer = NULL;
-    newList->tailPointer = NULL;
-    newList->currentItem = NULL;
-    newList->totalItem = 0;
-
-    return newList;
+    openList = &(listPool[memoryUsed]);
+    openList->headPointer = NULL;
+    openList->tailPointer = NULL;
+    openList->currentItem = NULL;
+    openList->totalItem = 0;
+    memoryUsed += sizeof(LIST);
+    return openList;
 }
-
-
+    
 /*int ListCount (LIST *list) {
     return list->totalItem;    
 }*/
