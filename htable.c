@@ -6,8 +6,14 @@
 
 #include <htable.h>
 
+#define HT_SIZE 64
+
 int hashFunc(unsigned long int id) {
-    return EXIT_SUCCESS;
+    int index;
+
+    index = (int) id % HT_SIZE;
+
+    return index;
 }
 
 int hInsert(struct htEntry item) {

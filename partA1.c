@@ -32,16 +32,9 @@ int main(int argc, char* argv[]) {
         args[2] = atoi(argv[3]);
     }
 
-    if (args[0] < 1) {
-        fprintf(stderr, "Error in main: invalid parameter 'threads'\n");
-        return EXIT_FAILURE;
-    }    
-    if (args[1] < 1) {
-        fprintf(stderr, "Error in main: invalid parameter 'deadline'\n");
-        return EXIT_FAILURE;
-    }
-    if (args[2] < 1 The) {
-        fprintf(stderr, "Error in main: invalid parameter 'size'\n");
+    if (args[0] < 1 ||
+        args[1] < 1 ||
+        args[2] < 1) {
         return EXIT_FAILURE;
     }
 
@@ -62,6 +55,7 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
     int i;                      /* counting var  */
     HANDLE cThread;             /* for checking  */
     DWORD id;                   /* thread ID     */
+    int index;                  /* hashed index  */
  
     args = (int*)lPtr;
 
@@ -71,6 +65,11 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
             fprintf(stderr,
                     "Error in parentThread: failed to create child thread\n");
         }
+        index = hashIn(id);
+
+        hTable[index].entryId = id;
+        hTable[index].beginTime = GetTickCount64();
+        hTable[index].sqCalls = 0;
     }
 
     Sleep(1000*args[1]);
@@ -87,13 +86,9 @@ DWORD WINAPI childThread(LPVOID lPtr) {
     int *args;                  /* ptr to args[] */
     int i;                      /* counting var  */
     unsigned long int elapsed;  /* total time    */
-
-    id = GetCurrentThreadId();
-    index = hashIn(id);
-
-    hTable[index].entryId = id;
-    hTable[index].beginTime = GetTickCount64();
-    hTable[index].sqCalls = 0;
+    
+    id = getThrId();
+    index = hFind(id);
 
     args = (int*)lPtr;
   
