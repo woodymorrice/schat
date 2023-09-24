@@ -12,7 +12,8 @@ Woody Morrice - wam553 - 11071060
 const int MAX_ITEM = 10; 
 bool isListAllocated = false;
 bool isNodeAllocated = false;
-size_t memoryUsed;
+size_t memoryListUsed;
+size_t memoryNodeUsed;
 LIST *memoryList;
 struct NODE *memoryNode;
 
@@ -22,12 +23,12 @@ LIST *ListCreate () {
         memoryList = malloc(sizeof(LIST) * LIST_POOL_SIZE);
         isListAllocated = true;
     }
-    emptyList = &memoryList[memoryUsed];
+    emptyList = &memoryList[memoryListUsed];
     emptyList->headPointer = NULL;
     emptyList->tailPointer = NULL;
     emptyList->currentItem = NULL;
     emptyList->totalItem = 0;
-    memoryUsed += sizeof(LIST);
+    memoryListUsed += sizeof(LIST);
     return emptyList;
 }
     
@@ -97,11 +98,12 @@ int ListAdd(LIST *list, void *item) {
         memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
         isNodeAllocated = true;
     }
-    curItem = list->currentItem;
-    curNext = curItem->nextNode;
-    newItem = NULL;
+    newItem = &memoryNode[memoryNodeUsed];
     newItem->dataType = item;
-    if (list->totalItem < MAX_ITEM) {
+    if (list->totalItem < NODE_POOL_SIZE) {
+        /*
+        * if the current list has no item
+        */
         if (list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
@@ -109,17 +111,17 @@ int ListAdd(LIST *list, void *item) {
             newItem->nextNode = NULL;
             ListFirst(list);
         }
-        if (list->currentItem == list->tailPointer) {
-            /*
-            * if current item is at tail
-            */
-            return ListAppend(list, item);
-        }
+        else {
+        curItem = list->currentItem;
+        curNext = curItem->nextNode;
+
         curItem->nextNode = newItem; 
         curNext->prevNode = newItem;
         newItem->nextNode = curNext;
         newItem->prevNode = curItem;
         ListNext(list);
+        }
+        memoryNodeUsed += sizeof(NODE);
         list->totalItem += 1;
         return 0;    
     }
