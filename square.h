@@ -10,22 +10,21 @@
 
 #include <time.h>
 
-#define HT_SIZE 64
+#define HT_SIZE 128
 
 struct htEntry {
     unsigned long int entryId;
-    int beginTime;
-    int sqCalls;
+    unsigned long int beginTime;
+    unsigned int sqCalls;
 };
 
 int square(int n);
 
-int hashFunc(unsigned long int id);
+int hashIn(unsigned long int id);
 
-/* int hInsert(struct htEntry item); */
+int hFind(unsigned long int id);
 
-/* struct htEntry hSearch(unsigned long int id); */
-int hSearch(unsigned long int id);
+unsigned long int getThrId();
 
 #endif
 
