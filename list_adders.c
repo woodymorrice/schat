@@ -39,28 +39,32 @@ int ListCount (LIST *list) {
 int ListAppend (LIST *list, void *item) {
     struct NODE *prevTail;
     struct NODE *newItem;
-    newItem = NULL;
+    if (isNodeAllocated == false) {
+        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
+        isNodeAllocated = true;
+    }
+    newItem = &memoryNode[memoryNodeUsed];
+    newItem->dataType = item;
     prevTail = list->tailPointer;
-    newItem->dataType = item; 
-    if(list->totalItem == 0) {
-        list->headPointer = newItem;
-        list->tailPointer = newItem;
-        newItem->prevNode = NULL;
-        newItem->nextNode = NULL;
+    if (list->totalItem < NODE_POOL_SIZE) { 
+        if(list->totalItem == 0) {
+            list->headPointer = newItem;
+            list->tailPointer = newItem;
+            newItem->prevNode = NULL;
+            newItem->nextNode = NULL;
+        }
+        else {
+            ListLast(list);
+            list->tailPointer = newItem;
+            newItem->prevNode = prevTail;
+            newItem->nextNode = NULL;
+            ListLast(list);
+        }
         list->totalItem += 1;
+        memoryNodeUsed += sizeof(NODE);
         return 0;
     }
-    
-    if (list->totalItem < MAX_ITEM) {
-        ListLast(list);
-        list->tailPointer = newItem;
-        newItem->prevNode = prevTail;
-        newItem->nextNode = NULL;
-        ListLast(list);
-        list->totalItem += 1;
-        return 0;
-    }
-    return -1; 
+    return -1;
 }
     
 
@@ -68,23 +72,33 @@ int ListPrepend (LIST *list, void *item) {
     struct NODE *prevHead;
     struct NODE *newItem;
     prevHead = list->headPointer;
-    newItem = NULL;
+    if (isNodeAllocated == false) {
+        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
+        isNodeAllocated = true;
+    }
+    newItem = &memoryNode[memoryNodeUsed];
     newItem->dataType = item;
     /*
     * If the current pointer is at the head of list,
     * item is added at the end.
     */
-    if (list->totalItem < MAX_ITEM) {
-        ListFirst(list);
-        list->headPointer = newItem;
-        newItem->prevNode = NULL;
-        newItem->nextNode = prevHead;
-        /*
-        * Making sure the head is new item and current item
-        * at the head
-        */
+    if (list->totalItem < NODE_POOL_SIZE) {
+        if (list->totalItem == 0) {
+            list->headPointer = newItem;
+            list->tailPointer = newItem;
+            newItem->prevNode = NULL;
+            newItem->nextNode = prevHead;
+        }
+        else {
+            ListFirst(list);
+            list->headPointer = newItem;
+            newItem->prevNode = NULL;
+            newItem->nextNode = prevHead;
+            prevHead->prevNode = newItem;
+        }
         ListFirst(list);
         list->totalItem += 1;
+        memoryNodeUsed += sizeof(NODE);
         return 0;
     }
     return -1;
