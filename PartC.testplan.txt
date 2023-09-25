@@ -18,6 +18,9 @@ indicating the adding function return -1 and cannot add anymore.
     
     pointer, if it returns NULL that mean the functions is not working properly
 
+# ListCount()
+    For this function, simply check the return value of the (list->totalItem).
+
 # ListAdd()
 
     Since the function supposed to add new item directly after current item. 
