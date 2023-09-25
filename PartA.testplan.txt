@@ -4,18 +4,18 @@
 
 Part A1 Test Plan
 
-Acceptable ranges of arguments must be tested. The upper limit on the "size" parameter
-will help determine thread size and the maximum necessary time for the "deadline"
-parameter. The size of storage and method of storage for thread IDs will set an upper
-limit on the "threads" parameter.
-Testing the lower bounds of arguments presents an opportunity where test outcomes can 
-be predicted accurately, or at least with very low variance. We must also test for
-proper behavior when all or some arguments are zero, in which case the program should
-do nothing.
+Acceptable ranges of arguments must be tested. The upper limit on the
+"size" parameter will help determine thread size and the maximum necessary
+time for the "deadline" parameter. The size of storage and method of
+storage for thread IDs will set an upper limit on the "threads" parameter.
+Testing the lower bounds of arguments presents an opportunity where test
+outcomes can be predicted accurately, or at least with very low variance.
+We must also test for proper behavior when all or some arguments are zero,
+in which case the program should do nothing.
 
-The "size" argument can be tested first since its bounds are independent of "threads"
-and we can pick an arbitrarily large value for "deadline" when testing the upper
-limits to allow square() to finish its calculations.
+The "size" argument can be tested first since its bounds are independent
+of "threads" and we can pick an arbitrarily large value for "deadline"
+when testing the upper limits to allow square() to finish its calculations.
 
 Test 1: size = 0
 Expected Outcome:
@@ -33,22 +33,24 @@ Test 4: size = 100
 Expected Outcome:
 5150 square calls
 
-Once some smaller values have been tested to ensure they are resulting in the proper
-number of calls, we can start exploring the upper bounds. The number of calls to
-square are stored in an unsigned 32-bit integer on the expected architecture, so the
-maximum number of calls that can be recorded before overflow is 4294967295, but even 
-a reasonably large stack size would likely not be able to handle that many calls, so
-we will aim for a much more realistic number. The Win32 API CreateThread() function 
-defaults to a stack size of 1 mb so we will test the upper bounds with that.
+Once some smaller values have been tested to ensure they are resulting in
+the proper number of calls, we can start exploring the upper bounds. The
+number of calls to square are stored in an unsigned 32-bit integer on the
+expected architecture, so the maximum number of calls that can be recorded
+before overflow is 4294967295, but even a reasonably large stack size would
+likely not be able to handle that many calls, so we will aim for a much more
+realistic number. The Win32 API CreateThread() function defaults to a stack
+size of 1 mb so we will test the upper bounds with that.
 
 Test 5: max(size)
 Expected Outcome:
 no stack overflow
 
-Next we can test the "deadline" argument. First we will test for proper behavior when
-"deadline" is zero and test for consistent square call output when "deadline" is one.
-Then we will see how long it takes to calculate max(size) and set the upper limit of
-"deadline" to be a nice number close to that.
+Next we can test the "deadline" argument. First we will test for proper
+behavior when "deadline" is zero and test for consistent square call output
+when "deadline" is one. Then we will see how long it takes to calculate
+max(size) and set the upper limit of "deadline" to be a nice number close
+to that.
 
 Test 6: deadline = 0
 Expected Outcome:
@@ -62,12 +64,13 @@ Test 8: max(deadline)
 Expected Outcome:
 calculations complete when max(size)
 
-Finally we will test the bounds of the "threads" parameter. We will test for proper
-behavior when "threads" is 0 and we will run a test when "threads" is one for no
-other reason but consistency. Since thread information storage was implemented using
-a hash table, ideally we want to keep it's capacity at or below 75 per cent. We set
-max capacity of the hash table to be 128 threads, so we will test 96 threads, a few
-more, and a few less, and use those results to determine the max number of threads.
+Finally we will test the bounds of the "threads" parameter. We will test
+for proper behavior when "threads" is 0 and we will run a test when "threads"
+is one for no other reason but consistency. Since thread information storage
+was implemented using a hash table, ideally we want to keep it's capacity at
+or below 75 per cent. We set max capacity of the hash table to be 128 threads,
+so we will test 96 threads, a few more, and a few less, and use those results
+to determine the max number of threads.
 
 Test 9: threads = 1
 Expected Outcome:
