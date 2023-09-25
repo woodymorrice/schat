@@ -7,32 +7,35 @@ Styling: we agreed that we will follow QEMU styles as recommended on class.
 
 # list.h
 
-Contains all requested functions given in A1-Final.txt specification, each functions will have comments
-on top to describe the tasks that it needs to carry out. 
+Contains all requested functions given in A1-Final.txt specification, 
+each functions will have comments on top to describe the tasks 
+that it needs to carry out. 
+
 For structure definition of LIST: 
     We have: 
-        struct NODE *headPointer;       // pointer points to fist NODE (head)
-        struct NODE *tailPointer:       // pointer points to last NODE (tail)
-        struct NODE *currentItem;       // pointer points to current NODE
-        int totalItem;                  // tells us how many items / nodes this LIST contains
+        struct NODE *headPointer;   // pointer points to fist NODE (head)
+        struct NODE *tailPointer:   // pointer points to last NODE (tail)
+        struct NODE *currentItem;   // pointer points to current NODE
+        int totalItem;              // tells us how many items / nodes this LIST contains
         
 
 For structure definition of NODE:
     We have: 
-        struct NODE *prevNode;          // pointer points to the previous NODE of the current NODE
-        struct NODE *nextNode;          // pointer points to the next NODE of the current NODE
-        void *dataType;                 // (dataType) or (item), hold the actual C data type
+        struct NODE *prevNode;      // pointer points to the previous NODE
+        struct NODE *nextNode;      // pointer points to the next NODE 
+        void *dataType;             // (dataType) or (item), hold actual data
 
 # list_adders.c
 
 LIST *ListCreate ()
-    Receive no parameters, at first we make all of the members in LIST becomes NULL, except totalItem = 0.
-    This function will make a new, empty list and returns its reference on success. Otherwise, return NULL.
+    Receive no parameters, at first we make all of the members in LIST becomes 
+    NULL, except totalItem = 0. This function will make a new, empty list 
+    and returns its reference on success. Otherwise, return NULL.
 
 @Pre-condition: list must not be NULL
 int ListCount (LIST *list) 
-    Receive a pointer to LIST and request this function to return the number of items in list 
-    by calling (list->totalItem). 
+    Receive a pointer to LIST and request this function to return the number 
+    of items in list by calling (list->totalItem). 
 
 int ListAdd (LIST *list, void* item)
 
@@ -198,14 +201,18 @@ void *ListSearch (LIST *list, int (* comparator)(void *item1, void* item2),
     void* comparisonArg)
     Receive a pointer to LIST and request this function to:
 
-    Create struct NODE *itemToCompare to hold the referenc of (list->currentItem)
-
-
-    Keep searching until the function comparator(compariArg, itemToCompare->dataType)
-
-    equal to 1 (1 means success, 0 means failure) and current pointer is
+    Create struct NODE *itemToCompare to hold the referenc of 
     
-    left at the matched item and the pointer to that item is return.
+    (list->currentItem)
+
+
+    Keep searching until the function comparator(compariArg, 
+    
+    itemToCompare->dataType) equal to 1 (1 means success, 0 means failure) and 
+
+    current pointer is left at the matched item and the pointer to that item 
+    
+    is return.
 
     
     If no match is found, current pointer is left at the end of list and 
