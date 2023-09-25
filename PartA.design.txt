@@ -56,7 +56,8 @@ call its API specific function to retrieve the thread id, and return it as
 an unsigned long integer. 
 
 # A1
-Each thread will be created with the default stack size of 1 mb. The main
+Each thread will be created with a stack size of 2 mb, which will allow
+a size argument of up to 100000 without causing an overflow. The main
 function and parent thread will call the Sleep() function to wait until
 the deadline. The SYSTEMTIME structure documentation page located at
 learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime
