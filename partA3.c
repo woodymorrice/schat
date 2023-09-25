@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
     int args[NUMARGS];          /* pass to thrds */ 
     int pThread;                /* for checking  */
     pthread_t id;
+    int index;
 
     if (argc != 4) {
         /* fprintf(stderr,
@@ -42,6 +43,8 @@ int main(int argc, char* argv[]) {
         fprintf(stderr,
                 "Error in main: failed to create parent thread\n");
     }
+    index = hashIn(id);
+    hTable[index].entryId = id;
 
     sleep(args[1]);
 
@@ -52,16 +55,16 @@ int main(int argc, char* argv[]) {
 void* parentThread(void *argPtr) {
     int *args;                  /* ptr to args[] */
     int sq;
-    pthread_t id;
-    int index;
+    /* pthread_t id;
+    int index; */
 
     args = (int*)argPtr;
 
-    id = getThrId();
+    /* id = getThrId();
     index = hashIn(id);
-    hTable[index].entryId = id;
+    hTable[index].entryId = id; */
     
-    sq = square(args[2]);
+    sq = square(1);
     if (sq != 0) {
         printf("Square called successfully from thread\n");
     }

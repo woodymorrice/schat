@@ -5,27 +5,34 @@
 
 OS=$(uname -s)
 
+if [ $1 = partA1 ]
+then
+    if [[ ! "$OS" =~ ^(MSYS|MINGW).*$ ]]
+    then
+        exit
+    else
+        $1=partA1.exe
+    fi
+elif [[ "$1" =~ ^(partA2|partA3|partA4)$ ]]
+then
+    if [ $OS != Linux ]
+    then
+        exit
+    fi
+fi
 
-# read each line from stdin one by one
 while read -r line;
 do
     argNum=1
-    arg1=0
-    arg2=0
-    arg3=0
-
     invalidLine=0
-
     # iterate through the arguments
     for arg in $line
     do
-        
         # after three arguments stop reading
         if [ $argNum -lt 4 ]
         then
-
             # if the argument is an integer, assign it
-            if [[ $arg =~ ^[0-9]+$ ]]
+            if [[ $arg =~ ^\d*[1-9]\d*$ ]]
             then
                 if [ $argNum = 1 ]
                 then
@@ -43,44 +50,13 @@ do
                 break
             fi
         fi
-
         argNum=$((argNum + 1))
     done
 
     # if the line is valid, execute it
     if [ $invalidLine = 0 ]
     then
-
-        case $1 in
-            partA1)
-                # Windows
-                if [ $OS = Linux ]
-                then
-                    echo "OS not compatible"
-                    exit 1
-                fi
-                echo "executing Windows threads"
-                ./windows_main.exe $arg1 $arg2 $arg3
-                ;;
-                
-            partA2)
-                # UBC pthreads
-                echo "executing UBC pthreads"
-                echo "... not yet implemented"
-                ;;
-
-            partA3)
-                # Posix
-                echo "executing Posix threads"
-                echo "... not yet implemented"
-                ;;
-
-            partA4)
-                # UNIX
-                echo "executing UNIX threads"
-                echo "...not yet implemented"
-                ;;
-        esac
+        ./$1 $arg1 $arg2 $arg3
     fi
 done
 
