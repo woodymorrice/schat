@@ -18,6 +18,7 @@ typedef struct NODE{
     void *dataType;
 } NODE;
 
+
 #define LIST_POOL_SIZE 50
 #define NODE_POOL_SIZE 50
 

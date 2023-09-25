@@ -110,16 +110,23 @@ int ListAdd(LIST *list, void *item) {
             newItem->prevNode = NULL;
             newItem->nextNode = NULL;
             ListFirst(list);
+        } else if (list->currentItem == 
+                   list->tailPointer) {
+            curItem = list->currentItem;
+            curItem->nextNode = newItem; 
+            newItem->nextNode = NULL;
+            newItem->prevNode = curItem;
+            list->tailPointer = newItem;
+            ListNext(list);
         }
         else {
-        curItem = list->currentItem;
-        curNext = curItem->nextNode;
-
-        curItem->nextNode = newItem; 
-        curNext->prevNode = newItem;
-        newItem->nextNode = curNext;
-        newItem->prevNode = curItem;
-        ListNext(list);
+            curItem = list->currentItem;
+            curNext = curItem->nextNode;
+            
+            curItem->nextNode = newItem;
+            curNext->prevNode = newItem;
+            newItem->nextNode = curNext;
+            newItem->prevNode = curItem;
         }
         memoryNodeUsed += sizeof(NODE);
         list->totalItem += 1;
@@ -170,19 +177,4 @@ void ListConcat(LIST *list1, LIST *list2) {
     list1Tail = list2->tailPointer;
     
     list1->totalItem += list2->totalItem;
-    
-    
-    /* for testing, remove after implementation */
-    if (list1 == NULL) {
-        printf("Error in procedure ListConcat: invalid parameter list1");
-    } else {
-        printf("Got to procedure ListConcat");
-    }
-
-    if (list2 == NULL) {
-        printf("Error in procedure ListConcat: invalid parameter list2");
-    } else {
-        printf("Got to procedure ListConcat");
-    }
-   
 }
