@@ -27,40 +27,6 @@ fi
 
 while read -r line;
 do
-    argNum=1
-    invalidLine=0
-    # iterate through the arguments
-    for arg in $line
-    do
-        # after three arguments stop reading
-        if [ $argNum -lt 4 ]
-        then
-            # if the argument is an integer, assign it
-            if [[ "$arg" =~ ^[0]*[1-9]\d*$ ]]
-            then
-                if [ $argNum = 1 ]
-                then
-                    arg1=$arg    
-                elif [ $argNum = 2 ]
-                then
-                    arg2=$arg
-                elif [ $argNum = 3 ]
-                then
-                    arg3=$arg
-                fi
-            # else the line is not valid
-            else
-                invalidLine=1
-                break
-            fi
-        fi
-        argNum=$((argNum + 1)) 
-    done
-
-    # if the line is valid, execute it
-    if [ $invalidLine = 0 ]
-    then
-        ./$exFile $arg1 $arg2 $arg3
-    fi
+	./$exFile $line
 done
 

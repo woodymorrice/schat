@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    pThread = CreateThread(NULL, 0, parentThread, args, 0, NULL);
+    pThread = CreateThread(NULL, 16384, parentThread, args, 0, NULL);
     if (pThread == NULL) {
         fprintf(stderr,
                 "Error in main: failed to create parent thread\n");
@@ -60,7 +60,7 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
     args = (int*)lPtr;
 
     for (i = 0; i < args[0]; i++) {
-        cThread = CreateThread(NULL, 0, childThread, args, 0, &id);
+        cThread = CreateThread(NULL, 2097152, childThread, args, 0, &id);
         if (cThread == NULL) {
             fprintf(stderr,
                     "Error in parentThread: failed to create child thread\n");
