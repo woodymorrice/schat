@@ -10,11 +10,11 @@ LILIB = -L.
 PLATFORM = $(shell uname -s)
 PTLIB = -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
 PTINC = -I/student/cmpt332/pthreads/
-POSINC = -lpthread
+POSINC = -pthread
 
 # Main Target
 ifeq ($(PLATFORM),Linux)
-all: mytestlist #partA2 partA3 partA4
+all: mytestlist partA2 partA3 #partA4
 
 else ifeq (MSYS,$(findstring MSYS,$(PLATFORM)))
 all: partA1.exe
@@ -43,7 +43,7 @@ partA1.o: partA1.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c partA1.c -o partA1.o
 	
 square_win.o: square.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -DWINTHR  -c square.c -o square.o
+	$(CC) $(CFLAGS) $(CPPFLAGS)  -c square.c -o square.o
 
 # Pthreads
 
@@ -56,7 +56,7 @@ partA2.o: partA2.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -c partA2.c -o partA2.o
 
 square_ubc.o: square.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -DUBCTHR  -c square.c -o square.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(PTINC) -c square.c -o square.o
 
 # Posix
 
@@ -69,7 +69,7 @@ partA3.o: partA3.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c partA3.c -o partA3.o
 
 square_pos.o: square.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -DPOSTHR  -c square.c -o square.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(POSINC) -c square.c -o square.o
 
 # UNIX
 
@@ -82,7 +82,7 @@ partA4.o: partA4.c square.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c partA4.c -o partA4.o
 
 square_uni.o: square.c square.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -DUNITHR  -c square.c -o square.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c square.c -o square.o
 
 
 # Part C

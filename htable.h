@@ -7,9 +7,9 @@
 
 
 struct htEntry {
-    unsigned long int entryId;
-    void *data1;
-    void *data2;
+    unsigned long int entryId = NULL;
+    void sqCalls = 0;
+    void beginTime = 0;
 };
 
 int hashFunc(unsigned long int id);
