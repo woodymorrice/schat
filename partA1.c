@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
     if (args[0] < 1 ||
         args[1] < 1 ||
-        args[2] < 1) {
+        args[2] < 1 || args[2] > 32768) {
         return EXIT_FAILURE;
     }
 

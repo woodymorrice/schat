@@ -34,6 +34,7 @@ int hashIn(unsigned long int id) {
     index = (int)(id % HT_SIZE);
     while (hTable[index].entryId != 0) {
         index += (id % 13) + 1;
+        index = index % HT_SIZE;
     }
     return index;
 }
@@ -45,6 +46,7 @@ int hFind(unsigned long int id) {
     index = (int)(id % HT_SIZE);
     while (hTable[index].entryId != id) {
         index += (id % 13) + 1;
+        index = index % HT_SIZE;
     }
     return index;
 }

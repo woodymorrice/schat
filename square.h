@@ -10,7 +10,7 @@
 
 #include <time.h>
 
-#define HT_SIZE 128
+#define HT_SIZE 64
 
 struct htEntry {
     unsigned long int entryId;
