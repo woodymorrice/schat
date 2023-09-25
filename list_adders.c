@@ -8,8 +8,12 @@ Woody Morrice - wam553 - 11071060
 #include <stdlib.h>
 #include <stdbool.h>
 #include <list.h>
-
-const int MAX_ITEM = 10; 
+/*
+convenience for testing size
+*/
+const int LIST_POOL_SIZE = 3;
+const int NODE_POOL_SIZE = 5;
+ 
 bool isListAllocated = false;
 bool isNodeAllocated = false;
 size_t memoryListUsed;
@@ -153,23 +157,33 @@ int ListInsert(LIST *list, void *item) {
     struct NODE *curItem;
     struct NODE *curPrev;
     struct NODE *newItem;
+    if (isNodeAllocated == false) {
+        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
+        isNodeAllocated = true;
+    }
     curItem = list->currentItem;
     curPrev = curItem->prevNode;
-    newItem = NULL;
+    newItem = &memoryNode[memoryNodeUsed];
     newItem->dataType = item;
-    if (list->totalItem < MAX_ITEM) {
+    if (list->totalItem < NODE_POOL_SIZE) {
         /*
         * if current item is at head
         */
         if (list->currentItem == list->headPointer) {
-            return ListPrepend(list, item);
+            list->headPointer = newItem;
+            curPrev = newItem;
+            newItem->nextNode = curItem;
+            newItem->prevNode = NULL;
         }
+        else {
         curItem->prevNode = newItem;
         curPrev->nextNode = newItem;
         newItem->prevNode = curPrev;
         newItem->nextNode = curItem;
         ListPrev(list);
+        }
         list->totalItem += 1;
+        memoryNodeUsed += sizeof(NODE);
         return 0;
     }
     return -1;
