@@ -11,14 +11,18 @@ then
     then
         exit
     else
-        $1=partA1.exe
+        exFile=partA1.exe
     fi
 elif [[ "$1" =~ ^(partA2|partA3|partA4)$ ]]
 then
     if [ $OS != Linux ]
     then
         exit
+    else
+        exFile=$1
     fi
+else
+    exit
 fi
 
 while read -r line;
@@ -32,7 +36,7 @@ do
         if [ $argNum -lt 4 ]
         then
             # if the argument is an integer, assign it
-            if [[ $arg =~ ^\d*[1-9]\d*$ ]]
+            if [[ "$arg" =~ ^[0]*[1-9]\d*$ ]]
             then
                 if [ $argNum = 1 ]
                 then
@@ -50,13 +54,13 @@ do
                 break
             fi
         fi
-        argNum=$((argNum + 1))
+        argNum=$((argNum + 1)) 
     done
 
     # if the line is valid, execute it
     if [ $invalidLine = 0 ]
     then
-        ./$1 $arg1 $arg2 $arg3
+        ./$exFile $arg1 $arg2 $arg3
     fi
 done
 
