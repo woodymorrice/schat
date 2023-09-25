@@ -14,8 +14,8 @@ convenience for testing size
 const int LIST_POOL_SIZE = 3;
 const int NODE_POOL_SIZE = 5;
  
-bool isListAllocated = false;
-bool isNodeAllocated = false;
+bool isAllocated = false;
+
 size_t memoryListUsed;
 size_t memoryNodeUsed;
 LIST *memoryList;
@@ -23,9 +23,10 @@ struct NODE *memoryNode;
 
 LIST *ListCreate () {
     LIST *emptyList; 
-    if (isListAllocated == false) {
+    if (isAllocated == false) {
         memoryList = malloc(sizeof(LIST) * LIST_POOL_SIZE);
-        isListAllocated = true;
+        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
+        isAllocated = true;
     }
     emptyList = &memoryList[memoryListUsed];
     emptyList->headPointer = NULL;
@@ -43,10 +44,6 @@ int ListCount (LIST *list) {
 int ListAppend (LIST *list, void *item) {
     struct NODE *prevTail;
     struct NODE *newItem;
-    if (isNodeAllocated == false) {
-        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
-        isNodeAllocated = true;
-    }
     newItem = &memoryNode[memoryNodeUsed];
     newItem->dataType = item;
     prevTail = list->tailPointer;
@@ -76,10 +73,6 @@ int ListPrepend (LIST *list, void *item) {
     struct NODE *prevHead;
     struct NODE *newItem;
     prevHead = list->headPointer;
-    if (isNodeAllocated == false) {
-        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
-        isNodeAllocated = true;
-    }
     newItem = &memoryNode[memoryNodeUsed];
     newItem->dataType = item;
     /*
@@ -112,10 +105,6 @@ int ListAdd(LIST *list, void *item) {
     struct NODE *curItem;
     struct NODE *curNext;
     struct NODE *newItem;
-    if (isNodeAllocated == false) {
-        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
-        isNodeAllocated = true;
-    }
     newItem = &memoryNode[memoryNodeUsed];
     newItem->dataType = item;
     if (list->totalItem < NODE_POOL_SIZE) {
@@ -157,10 +146,6 @@ int ListInsert(LIST *list, void *item) {
     struct NODE *curItem;
     struct NODE *curPrev;
     struct NODE *newItem;
-    if (isNodeAllocated == false) {
-        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
-        isNodeAllocated = true;
-    }
     curItem = list->currentItem;
     curPrev = curItem->prevNode;
     newItem = &memoryNode[memoryNodeUsed];
