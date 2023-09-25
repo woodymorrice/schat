@@ -11,12 +11,15 @@ Contains all requested functions given in A1-Final.txt specification,
 each functions will have comments on top to describe the tasks 
 that it needs to carry out. 
 
+Phase 2 changes: 
+Removes all define variables
+
 For structure definition of LIST: 
     We have: 
         struct NODE *headPointer;   // pointer points to fist NODE (head)
         struct NODE *tailPointer:   // pointer points to last NODE (tail)
         struct NODE *currentItem;   // pointer points to current NODE
-        int totalItem;              // tells us how many items / nodes this LIST contains
+        int totalItem;              // tells us how many items / nodes 
         
 
 For structure definition of NODE:
@@ -27,11 +30,28 @@ For structure definition of NODE:
 
 # list_adders.c
 
+Phase 2 changes to list_adders.c: 
+    In order for ListCreate() to create LIST preference, we need a malloc() 
+    to allocate enough memory base on the amount of LIST POOL and NODE POOL.
+    
+    
+    For LIST and NODE, by setting a bool value to make sure the function call 
+
+    can be allowed to call malloc() once.
+
+    
+    There will size_t (memoryNodeUsed) and (memoryListUsed). These 2 variables
+    
+    will be used to keep track of new NODE or new LIST base on their
+
+    sizeof(NODE) or sizeof(LIST). 
+
+
 LIST *ListCreate ()
     Receive no parameters, at first we make all of the members in LIST becomes 
     NULL, except totalItem = 0. This function will make a new, empty list 
     and returns its reference on success. Otherwise, return NULL.
-
+    
 @Pre-condition: list must not be NULL
 int ListCount (LIST *list) 
     Receive a pointer to LIST and request this function to return the number 
