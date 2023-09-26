@@ -8,11 +8,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include <time.h>
+#define NUMTHRDS 64
 
-#define HT_SIZE 64
-
-struct htEntry {
+struct thrInfo {
     unsigned long int entryId;
     unsigned long int beginTime;
     unsigned int sqCalls;
@@ -20,9 +18,9 @@ struct htEntry {
 
 int square(int n);
 
-int hashIn(unsigned long int id);
+/* int hashIn(unsigned long int id);
 
-int hFind(unsigned long int id);
+int hFind(unsigned long int id); */
 
 unsigned long int getThrId();
 

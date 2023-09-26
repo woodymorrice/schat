@@ -14,7 +14,7 @@ POSINC = -pthread
 
 # Main Target
 ifeq ($(PLATFORM),Linux)
-all: mytestlist partA2 partA3 #partA4
+all: mytestlist #partA2 partA3 partA4
 
 else ifeq (MSYS,$(findstring MSYS,$(PLATFORM)))
 all: partA1.exe

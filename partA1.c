@@ -7,7 +7,9 @@
 
 #define NUMARGS 3 /* # of CMD line args */
 
-struct htEntry hTable[HT_SIZE]; /* stores thread info */
+/*struct htEntry hTable[HT_SIZE];  stores thread info */
+
+struct thrInfo thrArr[NUMTHRDS];
 
 bool keepRunning; /* global flag for threads */
 
@@ -15,9 +17,10 @@ DWORD WINAPI parentThread(LPVOID lPtr);
 DWORD WINAPI childThread(LPVOID lPtr);
 unsigned long int getThrId();
 
+int args[NUMARGS];
 
 int main(int argc, char* argv[]) {
-    int args[NUMARGS];          /* pass to thrds */ 
+    /* int args[NUMARGS];           pass to thrds */ 
     HANDLE pThread;             /* for checking  */
 
     keepRunning = true;
@@ -44,8 +47,6 @@ int main(int argc, char* argv[]) {
                 "Error in main: failed to create parent thread\n");
     }
 
-    Sleep(1000*args[1]);
-
     return EXIT_SUCCESS;
 }
 
@@ -65,11 +66,9 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
             fprintf(stderr,
                     "Error in parentThread: failed to create child thread\n");
         }
-        index = hashIn(id);
-
-        hTable[index].entryId = id;
-        hTable[index].beginTime = GetTickCount64();
-        hTable[index].sqCalls = 0;
+        thrArr[i].entryId = id;
+        thrArr[i].beginTime = GetTickCount64();
+        thrArr[i].sqCalls = 0;
     }
 
     Sleep(1000*args[1]);
@@ -88,7 +87,9 @@ DWORD WINAPI childThread(LPVOID lPtr) {
     unsigned long int elapsed;  /* total time    */
     
     id = getThrId();
-    index = hFind(id);
+
+    for (index = 0; index < (HT_SIZE - 1) &&
+            id != thrArr[index].entryId; i++);
 
     args = (int*)lPtr;
   
@@ -96,10 +97,10 @@ DWORD WINAPI childThread(LPVOID lPtr) {
         square(i);
     }
 
-    elapsed = GetTickCount64() - hTable[index].beginTime;
+    elapsed = GetTickCount64() - thrArr[index].beginTime;
 
     printf("%d square calls, %d ms\n",
-            hTable[index].sqCalls, (unsigned) elapsed);
+            thrArr[index].sqCalls, (unsigned) elapsed);
         
     return EXIT_SUCCESS;
 }

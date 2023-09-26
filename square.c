@@ -4,22 +4,25 @@
 
 #include <square.h>
 
-extern struct htEntry hTable[];
+/* extern struct htEntry hTable[]; */
 
+extern struct thrInfo thrArr[NUMTHRDS];
 
 int square(int n) {
     unsigned long int id;
     int index;
 
     id = getThrId();
-    index = hFind(id);
-    hTable[index].sqCalls += 1;
+    
+    for (index = 0; index < (HT_SIZE - 1) &&
+            id != thrArr[index].entryId; i++);
+
+    thrArr[index].sqCalls += 1;
 
     if (n < 0) {
         fprintf(stderr,
                 "Error in square: invalid parameter 'size'\n");
     }
-
     if (n == 0) {
         return 0;
     } else {
@@ -28,7 +31,7 @@ int square(int n) {
 }
 
 
-int hashIn(unsigned long int id) {
+/* int hashIn(unsigned long int id) {
     int index;
 
     index = (int)(id % HT_SIZE);
@@ -49,5 +52,5 @@ int hFind(unsigned long int id) {
         index = index % HT_SIZE;
     }
     return index;
-}
+} */
 
