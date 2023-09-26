@@ -14,8 +14,8 @@ int square(int n) {
 
     id = getThrId();
     
-    for (index = 0; index < (HT_SIZE - 1) &&
-            id != thrArr[index].entryId; i++);
+    for (index = 0; index < (NUMTHRDS - 1) &&
+            id != thrArr[index].entryId; index++);
 
     thrArr[index].sqCalls += 1;
 

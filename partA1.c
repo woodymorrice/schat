@@ -47,6 +47,9 @@ int main(int argc, char* argv[]) {
                 "Error in main: failed to create parent thread\n");
     }
 
+    Sleep(1000*args[1]);
+    keepRunning = false;
+
     return EXIT_SUCCESS;
 }
 
@@ -56,12 +59,12 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
     int i;                      /* counting var  */
     HANDLE cThread;             /* for checking  */
     DWORD id;                   /* thread ID     */
-    int index;                  /* hashed index  */
+    /* int index;                  hashed index  */
  
     args = (int*)lPtr;
 
     for (i = 0; i < args[0]; i++) {
-        cThread = CreateThread(NULL, 2097152, childThread, args, 0, &id);
+        cThread = CreateThread(NULL, 131072, childThread, args, 0, &id);
         if (cThread == NULL) {
             fprintf(stderr,
                     "Error in parentThread: failed to create child thread\n");
@@ -88,8 +91,8 @@ DWORD WINAPI childThread(LPVOID lPtr) {
     
     id = getThrId();
 
-    for (index = 0; index < (HT_SIZE - 1) &&
-            id != thrArr[index].entryId; i++);
+    for (index = 0; index < (NUMTHRDS - 1) &&
+            id != thrArr[index].entryId; index++);
 
     args = (int*)lPtr;
   
