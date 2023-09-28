@@ -6,21 +6,16 @@
 
 #include <square.h>
 
-#define NUMARGS 3 /* # of CMD line args */
+struct thrInfo thrArr[NUMTHRDS]; /* stores thread info */
 
-struct htEntry hTable[HT_SIZE]; /* stores thread info */
-
-
+int mainp(void *argPtr);
 PROCESS parentThread(void *argPtr);
-PROCESS childThread();
+PROCESS childThread(void *argPtr);
 unsigned long int getThrId();
 
+int args[NUMARGS];
 
-int mainp(int argc, char* argv[]) {
-    int args[NUMARGS];          /* pass to thrds */ 
-    PID pThread;                /* for checking  */
-    int index;
-
+int main(int argc, char* argv[]) {
     if (argc != 4) {
         /* fprintf(stderr,
                 "Error in main: invalid number of parameters\n"); */
@@ -35,46 +30,62 @@ int mainp(int argc, char* argv[]) {
         args[1] < 1 ||
         args[2] < 1) {
         return EXIT_FAILURE;
-    }
+
+    mainp(argc, argv);
+    return EXIT_SUCCESS;
+}
+
+int mainp(void *argPtr) {
+    int *args;
+    PID pThread;
+
+    args = (int*)argPtr;
 
     pThread = Create((void(*)())parentThread,
-            32768, "parentThread", (void*) &args, NORM, USR);
+            16384, "parentThread", (void*)&args, NORM, USR);
     if (pThread == PNUL) {
         fprintf(stderr,
                 "Error in main: failed to create parent thread\n");
     }
-    index = hashIn(pThread);
-    hTable[index].entryId = pThread;
-
-
-    /* Do something instead of this
-     * Sleep(1000*args[1]+1000); */
 
     return EXIT_SUCCESS;
 }
 
 
 PROCESS parentThread(void *argPtr) {
-    int *args;                  /* ptr to args[] */
-    int sq;
-    /*PID id;
-    int index; */
+    int *args;
+    int i;
+    PID id;
+    int index;
+    struct timeval begTime;
 
     args = (int*)argPtr;
     
-    /* id = getThrId();
-    index = hashIn(id);
-    hTable[index].entryId = id; */
-
-    sq = square(1);
-    if (sq != 0) {
-        printf("Square called successfully from thread\n");
+    for (i = 0; i < args[0]; i++) {
+        id = Create((void(*)())childThread,
+                32768, "childThread", (void*)&args, NORM USR);
+        if (id == PNUL) {
+            fprintf(stderr,
+                "Error in parentThread: failed to create child thread\n");
+        }
+        thrArr[i].entryId = id;
+        thrArr[i].beginTime = 0;
+        thrArr[i].sqCalls = 0;
     }
-    
+    return EXIT_SUCCESS;
 }
 
 
-PROCESS childThread() {
+PROCESS childThread(void *argPtr) {
+    PID id;
+    int index;
+    int *args;
+    int i;
+
+    id = getThrId();
+
+    for (index = 0; index <
+
 }
 
 

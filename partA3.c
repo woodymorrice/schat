@@ -6,8 +6,6 @@
 
 #include <square.h>
 
-#define NUMARGS 3 /* # of CMD line args */
-
 struct htEntry hTable[HT_SIZE]; /* stores thread info */
 
 

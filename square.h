@@ -7,8 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define NUMTHRDS 64
+#define NUMARGS 3
 
 struct thrInfo {
     unsigned long int entryId;
@@ -17,10 +19,6 @@ struct thrInfo {
 };
 
 int square(int n);
-
-/* int hashIn(unsigned long int id);
-
-int hFind(unsigned long int id); */
 
 unsigned long int getThrId();
 

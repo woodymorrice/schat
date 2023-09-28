@@ -5,10 +5,6 @@
 
 #include <square.h>
 
-#define NUMARGS 3 /* # of CMD line args */
-
-/*struct htEntry hTable[HT_SIZE];  stores thread info */
-
 struct thrInfo thrArr[NUMTHRDS];
 
 bool keepRunning; /* global flag for threads */
@@ -19,10 +15,8 @@ unsigned long int getThrId();
 
 int args[NUMARGS];
 
-int main(int argc, char* argv[]) {
-    /* int args[NUMARGS];           pass to thrds */ 
+int main(int argc, char* argv[]) { 
     HANDLE pThread;             /* for checking  */
-
     keepRunning = true;
 
     if (argc != 4) {
@@ -64,7 +58,7 @@ DWORD WINAPI parentThread(LPVOID lPtr) {
         cThread = CreateThread(NULL, 2097152, childThread, args, 0, &id);
         if (cThread == NULL) {
             fprintf(stderr,
-                    "Error in parentThread: failed to create child thread\n");
+                "Error in parentThread: failed to create child thread\n");
         }
         thrArr[i].entryId = id;
         thrArr[i].beginTime = GetTickCount64();
