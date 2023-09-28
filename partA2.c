@@ -8,14 +8,15 @@
 
 struct thrInfo thrArr[NUMTHRDS]; /* stores thread info */
 
-int mainp(void *argPtr);
 PROCESS parentThread(void *argPtr);
 PROCESS childThread(void *argPtr);
 unsigned long int getThrId();
 
 int args[NUMARGS];
 
-int main(int argc, char* argv[]) {
+int mainp(int argc, char* argv[]) {
+    PID pThread;
+
     if (argc != 4) {
         /* fprintf(stderr,
                 "Error in main: invalid number of parameters\n"); */
@@ -30,16 +31,7 @@ int main(int argc, char* argv[]) {
         args[1] < 1 ||
         args[2] < 1) {
         return EXIT_FAILURE;
-
-    mainp(argc, argv);
-    return EXIT_SUCCESS;
-}
-
-int mainp(void *argPtr) {
-    int *args;
-    PID pThread;
-
-    args = (int*)argPtr;
+    }
 
     pThread = Create((void(*)())parentThread,
             16384, "parentThread", (void*)&args, NORM, USR);
@@ -56,36 +48,64 @@ PROCESS parentThread(void *argPtr) {
     int *args;
     int i;
     PID id;
-    int index;
-    struct timeval begTime;
 
     args = (int*)argPtr;
     
     for (i = 0; i < args[0]; i++) {
         id = Create((void(*)())childThread,
-                32768, "childThread", (void*)&args, NORM USR);
+                32768, "childThread", (void*)&args, HIGH, USR);
         if (id == PNUL) {
             fprintf(stderr,
                 "Error in parentThread: failed to create child thread\n");
         }
-        thrArr[i].entryId = id;
-        thrArr[i].beginTime = 0;
+        thrArr[i].entryId = (unsigned)id;
+        thrArr[i].beginTime = (unsigned)Time();
         thrArr[i].sqCalls = 0;
     }
-    return EXIT_SUCCESS;
+
+    Sleep(100*args[1]+10);
+
+    for (i = 0; i < args[0]; i++) {
+        if (PExists(thrArr[i].entryId)) {
+            printf("childThread %ld killed by parent."
+                   " %d square calls, %ld ms\n",
+                   thrArr[i].entryId,
+                   thrArr[i].sqCalls,
+                   (unsigned)Time() - thrArr[i].beginTime);
+            Kill(thrArr[i].entryId);
+        }
+    }
+
+    Pexit();
 }
 
 
 PROCESS childThread(void *argPtr) {
-    PID id;
+    long unsigned int id;
     int index;
     int *args;
     int i;
+    
+    id = (unsigned)getThrId();
 
-    id = getThrId();
+    for (index = 0; index < (NUMTHRDS - 1) &&
+            id != thrArr[index].entryId; index++);
 
-    for (index = 0; index <
+    args = (int*)argPtr;
 
+    printf("%d, %d, %d\n", args[0], args[1], args[2]);
+
+    for (i = 1; i <= args[2]; i++) {
+        square(i);
+    }
+
+    printf("childThread %ld finished."
+           " %d square calls, %ld ms\n",
+           thrArr[index].entryId,
+           thrArr[index].sqCalls,
+           (unsigned)Time() - thrArr[index].beginTime);
+
+    Pexit();
 }
 
 

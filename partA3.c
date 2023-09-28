@@ -6,19 +6,17 @@
 
 #include <square.h>
 
-struct htEntry hTable[HT_SIZE]; /* stores thread info */
-
+struct thrInfo thrArr[NUMTHRDS]; /* stores thread info */
 
 void* parentThread(void *argPtr);
-void childThread();
+void* childThread(void *argPtr);
 unsigned long int getThrId();
 
+int args[NUMARGS];
 
-int main(int argc, char* argv[]) {
-    int args[NUMARGS];          /* pass to thrds */ 
+int main(int argc, char* argv[]) { 
     int pThread;                /* for checking  */
     pthread_t id;
-    int index;
 
     if (argc != 4) {
         /* fprintf(stderr,
@@ -41,37 +39,56 @@ int main(int argc, char* argv[]) {
         fprintf(stderr,
                 "Error in main: failed to create parent thread\n");
     }
-    index = hashIn(id);
-    hTable[index].entryId = id;
 
     sleep(args[1]);
-
     return EXIT_SUCCESS;
 }
 
 
 void* parentThread(void *argPtr) {
-    int *args;                  /* ptr to args[] */
-    int sq;
-    /* pthread_t id;
-    int index; */
+    int *args;
+    int i;
+    int cThread;
+    pthread_t id;
+    struct timeval begTime;
 
     args = (int*)argPtr;
 
-    /* id = getThrId();
-    index = hashIn(id);
-    hTable[index].entryId = id; */
-    
-    sq = square(1);
-    if (sq != 0) {
-        printf("Square called successfully from thread\n");
+    id = getThrId();
+
+    for (i = 0; i < args[0]; i++) {
+        cThread = pthread_create(&id, NULL, childThread, (void*)&args);
+        if (cThread != 0) {
+            fprintf(stderr,
+                "Error in parentThread: failed to create child thread\n");
+        }
+        thrArr[i].entryId = id;
+        thrArr[i].beginTime = 0;
+        thrArr[i].sqCalls = 0;
     }
    
-    return NULL;
+    pthread_exit(NULL);
 }
 
 
-void childThread() {
+void* childThread(void *argPtr) {
+    pthread_t id;
+    int index;
+    int *args;
+    int i;
+
+    id = getThrId();
+
+    for (index = 0; index < (NUMTHRDS - 1) &&
+            id != thrArr[index].entryId; index++);
+
+    args = (int*)argPtr;
+
+    for (i = 1; i <= args[2]; i++) {
+        square(i);
+    }
+
+    pthread_exit(NULL);
 }
 
 

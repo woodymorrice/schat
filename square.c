@@ -4,8 +4,6 @@
 
 #include <square.h>
 
-/* extern struct htEntry hTable[]; */
-
 extern struct thrInfo thrArr[NUMTHRDS];
 
 int square(int n) {
@@ -19,38 +17,10 @@ int square(int n) {
 
     thrArr[index].sqCalls += 1;
 
-    if (n < 0) {
-        fprintf(stderr,
-                "Error in square: invalid parameter 'size'\n");
-    }
     if (n == 0) {
         return 0;
     } else {
         return (square(n-1) + n + n-1);
     }
 }
-
-
-/* int hashIn(unsigned long int id) {
-    int index;
-
-    index = (int)(id % HT_SIZE);
-    while (hTable[index].entryId != 0) {
-        index += (id % 13) + 1;
-        index = index % HT_SIZE;
-    }
-    return index;
-}
-
-
-int hFind(unsigned long int id) {
-    int index;
-    
-    index = (int)(id % HT_SIZE);
-    while (hTable[index].entryId != id) {
-        index += (id % 13) + 1;
-        index = index % HT_SIZE;
-    }
-    return index;
-} */
 

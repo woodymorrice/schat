@@ -9,12 +9,12 @@ CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 LILIB = -L.
 PLATFORM = $(shell uname -s)
 PTLIB = -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
-PTINC = -I/student/cmpt332/pthreads/
+PTINC = -I. -I/student/cmpt332/pthreads/
 POSINC = -pthread
 
 # Main Target
 ifeq ($(PLATFORM),Linux)
-all: mytestlist #partA2 partA3 partA4
+all: mytestlist partA2 partA3 #partA4
 
 else ifeq (MSYS,$(findstring MSYS,$(PLATFORM)))
 all: partA1.exe
