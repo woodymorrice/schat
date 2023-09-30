@@ -252,7 +252,10 @@ int main() {
     else {
         printf("testList: ListInsert() first item:\npassed!\n");
     }
-    
+   
+    /*
+    * This is when the adding is out of memory
+    */ 
     ListNext(testList);
     number3 = 22;
     pointerToNumber = &number3;
@@ -261,6 +264,9 @@ int main() {
     number1 = *((int*)head->dataType);
     middle = head->nextNode;
     number2 = *((int*)middle->dataType);
+    if (result == -1) {
+        perror("testList: (2nd) ListInsert() out of memory");
+    }
     if (number1 == number2) {
         printf("testList: ListInsert() fails to change item\n");
     } else if (number1 == 22) {

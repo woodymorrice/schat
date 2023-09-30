@@ -6,15 +6,18 @@ Woody Morrice - wam553 - 11071060
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
 #include <list.h>
+extern int memoryNodeUsed;
+extern int memoryListUsed;
+bool notEmpty = false;
 
 void *ListRemove(LIST *list) {
-    struct NODE *item1;
-    struct NODE *rmItem;
+    struct NODE *curItem;
+    struct NODE *prevItem;
     struct NODE *nextItem;
-    struct NODE *rmPrev;
-    item1 = list->currentItem;
+
+    curItem = list->currentItem;
     /*
     * If current list only has one item/one node
     */
@@ -22,70 +25,59 @@ void *ListRemove(LIST *list) {
         list->currentItem = NULL;
         list->headPointer = NULL;
         list->tailPointer = NULL;
-        list->totalItem -= 1;
-        return item1->dataType;
-    }
-    /*
-    * If the current item at head of list
-    */
-    if (item1->prevNode == NULL) {
+    } else if (curItem == list->headPointer) {
+        /*
+        * Current item is at head 
+        */
         struct NODE *oldHead;
-        struct NODE *itemMoved;
-
+        
         oldHead = list->headPointer;
-        ListNext(list);
+        nextItem = curItem->nextNode;
         oldHead->nextNode = NULL;
-        itemMoved = list->currentItem;
-        itemMoved->prevNode = NULL;
-        list->headPointer = list->currentItem;
-        list->totalItem -= 1;
-        return oldHead->dataType;
-    }
-    /*
-    * If the current item at tail
-    */
-    if (item1->nextNode == NULL) {
+        nextItem->prevNode = NULL;
+        ListNext(list);
+        list->headPointer = nextItem;
+    } else if (curItem == list->tailPointer) {
+        /*
+        * Current item is at tail
+        */
         struct NODE *oldTail;
-        struct NODE *itemMoved;
 
         oldTail = list->tailPointer;
-        ListPrev(list);
+        prevItem = curItem->prevNode;
         oldTail->prevNode = NULL;
-        itemMoved = list->currentItem;
-        itemMoved->nextNode = NULL;
-        list->tailPointer = list->currentItem;
-        list->totalItem -= 1;
-        return oldTail->dataType;
+        prevItem->nextNode = NULL;
+        ListPrev(list);
+        list->tailPointer = prevItem;        
     }
-    
-    rmItem = list->currentItem;
-    nextItem = rmItem->nextNode;
-    rmPrev = rmItem->prevNode;
-    nextItem->prevNode = rmItem->prevNode;
-    rmPrev->nextNode = list->currentItem; 
-    rmItem->prevNode = NULL;
-    rmItem->nextNode = NULL;
+    else {
+        /*
+        * Current item is at middle 
+        */
+        nextItem = curItem->nextNode;
+        prevItem = curItem->prevNode;
+
+        curItem->nextNode = NULL;
+        curItem->prevNode = NULL;
+        nextItem->prevNode = prevItem;
+        prevItem->nextNode = nextItem;
+        
+        ListNext(list); 
+    }
+    memoryNodeUsed -= sizeof(NODE);
     list->totalItem -= 1;
-    return rmItem->dataType;
+    return curItem->dataType;
 }
 
-void item_free () {
-    /* this line produces an error i dont know how to fix
-     * right now, so I'm commenting it out -W
-     * free(item->dataType);
-     */
-}
 
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     struct NODE *curItem;
-    int empty;
     ListFirst(list);
     /* Booleans dont exist in c90 so we have to use ints
      * 0 = true, 1 = false */
-    empty = 1;
-    while (empty == 1) {
+    while (notEmpty) {
         if (list == NULL) {
-            empty = 0;
+            notEmpty = true;
         }
         curItem = list->currentItem;
         itemFree(curItem->dataType);
@@ -95,6 +87,7 @@ void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     list->tailPointer = NULL;
     list->currentItem = NULL;
     list->totalItem = 0;
+    
 }
 
 void *ListTrim(LIST *list) {
@@ -103,10 +96,11 @@ void *ListTrim(LIST *list) {
     if (list->totalItem == 0) {
         return NULL;
     }
-    oldTail = ListLast(list);
-    newTail = ListPrev(list);
+    oldTail = list->tailPointer;
+    newTail = oldTail->prevNode;
     oldTail->prevNode = NULL;
     newTail->nextNode = NULL;
+    memoryNodeUsed -= sizeof(NODE);
     list->totalItem -= 1;
     return oldTail->dataType;
 }
