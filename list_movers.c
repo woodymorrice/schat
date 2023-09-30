@@ -8,6 +8,17 @@ Woody Morrice - wam553 - 11071060
 #include <stdlib.h>
 #include <list.h>
 
+extern const int LIST_POOL_SIZE;
+extern const int NODE_POOL_SIZE;
+
+extern int memoryNodeUsed;
+extern int memoryListUsed;
+
+extern LIST *curFreeList;
+extern struct NODE *curFreeNode;
+
+extern LIST *memoryList;
+extern struct NODE *memoryNode;
 
 void *ListFirst(LIST *list) {
     return list->currentItem = list->headPointer;
@@ -36,7 +47,6 @@ void *ListNext(LIST *list) {
     list->currentItem = item1->nextNode;
     itemMoved = list->currentItem;
     itemMoved->prevNode = item1;
-    return itemMoved->dataType; 
 }
 
 
@@ -55,6 +65,21 @@ void *ListPrev(LIST *list) {
     list->currentItem = item1->prevNode;
     itemMoved = list->currentItem;
     itemMoved->nextNode = item1;
-    return itemMoved->dataType;
 }
 
+void *ListSearch(LIST* list, int (*comparator)(void *item1, void *item2),
+                void *comparisonArg) {
+    struct NODE *curNode;
+    curNode = list->currentItem;
+    if (list == NULL || comparator == NULL || comparisonArg == NULL) {
+        return NULL;
+    }
+    while (comparator(comparisonArg, curNode->dataType) != 1) {
+        if (curNode == list->tailPointer) {
+            return NULL;
+        }
+        curNode = list->nextNode;
+    }
+    return curNode->dataType;
+    
+}
