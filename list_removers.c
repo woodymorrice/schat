@@ -11,8 +11,8 @@ Woody Morrice - wam553 - 11071060
 extern const int LIST_POOL_SIZE;
 extern const int NODE_POOL_SIZE;
 
-extern int memoryNodeUsed;
-extern int memoryListUsed;
+extern size_t memoryNodeUsed;
+extern size_t memoryListUsed;
 
 extern LIST *curFreeList;
 extern struct NODE *curFreeNode;
@@ -74,7 +74,7 @@ void *ListRemove(LIST *list) {
         
         ListNext(list); 
     }
-    memoryNodeUsed -= sizeof(NODE);
+    memoryNodeUsed -= sizeof(struct NODE);
     list->totalItem -= 1;
     return curItem->dataType;
 }
@@ -120,7 +120,7 @@ void *ListTrim(LIST *list) {
     newTail = oldTail->prevNode;
     oldTail->prevNode = NULL;
     newTail->nextNode = NULL;
-    memoryNodeUsed -= sizeof(NODE);
+    memoryNodeUsed -= sizeof(struct NODE);
     list->totalItem -= 1;
     return oldTail->dataType;
 }

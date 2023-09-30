@@ -18,8 +18,8 @@ bool isAllocated = false;
 /*
 Amount of memory used for LIST / NODE
 */
-int  memoryListUsed;
-int  memoryNodeUsed;
+size_t  memoryListUsed;
+size_t  memoryNodeUsed;
 
 /*
 Each block in the allocation
@@ -46,8 +46,12 @@ LIST *ListCreate () {
     LIST *emptyList; 
     if (isAllocated == false) {
         memoryList = malloc(sizeof(LIST) * LIST_POOL_SIZE);
-        memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
+        memoryNode = malloc(sizeof(struct NODE) * NODE_POOL_SIZE);
         isAllocated = true;
+    }
+    if (memoryListUsed > sizeof(LIST) * LIST_POOL_SIZE) {
+        printf("Error ListCreated(): memory list used exceed the limit\n");
+        return NULL;
     }
     emptyList = &memoryList[listBlock];
     emptyList->headPointer = NULL;
@@ -69,7 +73,7 @@ int ListAppend (LIST *list, void *item) {
     newItem = &memoryNode[nodeBlock];
     newItem->dataType = item;
     prevTail = list->tailPointer;
-    if (list->totalItem < NODE_POOL_SIZE) { 
+    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) { 
         if(list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
@@ -84,10 +88,11 @@ int ListAppend (LIST *list, void *item) {
             ListLast(list);
         }
         list->totalItem += 1;
-        memoryNodeUsed += sizeof(NODE);
+        memoryNodeUsed += sizeof(struct NODE);
         nodeBlock += 1;
         return 0;
     }
+    printf("Error ListAppend(): memory NODE used exceed the limit\n");
     return -1;
 }
     
@@ -102,7 +107,7 @@ int ListPrepend (LIST *list, void *item) {
     * If the current pointer is at the head of list,
     * item is added at the end.
     */
-    if (list->totalItem < NODE_POOL_SIZE) {
+    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) {
         if (list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
@@ -118,10 +123,11 @@ int ListPrepend (LIST *list, void *item) {
         }
         ListFirst(list);
         list->totalItem += 1;
-        memoryNodeUsed += sizeof(NODE);
+        memoryNodeUsed += sizeof(struct NODE);
         nodeBlock += 1;
         return 0;
     }
+    printf("Error ListPrepend(): memory NODE used exceed the limit\n");
     return -1;
 }
 
@@ -131,7 +137,7 @@ int ListAdd(LIST *list, void *item) {
     struct NODE *newItem;
     newItem = &memoryNode[nodeBlock];
     newItem->dataType = item;
-    if (list->totalItem < NODE_POOL_SIZE) {
+    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) {
         /*
         * if the current list has no item
         */
@@ -161,11 +167,12 @@ int ListAdd(LIST *list, void *item) {
             
             ListNext(list);
         }
-        memoryNodeUsed += sizeof(NODE);
+        memoryNodeUsed += sizeof(struct NODE);
         list->totalItem += 1;
         nodeBlock += 1;
         return 0;
     }
+    printf("Error ListAdd(): memory NODE used exceed the limit\n");
     return -1;
 }
 
@@ -177,7 +184,7 @@ int ListInsert(LIST *list, void *item) {
     curPrev = curItem->prevNode;
     newItem = &memoryNode[nodeBlock];
     newItem->dataType = item;
-    if (list->totalItem < NODE_POOL_SIZE) {
+    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) {
         /*
         * if current item is at head
         */
@@ -195,10 +202,11 @@ int ListInsert(LIST *list, void *item) {
         ListPrev(list);
         }
         list->totalItem += 1;
-        memoryNodeUsed += sizeof(NODE);
+        memoryNodeUsed += sizeof(struct NODE);
         nodeBlock += 1;
         return 0;
     }
+    printf("Error ListInsert(): memory NODE used exceed the limit\n");
     return -1;
 }
 
