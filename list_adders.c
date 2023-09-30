@@ -11,8 +11,8 @@ Woody Morrice - wam553 - 11071060
 /*
 convenience for testing size
 */
-const int LIST_POOL_SIZE = 3;
-const int NODE_POOL_SIZE = 5;
+const int LIST_POOL_SIZE = 4;
+const int NODE_POOL_SIZE = 10;
  
 bool isAllocated = false;
 /*

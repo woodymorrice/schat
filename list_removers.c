@@ -43,10 +43,10 @@ void *ListRemove(LIST *list) {
         
         oldHead = list->headPointer;
         nextItem = curItem->nextNode;
-        oldHead->nextNode = NULL;
-        nextItem->prevNode = NULL;
-        ListNext(list);
+        list->currentItem = nextItem;
         list->headPointer = nextItem;
+        nextItem->prevNode = NULL;
+        oldHead->nextNode = NULL;
     } else if (curItem == list->tailPointer) {
         /*
         * Current item is at tail
@@ -55,10 +55,10 @@ void *ListRemove(LIST *list) {
 
         oldTail = list->tailPointer;
         prevItem = curItem->prevNode;
-        oldTail->prevNode = NULL;
+        list->currentItem = prevItem;
+        list->tailPointer = prevItem;
         prevItem->nextNode = NULL;
-        ListPrev(list);
-        list->tailPointer = prevItem;        
+        oldTail->prevNode = NULL;     
     }
     else {
         /*
@@ -72,7 +72,7 @@ void *ListRemove(LIST *list) {
         nextItem->prevNode = prevItem;
         prevItem->nextNode = nextItem;
         
-        ListNext(list); 
+        list->currentItem = nextItem; 
     }
     memoryNodeUsed -= sizeof(struct NODE);
     list->totalItem -= 1;
