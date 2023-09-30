@@ -218,4 +218,14 @@ void ListConcat(LIST *list1, LIST *list2) {
     list1Tail = list2->tailPointer;
     
     list1->totalItem += list2->totalItem;
+    /*
+    * Deleting list2
+    */
+    list2->headPointer = NULL;
+    list2->tailPointer = NULL;
+    list2->currentItem = NULL;
+    list2->totalItem = 0;
+    
+    curFreeList = list2;
+    memoryListUsed -= sizeof(LIST);
 }

@@ -8,8 +8,18 @@ Woody Morrice - wam553 - 11071060
 #include <stdlib.h>
 #include <stdbool.h>
 #include <list.h>
+extern const int LIST_POOL_SIZE;
+extern const int NODE_POOL_SIZE;
+
 extern int memoryNodeUsed;
 extern int memoryListUsed;
+
+extern LIST *curFreeList;
+extern struct NODE *curFreeNode;
+
+extern LIST *memoryList;
+extern struct NODE *memoryNode;
+
 bool notEmpty = false;
 
 void *ListRemove(LIST *list) {
@@ -72,6 +82,8 @@ void *ListRemove(LIST *list) {
 
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     struct NODE *curItem;
+    LIST *curList;
+    int i;
     ListFirst(list);
     /* Booleans dont exist in c90 so we have to use ints
      * 0 = true, 1 = false */
@@ -87,6 +99,14 @@ void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     list->tailPointer = NULL;
     list->currentItem = NULL;
     list->totalItem = 0;
+    for (i = 0; i < LIST_POOL_SIZE; i++) {
+        curList = &memoryList[i];
+        if (curList->headPointer == NULL &&
+            curList->tailPointer == NULL) {
+            curFreeList = &memoryList[i];
+        }
+    }
+    memoryListUsed -= sizeof(LIST);
     
 }
 
