@@ -11,11 +11,10 @@ int square(int n) {
     int index;
 
     id = getThrId();
-    
-    for (index = 0; index < (NUMTHRDS - 1) &&
+    for (index = 0; index < NUMTHRDS &&
             id != thrArr[index].entryId; index++);
 
-    thrArr[index].sqCalls += 1;
+    thrArr[index].sqCalls += 1;    
 
     if (n == 0) {
         return 0;
