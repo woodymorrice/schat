@@ -15,11 +15,32 @@ const int LIST_POOL_SIZE = 3;
 const int NODE_POOL_SIZE = 5;
  
 bool isAllocated = false;
+/*
+Amount of memory used for LIST / NODE
+*/
+int  memoryListUsed;
+int  memoryNodeUsed;
 
-size_t memoryListUsed;
-size_t memoryNodeUsed;
+/*
+Each block in the allocation
+*/
+int listBlock;
+int nodeBlock;
+
+/*
+LIST POOL
+NODE POOL
+*/
+
 LIST *memoryList;
 struct NODE *memoryNode;
+
+/*
+Point to the current free list / free node
+*/
+LIST *curFreeList;
+struct NODE *curFreeNode;
+
 
 LIST *ListCreate () {
     LIST *emptyList; 
@@ -28,12 +49,13 @@ LIST *ListCreate () {
         memoryNode = malloc(sizeof(NODE) * NODE_POOL_SIZE);
         isAllocated = true;
     }
-    emptyList = &memoryList[memoryListUsed];
+    emptyList = &memoryList[listBlock];
     emptyList->headPointer = NULL;
     emptyList->tailPointer = NULL;
     emptyList->currentItem = NULL;
     emptyList->totalItem = 0;
     memoryListUsed += sizeof(LIST);
+    listBlock += 1;
     return emptyList;
 }
     
@@ -44,7 +66,7 @@ int ListCount (LIST *list) {
 int ListAppend (LIST *list, void *item) {
     struct NODE *prevTail;
     struct NODE *newItem;
-    newItem = &memoryNode[memoryNodeUsed];
+    newItem = &memoryNode[nodeBlock];
     newItem->dataType = item;
     prevTail = list->tailPointer;
     if (list->totalItem < NODE_POOL_SIZE) { 
@@ -63,6 +85,7 @@ int ListAppend (LIST *list, void *item) {
         }
         list->totalItem += 1;
         memoryNodeUsed += sizeof(NODE);
+        nodeBlock += 1;
         return 0;
     }
     return -1;
@@ -73,7 +96,7 @@ int ListPrepend (LIST *list, void *item) {
     struct NODE *prevHead;
     struct NODE *newItem;
     prevHead = list->headPointer;
-    newItem = &memoryNode[memoryNodeUsed];
+    newItem = &memoryNode[nodeBlock];
     newItem->dataType = item;
     /*
     * If the current pointer is at the head of list,
@@ -96,6 +119,7 @@ int ListPrepend (LIST *list, void *item) {
         ListFirst(list);
         list->totalItem += 1;
         memoryNodeUsed += sizeof(NODE);
+        nodeBlock += 1;
         return 0;
     }
     return -1;
@@ -105,7 +129,7 @@ int ListAdd(LIST *list, void *item) {
     struct NODE *curItem;
     struct NODE *curNext;
     struct NODE *newItem;
-    newItem = &memoryNode[memoryNodeUsed];
+    newItem = &memoryNode[nodeBlock];
     newItem->dataType = item;
     if (list->totalItem < NODE_POOL_SIZE) {
         /*
@@ -134,10 +158,13 @@ int ListAdd(LIST *list, void *item) {
             curNext->prevNode = newItem;
             newItem->nextNode = curNext;
             newItem->prevNode = curItem;
+            
+            ListNext(list);
         }
         memoryNodeUsed += sizeof(NODE);
         list->totalItem += 1;
-        return 0;    
+        nodeBlock += 1;
+        return 0;
     }
     return -1;
 }
@@ -148,7 +175,7 @@ int ListInsert(LIST *list, void *item) {
     struct NODE *newItem;
     curItem = list->currentItem;
     curPrev = curItem->prevNode;
-    newItem = &memoryNode[memoryNodeUsed];
+    newItem = &memoryNode[nodeBlock];
     newItem->dataType = item;
     if (list->totalItem < NODE_POOL_SIZE) {
         /*
@@ -169,6 +196,7 @@ int ListInsert(LIST *list, void *item) {
         }
         list->totalItem += 1;
         memoryNodeUsed += sizeof(NODE);
+        nodeBlock += 1;
         return 0;
     }
     return -1;

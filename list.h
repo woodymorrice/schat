@@ -18,6 +18,7 @@ typedef struct NODE{
     void *dataType;
 } NODE;
 
+
 /* Makes a new, empty list, and returns its reference on success.
  * Returns a NULL pointer on failure */
 
