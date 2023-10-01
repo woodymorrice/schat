@@ -15,7 +15,6 @@ extern size_t memoryNodeUsed;
 extern size_t memoryListUsed;
 
 extern LIST *curFreeList;
-extern struct NODE *curFreeNode;
 
 extern LIST *memoryList;
 extern struct NODE *memoryNode;

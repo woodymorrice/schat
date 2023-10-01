@@ -18,7 +18,10 @@ typedef struct NODE{
     void *dataType;
 } NODE;
 
-
+typedef struct {
+    struct NODE *curFree;
+    struct NODE *nextFree;
+} freeNode;
 /* Makes a new, empty list, and returns its reference on success.
  * Returns a NULL pointer on failure */
 

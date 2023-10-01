@@ -370,7 +370,7 @@ int main() {
         printf("testList1: ListRemove(), total item return\n");
         printf(" passed!\n");
     }
-    if (tail->prevNode == NULL || tail->nextNode != NULL) {
+    if (tail->prevNode != NULL || tail->nextNode != NULL) {
         printf("testList1 (2nd): ListRemove(), tail node preference wrong\n");
         printf(" Not passed!\n"); 
     }
@@ -398,9 +398,9 @@ int main() {
     * Testing ListAppend(LIST*, void*)
     */
     result = ListAppend(testList2, &a);
-    current = testList1->currentItem;
-    head = testList1->headPointer;
-    tail = testList1->tailPointer;
+    current = testList2->currentItem;
+    head = testList2->headPointer;
+    tail = testList2->tailPointer;
     if (result == -1) {
         printf("testList2: (1st) ListAppend() return -1 for 'char':\n");
         printf(" Not passed!\n");
@@ -427,9 +427,9 @@ int main() {
     }
 
     result = ListAppend(testList2, &b);
-    current = testList1->currentItem;
-    head = testList1->headPointer;
-    tail = testList1->tailPointer;
+    current = testList2->currentItem;
+    head = testList2->headPointer;
+    tail = testList2->tailPointer;
     if (result == -1) {
         printf("testList2: (2nd) ListAppend() return -1 for 'char':\n");
         printf(" Not passed!\n");
@@ -457,9 +457,9 @@ int main() {
 
     ListFirst(testList2);
     result = ListAppend(testList2, &c);
-    current = testList1->currentItem;
-    head = testList1->headPointer;
-    tail = testList1->tailPointer;
+    current = testList2->currentItem;
+    head = testList2->headPointer;
+    tail = testList2->tailPointer;
     if (result == -1) {
         printf("testList2: (3rd) ListAppend() return -1 for 'char':\n");
         printf(" Not passed!\n");
