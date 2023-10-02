@@ -16,12 +16,9 @@ unsigned long int getThrId();
 int args[NUMARGS];
 
 int main(int argc, char* argv[]) { 
-    HANDLE pThread;             /* for checking  */
     keepRunning = true;
 
     if (argc != 4) {
-        fprintf(stderr,
-                "Error in main: invalid number of parameters\n");
         return EXIT_FAILURE;
     } else {
         args[0] = atoi(argv[1]);
@@ -29,20 +26,18 @@ int main(int argc, char* argv[]) {
         args[2] = atoi(argv[3]);
     }
 
-    if (args[0] < 1 ||
-        args[1] < 1 ||
-        args[2] < 1 || args[2] > 32768) {
+    if (args[0] < 1 || 64    < args[0] ||
+        args[1] < 1 || 300   < args[1] ||
+        args[2] < 1 || 20000 < args[2]) {
         return EXIT_FAILURE;
     }
 
-    pThread = CreateThread(NULL, 16384, parentThread, args, 0, NULL);
-    if (pThread == NULL) {
-        fprintf(stderr,
-                "Error in main: failed to create parent thread\n");
+    if (NULL == CreateThread(NULL, 16384, 
+                parentThread, &args, 0, NULL)) {
+        fprintf(stderr, "Error creating parent thread\n");
     }
 
-    Sleep(1000*args[1]);
-    keepRunning = false;
+    Sleep((1000*args[1])+2000);
 
     return EXIT_SUCCESS;
 }
@@ -51,26 +46,23 @@ int main(int argc, char* argv[]) {
 DWORD WINAPI parentThread(LPVOID lPtr) {
     int *args;                  /* ptr to args[] */
     int i;                      /* counting var  */
-    HANDLE cThread;             /* for checking  */
-    DWORD id;                   /* thread ID     */
-    /* int index;                  hashed index  */
  
     args = (int*)lPtr;
 
     for (i = 0; i < args[0]; i++) {
-        cThread = CreateThread(NULL, 131072, childThread, args, 0, &id);
-        if (cThread == NULL) {
-            fprintf(stderr,
-                "Error in parentThread: failed to create child thread\n");
-        }
-        thrArr[i].entryId = id;
-        thrArr[i].beginTime = GetTickCount64();
+        thrArr[i].beginTime = 0;
         thrArr[i].sqCalls = 0;
+        if (NULL == CreateThread(NULL, 131072,
+                    childThread, args, 0, &thrArr[i].entryId)) {
+            fprintf(stderr, "Error creating child thread\n");
+        }
     }
 
     Sleep(1000*args[1]);
 
     keepRunning = false;
+
+    Sleep(2000);
 
     return EXIT_SUCCESS;
 }
@@ -83,21 +75,23 @@ DWORD WINAPI childThread(LPVOID lPtr) {
     int i;                      /* counting var  */
     unsigned long int elapsed;  /* total time    */
     
+    args = (int*)lPtr;
+
     id = getThrId();
 
-    for (index = 0; index < (NUMTHRDS - 1) &&
+    for (index = 0; index < args[0] &&
             id != thrArr[index].entryId; index++);
 
-    args = (int*)lPtr;
+    thrArr[index].beginTime = (unsigned)GetTickCount64();
   
     for (i = 1; i <= args[2] && keepRunning; i++) {
         square(i);
     }
 
-    elapsed = GetTickCount64() - thrArr[index].beginTime;
+    elapsed = (unsigned)GetTickCount64() - thrArr[index].beginTime;
 
-    printf("%d square calls, %d ms\n",
-            thrArr[index].sqCalls, (unsigned) elapsed);
+    printf("%d square calls, %ld ms\n",
+            thrArr[index].sqCalls, elapsed);
         
     return EXIT_SUCCESS;
 }
