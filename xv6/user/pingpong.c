@@ -12,27 +12,44 @@
  * "<pid>: received pong" and exit. */
 
 int main(int argc, char *argv[]) {
-    int pip[2];
-    char* buf[1];
+    int pi1[2];     /* parent -> child */
+    int pi2[2];     /* child -> parent */
+    char buf1;
+    char buf2;
     int pid;
 
-    pipe(pip);
+    pipe(pi1);
+    pipe(pi2);
+
+    buf1 = '0'; /* init'd to '0' for testing */
+    buf2 = '0';
     
-    write(pip[1], buf, 1);
+    /* printf("buffer 1: %c, buffer 2: %c\n", buf1, buf2); */
+
+    write(pi1[1], "1", 1);
 
     if (fork() == 0) {
-        if (read(pip[0], buf, 1) == 1) {
+        if (read(pi1[0], &buf1, 1) == 1) {
             pid = getpid();
-            fprintf(1, "%d: received ping\n", pid);
+            printf("%d: received ping\n", pid);
+            /* printf("buffer 1: %c\n", buf1); */
         }
-        write(pip[1], buf, 1);
+        else {
+            fprintf(2, 
+                    "Child did not receive 1 byte\n");
+        }
+        write(pi2[1], "1", 1);
         exit(0);
     }
     else {
-        wait(0);
-        if (read(pip[0], buf, 1) == 1) {
+        if (read(pi2[0], &buf2, 1) == 1) {
             pid = getpid();
-            fprintf(1, "%d: received pong\n", pid);
+            printf("%d: received pong\n", pid);
+            /* printf("buffer 2: %c\n", buf2); */
+        }
+        else {
+            fprintf(2,
+                    "Parent did not receive 1 byte\n");
         }
     }
     exit(0);

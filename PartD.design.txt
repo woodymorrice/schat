@@ -1,0 +1,37 @@
+CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+# Design Documentation for Part D
+
+# Work Plan
+Woody will be in charge of design and implementation for part D.
+
+# Design Details
+The main() function is the parent in the specification. First,
+two pipes are declared. Two pipes are used to prevent any ambiguity
+about whether the correct byte is being read/received. The parent
+writes a single character (one byte) to the first pipe. fork() is 
+called to create the child process, and the single byte is read into
+buffer one. Two buffers are used for demontrative purposes, again so
+there is no ambiguity about whether the correct byte was actually
+read/received. read() returns the number of bytes that were read,
+so the program prints an error message if read returns any number 
+other than 1. When one byte is read, the child process prints the
+appropriate message to the terminal. Then the child writes the single
+character from buffer 1 to the second pipe, and exits. The parent
+reads from the second pipe into buffer two, again emitting an error
+if read does not return 1, and on success it prints the appropriate
+message to the terminal, then exits.
+
+# Implementation Details
+The char data type is used to allow for explicit demonstration of
+correct input/output. Two pipes and two buffers are also used to
+help show correctness.
+
+# Function Specifics
+int main(int argc, char* argv[])
+Preconditions: none
+Postconditions: none
+
+
