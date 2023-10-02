@@ -312,6 +312,9 @@ fork(void)
 
   pid = np->pid;
 
+  /* Copy trace mask to child */
+  np->tmask = p->tmask;
+
   release(&np->lock);
 
   acquire(&wait_lock);
@@ -685,4 +688,12 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+
+void
+trace(int mask)
+{
+  struct proc *p = myproc();
+  p->tmask = mask;
 }

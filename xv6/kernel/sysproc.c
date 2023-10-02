@@ -91,3 +91,15 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+/* enables tracing for the process that calls it */
+/* and children that it subsequently forks. */
+uint64
+sys_trace(void)
+{
+  int mask;
+
+  argint(0, &mask);
+  myproc()->tmask = mask;
+  return 0;
+}
