@@ -36,7 +36,7 @@ void *ListNext(LIST *list) {
     list->currentItem = item1->nextNode;
     itemMoved = list->currentItem;
     itemMoved->prevNode = item1;
-    return itemMoved->dataType; 
+    return itemMoved->dataType;
 }
 
 
@@ -58,3 +58,19 @@ void *ListPrev(LIST *list) {
     return itemMoved->dataType;
 }
 
+void *ListSearch(LIST* list, int (*comparator)(void *item1, void *item2),
+                void *comparisonArg) {
+    struct NODE *curNode;
+    curNode = list->currentItem;
+    if (list == NULL || comparator == NULL || comparisonArg == NULL) {
+        return NULL;
+    }
+    while (comparator(comparisonArg, curNode->dataType) != 1) {
+        if (curNode == list->tailPointer) {
+            return NULL;
+        }
+        curNode = curNode->nextNode;
+    }
+    return curNode->dataType;
+    
+}

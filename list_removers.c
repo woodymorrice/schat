@@ -8,8 +8,17 @@ Woody Morrice - wam553 - 11071060
 #include <stdlib.h>
 #include <stdbool.h>
 #include <list.h>
-extern int memoryNodeUsed;
-extern int memoryListUsed;
+extern const int LIST_POOL_SIZE;
+extern const int NODE_POOL_SIZE;
+
+extern size_t memoryNodeUsed;
+extern size_t memoryListUsed;
+
+extern LIST *curFreeList;
+
+extern LIST *memoryList;
+extern struct NODE *memoryNode;
+
 bool notEmpty = false;
 
 void *ListRemove(LIST *list) {
@@ -33,10 +42,10 @@ void *ListRemove(LIST *list) {
         
         oldHead = list->headPointer;
         nextItem = curItem->nextNode;
-        oldHead->nextNode = NULL;
-        nextItem->prevNode = NULL;
-        ListNext(list);
+        list->currentItem = nextItem;
         list->headPointer = nextItem;
+        nextItem->prevNode = NULL;
+        oldHead->nextNode = NULL;
     } else if (curItem == list->tailPointer) {
         /*
         * Current item is at tail
@@ -45,10 +54,10 @@ void *ListRemove(LIST *list) {
 
         oldTail = list->tailPointer;
         prevItem = curItem->prevNode;
-        oldTail->prevNode = NULL;
+        list->currentItem = prevItem;
+        list->tailPointer = prevItem;
         prevItem->nextNode = NULL;
-        ListPrev(list);
-        list->tailPointer = prevItem;        
+        oldTail->prevNode = NULL;     
     }
     else {
         /*
@@ -62,9 +71,9 @@ void *ListRemove(LIST *list) {
         nextItem->prevNode = prevItem;
         prevItem->nextNode = nextItem;
         
-        ListNext(list); 
+        list->currentItem = nextItem; 
     }
-    memoryNodeUsed -= sizeof(NODE);
+    memoryNodeUsed -= sizeof(struct NODE);
     list->totalItem -= 1;
     return curItem->dataType;
 }
@@ -72,6 +81,8 @@ void *ListRemove(LIST *list) {
 
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     struct NODE *curItem;
+    LIST *curList;
+    int i;
     ListFirst(list);
     /* Booleans dont exist in c90 so we have to use ints
      * 0 = true, 1 = false */
@@ -87,6 +98,14 @@ void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     list->tailPointer = NULL;
     list->currentItem = NULL;
     list->totalItem = 0;
+    for (i = 0; i < LIST_POOL_SIZE; i++) {
+        curList = &memoryList[i];
+        if (curList->headPointer == NULL &&
+            curList->tailPointer == NULL) {
+            curFreeList = &memoryList[i];
+        }
+    }
+    memoryListUsed -= sizeof(LIST);
     
 }
 
@@ -100,7 +119,7 @@ void *ListTrim(LIST *list) {
     newTail = oldTail->prevNode;
     oldTail->prevNode = NULL;
     newTail->nextNode = NULL;
-    memoryNodeUsed -= sizeof(NODE);
+    memoryNodeUsed -= sizeof(struct NODE);
     list->totalItem -= 1;
     return oldTail->dataType;
 }
