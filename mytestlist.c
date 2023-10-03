@@ -9,34 +9,8 @@ int main() {
     LIST *testList1;
     LIST *testList2;
     LIST *testList3;
-/*
+
     int n0, n1, n2, n3, n4, n5, result;
-    char a, b, c, d;
-    double pFloat, pFloat1;    
-    NODE *tail;
-    NODE *head;
-    NODE *current;
-    NODE *next;
-    NODE *prev;
-    
-
-    * Use for testing functions in list_removers.c
-  
-    int *resultPointer;
-    
-    a = 'a';
-    b = 'b';
-    c = 'c';
-    d = 'd';
-
-    n0 = 1;
-    n1 = 2;
-    n2 = 3;
-    n3 = 4;
-    n4 = 5;
-    n5 = 6;
-*/
-    int n0, n1, n2, n3, n4, result;
     NODE *current;
     NODE *head;
     NODE *tail;
@@ -48,6 +22,7 @@ int main() {
     n2 = 2;
     n3 = 3;
     n4 = 4;
+    n5 = 5;
     
     testList = ListCreate();
     if (testList == NULL) {
@@ -115,6 +90,15 @@ int main() {
     else {
         printf("testList: (1st) dataType return correct.\n passed!\n");
     }
+    if (testList->totalItem != 1) {
+        printf("testList: (1st) totalItem return different value:\n");
+        printf("Return: %d items\n", testList->totalItem);
+        printf(" Not passed!\n");
+    }
+    else {
+        printf("testList: (1st) check totalItem return value:\n");
+        printf(" passed!\n");
+    }
 
     result = ListAdd(testList, &n1);
     current = testList->currentItem;
@@ -147,6 +131,15 @@ int main() {
     }
     else {
         printf("testList: (2nd) dataType return correct.\n passed!\n");
+    }
+    if (testList->totalItem != 2) {                                             
+        printf("testList: (2nd) totalItem return different value:\n");          
+        printf("Return: %d items\n", testList->totalItem);                                           
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList: (2nd) check totalItem return value:\n");              
+        printf(" passed!\n");                                                   
     }
 
     result = ListAdd(testList, &n2);
@@ -181,6 +174,15 @@ int main() {
     }
     else {
         printf("testList: (3rd) dataType return correct.\n passed!\n");
+    }
+    if (testList->totalItem != 3) {                                             
+        printf("testList: (3rd) totalItem return different value:\n");          
+        printf("Return: %d items\n", testList->totalItem);                                           
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList: (3rd) check totalItem return value:\n");              
+        printf(" passed!\n");                                                   
     }
 
     printf("\n\nTesting ListAdd() when the currentPointer at head\n");
@@ -220,6 +222,15 @@ int main() {
     }
     else {
         printf("testList: (4th) dataType return correct.\n passed!\n");
+    }
+    if (testList->totalItem != 4) {                                             
+        printf("testList: (4th) totalItem return different value:\n");          
+        printf("Return: %d items\n", testList->totalItem);                                           
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList: (4th) check totalItem return value:\n");              
+        printf(" passed!\n");                                                   
     } 
 
     prev = testList->currentItem;
@@ -257,49 +268,63 @@ int main() {
     else {
         printf("testList1: (5th) dataType return correct.\n passed!\n");
     }
+    if (testList->totalItem != 5) {                                             
+        printf("testList: (5th) totalItem return different value:\n");          
+        printf("Return: %d items\n", testList->totalItem);                                           
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList: (5th) check totalItem return value:\n");              
+        printf(" passed!\n");                                                   
+    }
     
+    ListFirst(testList);
+    next = (testList->currentItem)->prevNode;
+    result = ListAdd(testList, &n5);
+    current = testList->currentItem;
+    head = testList->headPointer;
+    tail = testList->tailPointer;
+    if (result == -1) {                                                         
+        printf("testList: (6th) ListAdd() return -1 for 'int':\n");             
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList: ListAdd() adding 6th item return:\n passed!\n");      
+    }                                                                           
+    if (head == tail) {                                                         
+        printf("testList (6th): ListAdd(), head and tail are the same\n");      
+        printf(" Not passed\n");                                                
+    }                                                                           
+    else {                                                                      
+        printf("testList (6th): ListAdd(), head and tail preference:\n");       
+        printf(" passed!\n");                                                   
+    }                                                                           
+    if (current->prevNode != head || current->nextNode != next) {               
+        printf("testList (6th): ListAdd(), current preference is wrong\n");     
+        printf(" Not passed\n");                                                
+    }                                                                           
+    else {                                                                      
+        printf("testList (6th): ListAdd(), checking current preference:\n");    
+        printf(" passed!\n");                                                   
+    }                                                                           
+    if (*((int*)current->dataType) != 5) {                                      
+        printf("testList1: (6th) dataType return different.\n Not passed!\n");  
+    }                                                                           
+    else {                                                                      
+        printf("testList1: (6th) dataType return correct.\n passed!\n");        
+    }                                                                           
+    if (testList->totalItem != 6) {                                             
+        printf("testList: (6th) totalItem return different value:\n");          
+        printf("Return: %d items\n", testList->totalItem);                                           
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList: (6th) check totalItem return value:\n");              
+        printf(" passed!\n");                                                   
+    }
+
+ 
 /*
-    * Attempting to make error occur here: 
-    * when Node is out of memory
-
-    result = ListAdd(testList1, &n5);
-    current = testList1->currentItem;
-    head = testList1->headPointer;
-    tail = testList1->tailPointer;
-    if (result == -1) {
-        printf("testList1: ListAdd() adding 4th 'int':\n Not passed!\n");
-    } else if (head == tail) {
-        printf("testList1: (4th) head and tail return same\n Not passed!\n");
-    } else if (current->prevNode == NULL || current->nextNode != NULL) {
-        printf("testList1: (4th) node preference return wrong\n");
-        printf(" Not passed\n");
-    } else if (*((int*)current->dataType) != 6) {
-        printf("testList1: (4th) dataType return different.\n Not passed!\n");
-    }
-    else {
-        printf("testList1: ListAdd() adding 4th item:\n passed!\n");
-        printf("     Not supposed to pass here!\n");
-    }
-
-  
-    * Testing ListCount(LIST*)
-   
-    result = ListCount(testList);
-    if (result != 2) {
-        printf("testList: result return %d items\n Not passed!\n", result);
-    }
-    else {
-        printf("testList: return item:\n passed!\n");
-    }
-
-    result = ListCount(testList1);
-    if (result != 3) {
-        printf("testList1: result return %d items\n Not passed!\n", result);
-    }
-    else {
-        printf("testList1: return item:\n passed!\n");
-    }
-
    
     * Testing ListRemove(LIST *)
     

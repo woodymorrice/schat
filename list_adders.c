@@ -219,7 +219,9 @@ int ListAdd(LIST *list, void *item) {
                 */
                 curItem = list->currentItem;
                 curNext = curItem->nextNode;
-            
+                nodeBlock += 1;                                                 
+                curFreeNode->nextNode = &memoryNode[nodeBlock];
+                curFreeNode = curFreeNode->nextNode; 
                 curItem->nextNode = newItem;
                 curNext->prevNode = newItem;
                 newItem->nextNode = curNext;
