@@ -4,15 +4,18 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <signal.h>
+#include <time.h>
 
 #include <square.h>
 
 struct thrInfo thrArr[NUMTHRDS]; /* stores thread info */
+int thrOut[NUMTHRDS];
 
 void* parentThread(void *argPtr);
 void* childThread(void *argPtr);
 unsigned long int getThrId();
 void cHandler(int n);
+int getMs();
 
 int args[NUMARGS];
 
@@ -38,7 +41,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Error creating parent thread\n");
     }
 
-    pthread_join(id, NULL);
+    sleep(args[1]+2);
     return EXIT_SUCCESS;
 }
 
@@ -51,7 +54,7 @@ void* parentThread(void *argPtr) {
 
     printf("parent args: %d, %d, %d\n", args[0], args[1], args[2]);
     for (i = 0; i < args[0]; i++) {
-        thrArr[i].beginTime = 0;
+        thrArr[i].beginTime = getMs();
         thrArr[i].sqCalls = 0;
         printf("index at creation: %d\n", i);
         if (0 != pthread_create(&(thrArr[i].entryId),
@@ -66,12 +69,13 @@ void* parentThread(void *argPtr) {
     sleep(args[1]);
 
     for (i = 0; i < args[0]; i++) {
-        if (pthread_kill(thrArr[i].entryId, SIGTERM) == 0) {
+        if (thrOut[i] != 1) {
+        pthread_kill(thrArr[i].entryId, SIGTERM);
         printf("childThread %ld killed by parent."
                " %d square calls, %ld ms\n",
                thrArr[i].entryId,
                thrArr[i].sqCalls,
-               thrArr[i].beginTime);
+               getMs() - thrArr[i].beginTime);
         }
     }
 
@@ -108,10 +112,12 @@ void* childThread(void *argPtr) {
         square(i);
     }
 
+    thrOut[index] = 1;
+
     printf("childThread %ld finished:"
            "%d square calls, %ld ms\n",
             id, thrArr[index].sqCalls,
-            thrArr[index].beginTime);
+            getMs() - thrArr[index].beginTime);
 
     pthread_exit(NULL);
 }
@@ -127,3 +133,13 @@ void cHandler(int n) {
     }
 }
 
+int getMs() {
+    struct timespec clock;
+    int sec, msec;
+
+    clock_gettime(CLOCK_REALTIME, &clock);
+    sec = (clock.tv_sec % 10000) * 1000;
+    msec = clock.tv_nsec / 1000000;
+
+    return sec + msec;
+}

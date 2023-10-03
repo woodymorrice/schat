@@ -145,7 +145,6 @@ syscall(void)
   struct proc *p = myproc();
   int i;
   int bit;
-  int index;
 
   num = p->trapframe->a7;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
@@ -154,17 +153,14 @@ syscall(void)
     p->trapframe->a0 = syscalls[num]();
 
     /* New code for trace here */
-    if (p->tmask > 1) {
-      for (i = 0; i < 32; i++) {
+    if (p->tmask > 0) {
+      for (i = 1; i < 32; i++) {
         bit = p->tmask & (1 << i);
-        index = 0;
-        while (bit > 2) {
-          bit = bit / 2;
-          index += 1;
-        }
-        if (index == num - 1) {
-          printf("%d: syscall %s -> %d\n",
-                 p->pid, syscall_names[index], p->trapframe->a0);
+        if (bit != 0) {
+          if (i == num) {
+            printf("%d: syscall %s -> %d\n",
+                   p->pid, syscall_names[i-1], p->trapframe->a0);
+          }
         }
       }
     }
