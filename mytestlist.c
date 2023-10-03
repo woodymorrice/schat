@@ -5,24 +5,24 @@
 
 
 int main() {
-    LIST *testList;
+/*    LIST *testList;
     LIST *testList1;
     LIST *testList2;
     LIST *testList3;
 
     int n0, n1, n2, n3, n4, n5, result;
     char a, b, c, d;
-    /*double pFloat, pFloat1;*/
+    double pFloat, pFloat1;
     
-    struct NODE *tail;
-    struct NODE *head;
-    struct NODE *current;
-    struct NODE *next;
-    struct NODE *prev;
+    NODE *tail;
+    NODE *head;
+    NODE *current;
+    NODE *next;
+    NODE *prev;
     
-    /*
+
     * Use for testing functions in list_removers.c
-    */
+  
     int *resultPointer;
     
     a = 'a';
@@ -61,9 +61,8 @@ int main() {
         printf("testList2: ListCreate():\n passed!\n");
     }
 
-    /*
     Attempting to make the exceed error here
-    */
+ 
     testList3 = ListCreate();
     if (testList3 == NULL) {
         printf("testList3: ListCreated() not working, point to NULL\n");
@@ -71,10 +70,10 @@ int main() {
     else {
         printf("testList3: ListCreate():\n passed!\n");
     }
-
-    /*
+    
+    
     * Testing ListAdd(LIST*, void*)
-    */
+
     result = ListAdd(testList, &n0);
     current = testList->currentItem;
     head = testList->headPointer;
@@ -218,11 +217,10 @@ int main() {
         printf("testList1: (3rd) dataType return correct.\n passed!\n");
     }
     
-    /*
+ 
     * Attempting to make error occur here: 
     * when Node is out of memory
-    */
-    /*
+
     result = ListAdd(testList1, &n5);
     current = testList1->currentItem;
     head = testList1->headPointer;
@@ -241,11 +239,10 @@ int main() {
         printf("testList1: ListAdd() adding 4th item:\n passed!\n");
         printf("     Not supposed to pass here!\n");
     }
-    */
 
-    /*
+  
     * Testing ListCount(LIST*)
-    */
+   
     result = ListCount(testList);
     if (result != 2) {
         printf("testList: result return %d items\n Not passed!\n", result);
@@ -262,13 +259,12 @@ int main() {
         printf("testList1: return item:\n passed!\n");
     }
 
-    /*
+   
     * Testing ListRemove(LIST *)
-    */
     
-    /*
+    
     * Test when the current item is at head
-    */
+
     ListFirst(testList1);
     current = testList1->currentItem;
     next = current->nextNode;
@@ -394,9 +390,9 @@ int main() {
         printf("testList1: ListRemove(), successfully acquire new tail\n");
         printf(" passed!\n");
     }
-    /*
+
     * Testing ListAppend(LIST*, void*)
-    */
+    
     result = ListAppend(testList2, &a);
     current = testList2->currentItem;
     head = testList2->headPointer;
@@ -493,9 +489,9 @@ int main() {
         printf(" passed!\n");
     }
     
-    /*
+
     * Testing ListPrepend(LIST*, void*)
-    */
+    
     current = testList1->currentItem;
     next = current->nextNode;
     result = ListPrepend(testList2, &d);
@@ -537,7 +533,7 @@ int main() {
         printf("testList2: (4th) head and tail preference for new item\n");
         printf(" passed!\n");
     }
-    
+ */   
     return EXIT_SUCCESS;
 
 }

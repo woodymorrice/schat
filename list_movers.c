@@ -10,7 +10,8 @@ Woody Morrice - wam553 - 11071060
 
 
 void *ListFirst(LIST *list) {
-    return list->currentItem = list->headPointer;
+    list->currentItem = list->headPointer;
+    return list->currentItem;
 }
 
 void *ListLast(LIST *list) {
@@ -22,8 +23,8 @@ void *ListCurr(LIST *list) {
 }
 
 void *ListNext(LIST *list) {
-    struct NODE *item1;
-    struct NODE *itemMoved;
+    NODE *item1;
+    NODE *itemMoved;
 
     item1 = list->currentItem;
     /*

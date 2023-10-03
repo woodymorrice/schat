@@ -8,8 +8,6 @@ Woody Morrice - wam553 - 11071060
 #include <stdlib.h>
 #include <stdbool.h>
 #include <list.h>
-extern const int LIST_POOL_SIZE;
-extern const int NODE_POOL_SIZE;
 
 extern size_t memoryNodeUsed;
 extern size_t memoryListUsed;
@@ -19,6 +17,8 @@ extern LIST *curFreeList;
 extern LIST *memoryList;
 extern struct NODE *memoryNode;
 
+extern struct NODE *curFreeNode;
+
 bool notEmpty = false;
 
 void *ListRemove(LIST *list) {
@@ -27,51 +27,49 @@ void *ListRemove(LIST *list) {
     struct NODE *nextItem;
 
     curItem = list->currentItem;
-    /*
-    * If current list only has one item/one node
-    */
-    if(list->totalItem == 1) {
+    curFreeNode = curItem;
+    if (list->totalItem == 0) {
+        return NULL;
+    } else if(list->totalItem == 1) {
+        /*
+        * if list only has one item / one node
+        */
         list->currentItem = NULL;
         list->headPointer = NULL;
         list->tailPointer = NULL;
-    } else if (curItem == list->headPointer) {
-        /*
-        * Current item is at head 
-        */
-        struct NODE *oldHead;
-        
-        oldHead = list->headPointer;
-        nextItem = curItem->nextNode;
-        list->currentItem = nextItem;
-        list->headPointer = nextItem;
-        nextItem->prevNode = NULL;
-        oldHead->nextNode = NULL;
-    } else if (curItem == list->tailPointer) {
-        /*
-        * Current item is at tail
-        */
-        struct NODE *oldTail;
-
-        oldTail = list->tailPointer;
-        prevItem = curItem->prevNode;
-        list->currentItem = prevItem;
-        list->tailPointer = prevItem;
-        prevItem->nextNode = NULL;
-        oldTail->prevNode = NULL;     
     }
     else {
-        /*
-        * Current item is at middle 
-        */
-        nextItem = curItem->nextNode;
-        prevItem = curItem->prevNode;
+        if (curItem == list->headPointer) {
+            /*
+            * Current item is at head 
+            */
+            nextItem = curItem->nextNode;
+            list->currentItem = nextItem;
+            list->headPointer = nextItem;
+            nextItem->prevNode = NULL;
+        } else if (curItem == list->tailPointer) {
+            /*
+            * Current item is at tail
+            */
+            prevItem = curItem->prevNode;
+            list->currentItem = prevItem;
+            list->tailPointer = prevItem;
+            prevItem->nextNode = NULL;     
+        }
+        else {
+            /*
+            * Current item is at middle 
+            */
+            nextItem = curItem->nextNode;
+            prevItem = curItem->prevNode;
 
-        curItem->nextNode = NULL;
-        curItem->prevNode = NULL;
-        nextItem->prevNode = prevItem;
-        prevItem->nextNode = nextItem;
+            curItem->nextNode = NULL;
+            curItem->prevNode = NULL;
+            nextItem->prevNode = prevItem;
+            prevItem->nextNode = nextItem;
         
-        list->currentItem = nextItem; 
+            list->currentItem = nextItem; 
+        }
     }
     memoryNodeUsed -= sizeof(struct NODE);
     list->totalItem -= 1;
