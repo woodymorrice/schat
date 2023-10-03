@@ -36,14 +36,18 @@ int main() {
     n4 = 5;
     n5 = 6;
 */
-    int n0, n1, result;
+    int n0, n1, n2, n3, n4, result;
     NODE *current;
     NODE *head;
     NODE *tail;
+    NODE *next;
+    NODE *prev;
     
     n0 = 0;
     n1 = 1;
     n2 = 2;
+    n3 = 3;
+    n4 = 4;
     
     testList = ListCreate();
     if (testList == NULL) {
@@ -77,8 +81,8 @@ int main() {
     else {
         printf("testList3: ListCreate():\n passed!\n");
     }
-    
 
+    printf("\n\nBegin testing ListAdd() when currentPointer is at tail.\n\n");
 
     result = ListAdd(testList, &n0);
     current = testList->currentItem;
@@ -93,12 +97,17 @@ int main() {
     if (head != tail) {
         printf("testList: ListAdd(), head and tail not the same\n");
         printf(" Not passed\n");
-    } else if (current->prevNode != NULL && current->nextNode != NULL) {
+    }
+    else {
+        printf("testList: ListAdd(), head and tail preference:\n passed!\n");
+    }
+    if (current->prevNode != NULL && current->nextNode != NULL) {
         printf("testList: ListAdd(), current preference is wrong\n");
         printf(" Not passed\n");
     }
     else {
-        printf("testList: ListAdd(), head and tail preference:\n passed!\n");
+        printf("testList: ListAdd(), checking current preference:\n");
+        printf(" passed!\n");
     }
     if (*((int*)current->dataType) != 0) {
         printf("testList: (1st) dataType return different.\n Not passed!\n");
@@ -106,7 +115,6 @@ int main() {
     else {
         printf("testList: (1st) dataType return correct.\n passed!\n");
     }
-   
 
     result = ListAdd(testList, &n1);
     current = testList->currentItem;
@@ -121,12 +129,17 @@ int main() {
     if (head == tail) {
         printf("testList (2nd): ListAdd(), head and tail are the same\n");
         printf(" Not passed\n");
-    } else if (current->prevNode == NULL || current->nextNode != NULL) {
+    }
+    else {
+        printf("testList (2nd): ListAdd(), head and tail preference:\n");
+        printf(" passed!\n");
+    }
+    if (current->prevNode == NULL || current->nextNode != NULL) {
         printf("testList (2nd): ListAdd(), current preference is wrong\n");
         printf(" Not passed\n");
     }
     else {
-        printf("testList (2nd): ListAdd(), head and tail preference:\n");
+        printf("testList (2nd): ListAdd(), checking current preference:\n");
         printf(" passed!\n");
     }
     if (*((int*)current->dataType) != 1) {
@@ -147,15 +160,20 @@ int main() {
     else {
         printf("testList3: ListAdd() adding 3rd item return:\n passed!\n");
     }
-    if (head != tail) {
-        printf("testList (3rd): ListAdd(), head and tail not the same\n");
-        printf(" Not passed\n");
-    } else if (current->prevNode != NULL && current->nextNode != NULL) {
-        printf("testList (3rd): ListAdd(), current preference is wrong\n");
+    if (head == tail) {
+        printf("testList (3rd): ListAdd(), head and tail are the same\n");
         printf(" Not passed\n");
     }
     else {
         printf("testList (3rd): ListAdd(), head and tail preference:\n");
+        printf(" passed!\n");
+    }
+    if (current->prevNode == NULL || current->nextNode != NULL) {
+        printf("testList (3rd): ListAdd(), current preference is wrong\n");
+        printf(" Not passed\n");
+    }
+    else {
+        printf("testList (3rd): ListAdd(), checking current preference:\n");
         printf(" passed!\n");
     }
     if (*((int*)current->dataType) != 2) {
@@ -164,66 +182,83 @@ int main() {
     else {
         printf("testList: (3rd) dataType return correct.\n passed!\n");
     }
-/*
-    result = ListAdd(testList1, &n3);
-    current = testList1->currentItem;
-    head = testList1->headPointer;
-    tail = testList1->tailPointer;
+
+    printf("\n\nTesting ListAdd() when the currentPointer at head\n");
+    printf("Or at other position, such as middle\n\n");
+    
+    ListFirst(testList);
+    next = (testList->currentItem)->nextNode;
+    result = ListAdd(testList, &n3);
+    current = testList->currentItem;
+    head = testList->headPointer;
+    tail = testList->tailPointer;
     if (result == -1) {
-        printf("testList1: (2nd) ListAdd() return -1 for 'int':\n");
+        printf("testList: (4th) ListAdd() return -1 for 'int':\n");
         printf(" Not passed!\n");
     }
     else {
-        printf("testList1: ListAdd() adding 2nd item return:\n passed!\n");
+        printf("testList: ListAdd() adding 4th item return:\n passed!\n");
     }
     if (head == tail) {
-        printf("testList1 (2nd): ListAdd(), head and tail are the same\n");
-        printf(" Not passed\n");
-    } else if (current->prevNode == NULL || current->nextNode != NULL) {
-        printf("testList1 (2nd): ListAdd(), current preference is wrong\n");
+        printf("testList (4th): ListAdd(), head and tail are the same\n");
         printf(" Not passed\n");
     }
     else {
-        printf("testList1 (2nd): ListAdd(), head and tail preference:\n");
+        printf("testList (4th): ListAdd(), head and tail preference:\n");
+        printf(" passed!\n");
+    }
+    if (current->prevNode != head || current->nextNode != next) {
+        printf("testList (4th): ListAdd(), current preference is wrong\n");
+        printf(" Not passed\n");
+    }
+    else {
+        printf("testList (4th): ListAdd(), checking current preference:\n");
+        printf(" passed!\n");
+    }
+    if (*((int*)current->dataType) != 3) {
+        printf("testList: (4th) dataType return different.\n Not passed!\n");
+    }
+    else {
+        printf("testList: (4th) dataType return correct.\n passed!\n");
+    } 
+
+    prev = testList->currentItem;
+    next = (testList->currentItem)->nextNode;
+    result = ListAdd(testList, &n4);
+    current = testList->currentItem;
+    head = testList->headPointer;
+    tail = testList->tailPointer;
+    if (result == -1) {
+        printf("testList: (5th) ListAdd() return -1 for 'int':\n");
+        printf(" Not passed!\n");
+    }
+    else {
+        printf("testList: ListAdd() adding 5th item return:\n passed!\n");
+    }
+    if (head == tail) {
+        printf("testList (5th): ListAdd(), head and tail are the same\n");
+        printf(" Not passed\n");
+    }
+    else {
+        printf("testList (5th): ListAdd(), head and tail preference:\n");
+        printf(" passed!\n");
+    }
+    if (current->prevNode != prev || current->nextNode != next) {
+        printf("testList (5th): ListAdd(), current preference is wrong\n");
+        printf(" Not passed\n");
+    }
+    else {
+        printf("testList (5th): ListAdd(), checking current preference:\n");
         printf(" passed!\n");
     }
     if (*((int*)current->dataType) != 4) {
-        printf("testList1: (2nd) dataType return different.\n Not passed!\n");
+        printf("testList1: (5th) dataType return different.\n Not passed!\n");
     }
     else {
-        printf("testList1: (2nd) dataType return correct.\n passed!\n");
-    } 
-
-    result = ListAdd(testList1, &n4);
-    current = testList1->currentItem;
-    head = testList1->headPointer;
-    tail = testList1->tailPointer;
-    if (result == -1) {
-        printf("testList1: (3rd) ListAdd() return -1 for 'int':\n");
-        printf(" Not passed!\n");
-    }
-    else {
-        printf("testList1: ListAdd() adding 3rd item return:\n passed!\n");
-    }
-    if (head == tail) {
-        printf("testList1 (3rd): ListAdd(), head and tail are the same\n");
-        printf(" Not passed\n");
-    } else if (current->prevNode == NULL || current->nextNode != NULL) {
-        printf("testList1 (3rd): ListAdd(), current preference is wrong\n");
-        printf(" Not passed\n");
-    }
-    else {
-        printf("testList1 (3rd): ListAdd(), head and tail preference:\n");
-        printf(" passed!\n");
-    }
-    if (*((int*)current->dataType) != 5) {
-        printf("testList1: (3rd) dataType return different.\n Not passed!\n");
-    }
-    else {
-        printf("testList1: (3rd) dataType return correct.\n passed!\n");
+        printf("testList1: (5th) dataType return correct.\n passed!\n");
     }
     
- 
+/*
     * Attempting to make error occur here: 
     * when Node is out of memory
 
