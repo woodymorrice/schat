@@ -53,7 +53,7 @@ LIST *ListCreate () {
         memoryNode[0].dataType = NULL;                                             
         memoryNode[0].nextNode = &memoryNode[1];                                   
                                                                                 
-        for(node=1; node < NODE_POOL_SIZE - 1; node++){                                  
+        for(node = 1; node < NODE_POOL_SIZE - 1; node++){                                  
             memoryNode[node].prevNode = &memoryNode[node - 1];                         
             memoryNode[node].dataType = NULL;                                       
             memoryNode[node].nextNode = &memoryNode[node + 1];                         
@@ -88,7 +88,9 @@ LIST *ListCreate () {
         memoryList[LIST_POOL_SIZE - 1].totalItem = 0;
         memoryList[LIST_POOL_SIZE - 1].prevLP = &memoryList[list - 1];
         memoryList[LIST_POOL_SIZE - 1].nextLP = NULL;
-                              
+                       
+        curFreeList = &memoryList[listBlock];
+        curFreeNode = &memoryNode[nodeBlock];
         isInited = true;
     }
 
@@ -97,7 +99,6 @@ LIST *ListCreate () {
         printf("Error ListCreated(): memory list used exceed the limit\n");
         return NULL;
     }
-    curFreeList = &memoryList[listBlock];
     emptyList = curFreeList;
     memoryListUsed += sizeof(LIST);
     listBlock += 1;
@@ -190,6 +191,9 @@ int ListAdd(LIST *list, void *item) {
         if (list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
+            nodeBlock += 1;
+            curFreeNode->nextNode = &memoryNode[nodeBlock];
+            curFreeNode = curFreeNode->nextNode; 
             newItem->prevNode = NULL;
             newItem->nextNode = NULL;
             list->currentItem = list->headPointer;
@@ -200,7 +204,10 @@ int ListAdd(LIST *list, void *item) {
                 * current item is at tail
                 */
                 curItem = list->currentItem;
-                curItem->nextNode = newItem; 
+                curItem->nextNode = newItem;
+                nodeBlock += 1;
+                curFreeNode->nextNode = &memoryNode[nodeBlock];
+                curFreeNode = curFreeNode->nextNode; 
                 newItem->nextNode = NULL;
                 newItem->prevNode = curItem;
                 list->tailPointer = newItem;
@@ -223,7 +230,6 @@ int ListAdd(LIST *list, void *item) {
         }
         memoryNodeUsed += sizeof(NODE);
         list->totalItem += 1;
-        curFreeNode = curFreeNode->nextNode;
         return 0;
     }
     printf("Error ListAdd(): memory NODE used exceed the limit\n");

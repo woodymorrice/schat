@@ -5,15 +5,14 @@
 
 
 int main() {
-/*    LIST *testList;
+    LIST *testList;
     LIST *testList1;
     LIST *testList2;
     LIST *testList3;
-
+/*
     int n0, n1, n2, n3, n4, n5, result;
     char a, b, c, d;
-    double pFloat, pFloat1;
-    
+    double pFloat, pFloat1;    
     NODE *tail;
     NODE *head;
     NODE *current;
@@ -36,7 +35,16 @@ int main() {
     n3 = 4;
     n4 = 5;
     n5 = 6;
-
+*/
+    int n0, n1, result;
+    NODE *current;
+    NODE *head;
+    NODE *tail;
+    
+    n0 = 0;
+    n1 = 1;
+    n2 = 2;
+    
     testList = ListCreate();
     if (testList == NULL) {
         printf("testList: ListCreated() not working, point to NULL\n");
@@ -61,7 +69,6 @@ int main() {
         printf("testList2: ListCreate():\n passed!\n");
     }
 
-    Attempting to make the exceed error here
  
     testList3 = ListCreate();
     if (testList3 == NULL) {
@@ -71,8 +78,7 @@ int main() {
         printf("testList3: ListCreate():\n passed!\n");
     }
     
-    
-    * Testing ListAdd(LIST*, void*)
+
 
     result = ListAdd(testList, &n0);
     current = testList->currentItem;
@@ -94,7 +100,7 @@ int main() {
     else {
         printf("testList: ListAdd(), head and tail preference:\n passed!\n");
     }
-    if (*((int*)current->dataType) != 1) {
+    if (*((int*)current->dataType) != 0) {
         printf("testList: (1st) dataType return different.\n Not passed!\n");
     }
     else {
@@ -123,42 +129,42 @@ int main() {
         printf("testList (2nd): ListAdd(), head and tail preference:\n");
         printf(" passed!\n");
     }
-    if (*((int*)current->dataType) != 2) {
+    if (*((int*)current->dataType) != 1) {
         printf("testList: (2nd) dataType return different.\n Not passed!\n");
     }
     else {
         printf("testList: (2nd) dataType return correct.\n passed!\n");
     }
 
-    result = ListAdd(testList1, &n2);
+    result = ListAdd(testList, &n2);
     current = testList1->currentItem;
     head = testList1->headPointer;
     tail = testList1->tailPointer;
     if (result == -1) {
-        printf("testList1: (1st) ListAdd() return -1 for 'int':\n");
+        printf("testList: (3rd) ListAdd() return -1 for 'int':\n");
         printf(" Not passed!\n");
     }
     else {
-        printf("testList1: ListAdd() adding 1st item return:\n passed!\n");
+        printf("testList3: ListAdd() adding 3rd item return:\n passed!\n");
     }
     if (head != tail) {
-        printf("testList1 (1st): ListAdd(), head and tail not the same\n");
+        printf("testList (3rd): ListAdd(), head and tail not the same\n");
         printf(" Not passed\n");
     } else if (current->prevNode != NULL && current->nextNode != NULL) {
-        printf("testList1 (1st): ListAdd(), current preference is wrong\n");
+        printf("testList (3rd): ListAdd(), current preference is wrong\n");
         printf(" Not passed\n");
     }
     else {
-        printf("testList1 (1st): ListAdd(), head and tail preference:\n");
+        printf("testList (3rd): ListAdd(), head and tail preference:\n");
         printf(" passed!\n");
     }
-    if (*((int*)current->dataType) != 3) {
-        printf("testList1: (1st) dataType return different.\n Not passed!\n");
+    if (*((int*)current->dataType) != 2) {
+        printf("testList: (3rd) dataType return different.\n Not passed!\n");
     }
     else {
-        printf("testList1: (1st) dataType return correct.\n passed!\n");
+        printf("testList: (3rd) dataType return correct.\n passed!\n");
     }
-
+/*
     result = ListAdd(testList1, &n3);
     current = testList1->currentItem;
     head = testList1->headPointer;
