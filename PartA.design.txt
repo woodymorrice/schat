@@ -51,7 +51,9 @@ included via the square.h header file and should not need to be modified
 for any of the individual parts of part A.
 Each individual part of A will implement the getThrId function which will
 call its API specific function to retrieve the thread id, and return it as
-an unsigned long integer. 
+an unsigned long integer.
+After the deadline is reached, the program will sleep for an additional
+2 seconds to allow child threads to print to the console.
 
 
 # A1
