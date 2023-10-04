@@ -888,90 +888,106 @@ int main() {
         printf(" passed!\n");
     }     
     
-/*
-    ListFirst(testList2);
-    result = ListAppend(testList2, &c);
-    current = testList2->currentItem;
-    head = testList2->headPointer;
-    tail = testList2->tailPointer;
+    printf("\n\nTesting ListPrepend() on testList\n\n");
+    ListFirst(testList);
+    prev = testList->headPointer;
+    result = ListPrepend(testList, &n2);
+    current = testList->currentItem;
+    head = testList->headPointer;
+    tail = testList->tailPointer;
+     
     if (result == -1) {
-        printf("testList2: (3rd) ListAppend() return -1 for 'char':\n");
+        printf("testList: ListPrepend() return -1 for 'int'\n");
         printf(" Not passed!\n");
     }
     else {
-        printf("testList2: ListAppend() adding 3rd item 'char':\n passed!\n");
+        printf("testList: ListPrepend() adding 1st item 'int'\n");
+        printf(" passed!\n");
     }
     if (head == tail) {
-        printf("testList2 (3rd): ListAppend(), head and tail are the same\n");
-        printf(" Not passed\n");
-    } else if (current->prevNode != head || current->nextNode != tail) {
-        printf("testList2 (3rd): ListAppend(), current preference is wrong\n");
+        printf("testList: ListPrepend(), head and tail are the same\n");
         printf(" Not passed\n");
     }
     else {
-        printf("testList2 (3rd): Listppend(), head and tail preference:\n");
+        printf("testList: ListPrepend(), checking current head and tail\n");
         printf(" passed!\n");
     }
-    if (*((char*)current->dataType) != 'c') {
-        printf("testList2: (3rd) dataType return different.\n Not passed!\n");
+    if (current->prevNode != NULL || current->nextNode != prev) {
+        printf("testList: ListPrepend(), current preference is wrong\n");
+        printf(" Not passed\n");
     }
     else {
-        printf("testList2: (3rd) dataType return correct.\n passed!\n");
+        printf("testList: ListPrepend(), check current preference\n");
+        printf(" passed!\n");
     }
-    if (head->nextNode != current && tail->prevNode != current) {
-        printf("testList2: (3rd) head and tail preference for new item\n");
+    if (*((int*)current->dataType) != 2) {
+        printf("testList: ListPrepend() dataType return different.\n");
+        printf("Not passed!\n");
+    }
+    else {
+        printf("testList: ListPrepend() dataType return correct.\n");
+        printf(" passed!\n");
+    }
+    if (testList->totalItem != 5) {
+        printf("testList: ListPrepend() totalItem return different\n");
+        printf("Return: &d item, instead of 5\n");
         printf(" Not passed!\n");
     }
     else {
-        printf("testList2: (3rd) head and tail preference for new item\n");
+        printf("testList: ListPrepend() totatlItem return correct\n");
         printf(" passed!\n");
-    }
-    
+    } 
 
-    * Testing ListPrepend(LIST*, void*)
     
-    current = testList1->currentItem;
-    next = current->nextNode;
-    result = ListPrepend(testList2, &d);
-    head = testList1->headPointer;
-    tail = testList1->tailPointer;
+    prev = testList->headPointer;
+    result = ListPrepend(testList, &n5);
+    current = testList->currentItem;
+    head = testList->headPointer;
+    tail = testList->tailPointer;
+   
     if (result == -1) {
-        printf("testList2: (4th) ListPrepend() return -1 for 'char':\n");
+        printf("testList (2nd): ListPrepend() return -1 for 'int'\n");
         printf(" Not passed!\n");
     }
     else {
-        printf("testList2: ListPrepend() adding 4th item 'char':\n");
+        printf("testList (2nd): ListPrepend() adding 2nd item 'int'\n");
         printf(" passed!\n");
     }
     if (head == tail) {
-        printf("testList2 (4th): ListPrepend(), head and tail are the same\n");
-        printf(" Not passed\n");
-    } else if (testList2->currentItem == head || 
-            testList2->currentItem == tail) {
-        printf("testList2 (4th): ListPrepend(),current preference is wrong\n");
+        printf("testList (2nd): ListPrepend(), head and tail are the same\n");
         printf(" Not passed\n");
     }
     else {
-        printf("testList2 (4th): ListPrepend(), head and tail preference:\n");
+        printf("testList (2nd): ListPrepend(), checking current head"); 
+        printf(" and tail\n");
         printf(" passed!\n");
     }
-    if (*((char*)current->dataType) != 'd') {
-        printf("testList2: (4th) ListPrepend() dataType return different.\n");
+    if (current->prevNode != NULL || current->nextNode != prev) {
+        printf("testList (2nd): ListPrepend(), current preference is wrong\n");
+        printf(" Not passed\n");
+    }
+    else {
+        printf("testList (2nd): ListPrepend(), check current preference\n");
+        printf(" passed!\n");
+    }
+    if (*((int*)current->dataType) != 5) {
+        printf("testList (2nd): ListPrepend() dataType return different.\n");
+        printf("Not passed!\n");
+    }
+    else {
+        printf("testList (2nd): ListPrepend() dataType return correct.\n");
+        printf(" passed!\n");
+    }
+    if (testList->totalItem != 6) {
+        printf("testList (2nd): ListPrepend() totalItem return different\n");
+        printf("Return: &d item, instead of 6\n");
         printf(" Not passed!\n");
     }
     else {
-        printf("testList2: (4th) ListPrepend() dataType return correct.\n");
+        printf("testList (2nd): ListPrepend() totatlItem return correct\n");
         printf(" passed!\n");
-    }
-    if (head->nextNode != current || tail->prevNode == current) {
-        printf("testList2: (4th) head and tail preference for new item\n");
-        printf(" Not passed!\n");
-    }
-    else {
-        printf("testList2: (4th) head and tail preference for new item\n");
-        printf(" passed!\n");
-    }
- */   
+    } 
+    
     return EXIT_SUCCESS;
 
 }

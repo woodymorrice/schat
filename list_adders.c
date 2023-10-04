@@ -148,31 +148,33 @@ int ListAppend (LIST *list, void *item) {
 int ListPrepend (LIST *list, void *item) {
     NODE *prevHead;
     NODE *newItem;
-    prevHead = list->headPointer;
-    newItem = curFreeNode;
-    newItem->dataType = item;
     /*
     * If the current pointer is at the head of list,
     * item is added at the end.
     */
     if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
+        prevHead = list->headPointer;
+        newItem = curFreeNode;
+        newItem->dataType = item;
+
         if (list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
+            curFreeNode = curFreeNode->nextNode;
             newItem->prevNode = NULL;
-            newItem->nextNode = prevHead;
+            newItem->nextNode = NULL;
         }
         else {
-            ListFirst(list);
+            list->currentItem = list->headPointer;
+            curFreeNode = curFreeNode->nextNode;
             list->headPointer = newItem;
             newItem->prevNode = NULL;
             newItem->nextNode = prevHead;
             prevHead->prevNode = newItem;
         }
-        ListFirst(list);
+        list->currentItem = newItem;
         list->totalItem += 1;
         memoryNodeUsed += sizeof(NODE);
-        nodeBlock += 1;
         return 0;
     }
     printf("Error ListPrepend(): memory NODE used exceed the limit\n");
