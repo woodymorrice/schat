@@ -52,17 +52,12 @@ void* parentThread(void *argPtr) {
 
     args = (int*)argPtr;
 
-    printf("parent args: %d, %d, %d\n", args[0], args[1], args[2]);
     for (i = 0; i < args[0]; i++) {
         thrArr[i].beginTime = getMs();
         thrArr[i].sqCalls = 0;
-        printf("index at creation: %d\n", i);
         if (0 != pthread_create(&(thrArr[i].entryId),
                  NULL, childThread, (void*)args)) {
             fprintf(stderr, "Error creating child thread\n");
-        }
-        else {
-            printf("child pid at creation: %lu\n", thrArr[i].entryId);
         }
     }
 
@@ -71,8 +66,8 @@ void* parentThread(void *argPtr) {
     for (i = 0; i < args[0]; i++) {
         if (thrOut[i] != 1) {
         pthread_kill(thrArr[i].entryId, SIGTERM);
-        printf("childThread %ld killed by parent."
-               " %d square calls, %ld ms\n",
+        printf("Child %ld killed by parent: "
+               "%d square calls, %ld ms\n",
                thrArr[i].entryId,
                thrArr[i].sqCalls,
                getMs() - thrArr[i].beginTime);
@@ -97,16 +92,8 @@ void* childThread(void *argPtr) {
 
     id = getThrId();
 
-    printf("pid returned in child: %lu\n", id);
-
-    printf("child args: %d, %d, %d\n", args[0], args[1], args[2]);
-
     for (index = 0; thrArr[index].entryId != id &&
             index < args[0]; index++);
-
-    /* thrArr[index].beginTime = (unsigned)Time(); */
-
-    printf("index in child: %d\n", index);
 
     for (i = 1; i <= args[2]; i++) {
         square(i);
@@ -114,7 +101,7 @@ void* childThread(void *argPtr) {
 
     thrOut[index] = 1;
 
-    printf("childThread %ld finished:"
+    printf("Child %ld finished: "
            "%d square calls, %ld ms\n",
             id, thrArr[index].sqCalls,
             getMs() - thrArr[index].beginTime);

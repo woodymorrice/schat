@@ -38,26 +38,25 @@ and the address of the array will be passed to the created threads. If any
 of the provided arguments are not within the acceptable range, the program
 will exit silently but emit an exit code that indicates the program did
 not complete its operations successfully. Child thread information will
-be stored in a hash table. Each thread will have a unique hash entry object
-with three fields: threadId will store the thread identifier as an unsigned
-long integer, beginTime will store the system time when the thread was
-created as an unsigned long integer, and sqCalls will store the number of
-calls to the square function from that thread as an unsigned integer.
-The hashIn function will hash the thread id to an open index in the hash
-table and return that index. The child thread will index into the hash
-table and insert the necessary information. The hFind function hashes the
-thread id and finds the index with a matching thread id, and is used by the
-square function to identify the appropriate entry in the table to increment.
-The three API independent functions (square, hashIn and hFind) will be
-located in the square.c source file and included via the square.h header
-file.
+be stored in an array of threadInfo objects with three fields: threadId 
+will store the thread identifier as an unsigned long integer, beginTime
+will store the system time when the thread was created as an unsigned long
+integer, and sqCalls will store the number of calls to the square function
+from that thread as an unsigned integer. The array will hold a maximum of
+64 threads. Child threads will be stored in the array in the order they
+are created, and indexed by comparing their thread ID obtained with
+getThrId() with the thread ID stored in their corresponding threadInfo object.
+The square() function will be located in the square.c source file and
+included via the square.h header file and should not need to be modified
+for any of the individual parts of part A.
 Each individual part of A will implement the getThrId function which will
 call its API specific function to retrieve the thread id, and return it as
 an unsigned long integer. 
 
+
 # A1
-Each thread will be created with a stack size of 2 mb, which will allow
-a size argument of up to 100000 without causing an overflow. The main
+Each thread will be created with a stack size of 1 mb, which will allow
+a size argument of up to 20000 without causing an overflow. The main
 function and parent thread will call the Sleep() function to wait until
 the deadline. The SYSTEMTIME structure documentation page located at
 learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime
@@ -85,11 +84,86 @@ Postconditions: keepRunning global variable must be set to false.
 Preconditions: n must be a positive integer.
 Postconditions: n == 0
 
+# unsigned long int getThrId()
+Preconditions: none
+Postconditions: none
+
+
 # A2
-Pending implementation...
+Child threads are created with a stack size of 1 mb for consistency with
+part A1 and so that the test parameters are the same. I used Time()
+from ubc pthreads at the beginning and end of child thread execution
+and took the difference. I casted the output of MyPid() to unsigned
+to keep it consistent with part A1. The parent thread is created with
+HIGH priority allowing it to create all the child threads without
+being bogged down by their calculations, but as a result the child
+threads' running time may be shorter.
+
+# PROCESS parentThread(void* argPtr)
+Preconditions: Command line parameters must be integers
+Postconditions: Child threads must complete and output to console, or
+be killed and parentThread prints their output.
+
+# PROCESS childThread(void* argPtr)
+Preconditions: Parameters passed from parentThread should be valid and
+appropriate.
+Postconditions: Must output to console or be killed by parent.
+
+# int square(int n)
+Preconditions: n must be a positive integer.
+Postconditions: n == 0
+
+# unsigned long int getThrId()
+Preconditions: none
+Postconditions: none
 
 # A3
-Pending implementation...
+I wanted to maintain code clarity and avoid using posix
+thread attribute objects, and according to
+https://man7.org/linux/man-pages/man3/pthread_create.3.html
+the default stack size is 2 mb on x86_64 architecture. Since
+that is more than sufficient for consistency in testing maximum
+values for inputs with the other parts of part A, I kept the
+default value. I used a couple extra functions here: cHandler()
+is a signal handler function that terminates the child threads
+when the deadline is reached, and getMs() is a function that
+parses the output of the clock_gettime into a value in ms
+with enough resolution to track the thread running time at the
+maximum deadline value. The implementation here is similar to A2
+where the parent thread kills the child threads if the deadline
+is reached, the main difference is that pthread_kill sends a
+signal (ubc pthreads kill() does not as far as I know). This
+implementation also uses one extra global array, thrOut, where
+each child thread toggles a boolean just before they output to
+the console. The parent thread checks those booleans when it is
+killing the remaining child threads after the deadline to ensure
+that no thread output is printed twice.
+
+# void* parentThread(void *argPtr);
+Preconditions: Command line parameters must be integers
+Postconditions: Child threads must complete and output to console, or
+be killed and parentThread prints their output.
+
+# void* childThread(void *argPtr);
+Preconditions: Parameters passed from parentThread should be valid and
+appropriate.
+Postconditions: Must output to console or be killed by parent.
+
+# int square(int n)
+Preconditions: n must be a positive integer.
+Postconditions: n == 0
+
+# unsigned long int getThrId();
+Preconditions: none
+Postconditions: none
+
+# void cHandler(int n);
+Preconditions: Thread must receive a signal
+Postconditions: Thread must exit
+
+# int getMs();
+Preconditions: none
+Postconditions: none
 
 # A4
 Pending implementation...

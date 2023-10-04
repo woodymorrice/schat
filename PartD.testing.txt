@@ -14,7 +14,7 @@ after each read statement to print the byte that was read. This way
 the test results can be checked directly against the code. Two buffers
 are used to make the results even more explicit. The buffers will both
 be initialized to "0", and after both read actions, should contain
-"1". So the result of the test should look something like this:
+"1". So the output of the test should look something like this:
 
 buffer 1: 0
 buffer 2: 0
