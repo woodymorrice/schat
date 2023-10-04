@@ -12,28 +12,27 @@ Woody Morrice - wam553 - 11071060
 extern size_t memoryNodeUsed;
 extern size_t memoryListUsed;
 
-extern LIST *curFreeList;
-
 extern LIST *memoryList;
-extern struct NODE *memoryNode;
+extern NODE *memoryNode;
 
-extern struct NODE *curFreeNode;
+extern NODE *curFreeNode;
+extern LIST *curFreeList;
 
 bool notEmpty = false;
 
 void *ListRemove(LIST *list) {
-    struct NODE *curItem;
-    struct NODE *prevItem;
-    struct NODE *nextItem;
+    NODE *curItem;
+    NODE *prevItem;
+    NODE *nextItem;
 
     curItem = list->currentItem;
-    curFreeNode = curItem;
     if (list->totalItem == 0) {
         return NULL;
     } else if(list->totalItem == 1) {
         /*
         * if list only has one item / one node
         */
+        curFreeNode = curItem;
         list->currentItem = NULL;
         list->headPointer = NULL;
         list->tailPointer = NULL;
@@ -71,14 +70,14 @@ void *ListRemove(LIST *list) {
             list->currentItem = nextItem; 
         }
     }
-    memoryNodeUsed -= sizeof(struct NODE);
+    memoryNodeUsed -= sizeof(NODE);
     list->totalItem -= 1;
     return curItem->dataType;
 }
 
 
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
-    struct NODE *curItem;
+    NODE *curItem;
     LIST *curList;
     int i;
     ListFirst(list);
@@ -108,8 +107,8 @@ void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
 }
 
 void *ListTrim(LIST *list) {
-    struct NODE *oldTail;
-    struct NODE *newTail;
+    NODE *oldTail;
+    NODE *newTail;
     if (list->totalItem == 0) {
         return NULL;
     }
@@ -117,7 +116,7 @@ void *ListTrim(LIST *list) {
     newTail = oldTail->prevNode;
     oldTail->prevNode = NULL;
     newTail->nextNode = NULL;
-    memoryNodeUsed -= sizeof(struct NODE);
+    memoryNodeUsed -= sizeof(NODE);
     list->totalItem -= 1;
     return oldTail->dataType;
 }

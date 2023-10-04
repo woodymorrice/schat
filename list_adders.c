@@ -102,6 +102,8 @@ LIST *ListCreate () {
     emptyList = curFreeList;
     memoryListUsed += sizeof(LIST);
     listBlock += 1;
+    curFreeList->nextLP = &memoryList[listBlock];
+    curFreeList = curFreeList->nextLP;
     return emptyList;
 }
     
