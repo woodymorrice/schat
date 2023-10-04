@@ -22,7 +22,7 @@ int args[NUMARGS];
 int main(int argc, char* argv[]) { 
     pthread_t id;
 
-    if (argc != 4) {
+    if (argc < 4) {
         return EXIT_FAILURE;
     } else {
         args[0] = atoi(argv[1]);

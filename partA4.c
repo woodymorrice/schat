@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     struct sigaction sa;
     int index;
 
-    if (argc != 4) {
+    if (argc < 4) {
         return EXIT_FAILURE;
     } else {
         args[0] = atoi(argv[1]);
