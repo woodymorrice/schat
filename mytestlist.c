@@ -791,67 +791,104 @@ int main() {
         printf(" passed!\n");
     }       
 
-/*
-    * Testing ListAppend(LIST*, void*)
+    printf("\n\nTesting ListAppend() on testList\n\n");
     
-    result = ListAppend(testList2, &a);
-    current = testList2->currentItem;
-    head = testList2->headPointer;
-    tail = testList2->tailPointer;
+    prev = testList->tailPointer;
+    result = ListAppend(testList, &n0);
+    current = testList->currentItem;
+    head = testList->headPointer;
+    tail = testList->tailPointer;
     if (result == -1) {
-        printf("testList2: (1st) ListAppend() return -1 for 'char':\n");
+        printf("testList: ListAppend() return -1 for 'int'\n");
         printf(" Not passed!\n");
     }
     else {
-        printf("testList2: ListAppend() adding 1st item 'char':\n passed!\n");
-    }
-    if (head != tail) {
-        printf("testList2 (1st): ListAppend(), head and tail not the same\n");
-        printf(" Not passed\n");
-    } else if (current->prevNode != NULL || current->nextNode != NULL) {
-        printf("testList2 (1st): ListAppend(), current preference is wrong\n");
-        printf(" Not passed\n");
-    }
-    else {
-        printf("testList2 (1st): Listppend(), head and tail preference:\n");
+        printf("testList: ListAppend() adding 1st item 'int'\n");
         printf(" passed!\n");
-    }
-    if (*((char*)current->dataType) != 'a') {
-        printf("testList2: (1st) dataType return different.\n Not passed!\n");
-    }
-    else {
-        printf("testList2: (1st) dataType return correct.\n passed!\n");
-    }
-
-    result = ListAppend(testList2, &b);
-    current = testList2->currentItem;
-    head = testList2->headPointer;
-    tail = testList2->tailPointer;
-    if (result == -1) {
-        printf("testList2: (2nd) ListAppend() return -1 for 'char':\n");
-        printf(" Not passed!\n");
-    }
-    else {
-        printf("testList2: ListAppend() adding 2nd item 'char':\n passed!\n");
     }
     if (head == tail) {
-        printf("testList2 (2nd): ListAppend(), head and tail are the same\n");
-        printf(" Not passed\n");
-    } else if (current->prevNode == NULL || current->nextNode != NULL) {
-        printf("testList2 (2nd): ListAppend(), current preference is wrong\n");
+        printf("testList: ListAppend(), head and tail are the same\n");
         printf(" Not passed\n");
     }
     else {
-        printf("testList2 (2nd): Listppend(), head and tail preference:\n");
+        printf("testList: ListAppend(), checking current head and tail\n");
         printf(" passed!\n");
     }
-    if (*((char*)current->dataType) != 'b') {
-        printf("testList2: (2nd) dataType return different.\n Not passed!\n");
+    if (current->prevNode != prev || current->nextNode != NULL) {
+        printf("testList: ListAppend(), current preference is wrong\n");
+        printf(" Not passed\n");
     }
     else {
-        printf("testList2: (2nd) dataType return correct.\n passed!\n");
+        printf("testList: ListAppend(), check current preference\n");
+        printf(" passed!\n");
     }
-
+    if (*((int*)current->dataType) != 0) {
+        printf("testList: ListAppend() dataType return different.\n");
+        printf("Not passed!\n");
+    }
+    else {
+        printf("testList: ListAppend() dataType return correct.\n");
+        printf(" passed!\n");
+    }
+    if (testList->totalItem != 3) {
+        printf("testList: ListAppend() totalItem return different\n");
+        printf("Return: &d item, instead of 3\n");
+        printf(" Not passed!\n");
+    }
+    else {
+        printf("testList: ListAppend() totatlItem return correct\n");
+        printf(" passed!\n");
+    }
+    
+    prev = testList->tailPointer;
+    result = ListAppend(testList, &n1);
+    current = testList->currentItem;
+    head = testList->headPointer;
+    tail = testList->tailPointer;
+    if (result == -1) {
+        printf("testList (2nd): ListAppend() return -1 for 'int'\n");
+        printf(" Not passed!\n");
+    }
+    else {
+        printf("testList (2nd): ListAppend() adding 2nd item 'int'\n");
+        printf(" passed!\n");
+    }
+    if (head == tail) {
+        printf("testList (2nd): ListAppend(), head and tail are the same\n");
+        printf(" Not passed\n");
+    }
+    else {
+        printf("testList (2nd): ListAppend(), checking current head and tail");
+        printf("\n");
+        printf(" passed!\n");
+    }
+    if (current->prevNode != prev || current->nextNode != NULL) {
+        printf("testList (2nd): ListAppend(), current preference is wrong\n");
+        printf(" Not passed\n");
+    }
+    else {
+        printf("testList (2nd): ListAppend(), check current preference\n");
+        printf(" passed!\n");
+    }
+    if (*((int*)current->dataType) != 1) {
+        printf("testList (2nd): ListAppend() dataType return different.\n");
+        printf("Not passed!\n");
+    }
+    else {
+        printf("testList (2nd): ListAppend() dataType return correct.\n");
+        printf(" passed!\n");
+    }
+    if (testList->totalItem != 4) {
+        printf("testList (2nd): ListAppend() totalItem return different\n");
+        printf("Return: &d item, instead of 4\n");
+        printf(" Not passed!\n");
+    }
+    else {
+        printf("testList (2nd): ListAppend() totatlItem return correct\n");
+        printf(" passed!\n");
+    }     
+    
+/*
     ListFirst(testList2);
     result = ListAppend(testList2, &c);
     current = testList2->currentItem;

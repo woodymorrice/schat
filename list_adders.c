@@ -116,28 +116,28 @@ int ListAppend (LIST *list, void *item) {
     NODE *newItem;
 
     if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
+        prevTail = list->tailPointer;
         list->currentItem = list->tailPointer;
         newItem = curFreeNode;
         newItem->dataType = item;
-        prevTail = list->tailPointer;
          
-        if(list->totalItem == 0) {
+        if (list->totalItem == 0) {
+            curFreeNode = curFreeNode->nextNode;
             list->headPointer = newItem;
             list->tailPointer = newItem;
             newItem->prevNode = NULL;
             newItem->nextNode = NULL;
         }
         else {
+            curFreeNode = curFreeNode->nextNode;
             list->tailPointer = newItem;
+            prevTail->nextNode = newItem;
             newItem->prevNode = prevTail;
             newItem->nextNode = NULL;
             list->currentItem = list->tailPointer;
         }
         list->totalItem += 1;
         memoryNodeUsed += sizeof(NODE);
-        nodeBlock += 1;
-        curFreeNode = curFreeNode->nextNode;
-        curFreeNode->nextNode = &memoryNode[nodeBlock];
         return 0;
     }
     printf("Error ListAppend(): memory NODE used exceed the limit\n");
@@ -193,8 +193,6 @@ int ListAdd(LIST *list, void *item) {
         if (list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
-            nodeBlock += 1;
-            curFreeNode->nextNode = &memoryNode[nodeBlock];
             curFreeNode = curFreeNode->nextNode; 
             newItem->prevNode = NULL;
             newItem->nextNode = NULL;
@@ -207,8 +205,6 @@ int ListAdd(LIST *list, void *item) {
                 */
                 curItem = list->currentItem;
                 curItem->nextNode = newItem;
-                nodeBlock += 1;
-                curFreeNode->nextNode = &memoryNode[nodeBlock];
                 curFreeNode = curFreeNode->nextNode; 
                 newItem->nextNode = NULL;
                 newItem->prevNode = curItem;
@@ -221,8 +217,6 @@ int ListAdd(LIST *list, void *item) {
                 */
                 curItem = list->currentItem;
                 curNext = curItem->nextNode;
-                nodeBlock += 1;                                                 
-                curFreeNode->nextNode = &memoryNode[nodeBlock];
                 curFreeNode = curFreeNode->nextNode; 
                 curItem->nextNode = newItem;
                 curNext->prevNode = newItem;
