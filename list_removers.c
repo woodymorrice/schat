@@ -32,6 +32,7 @@ void *ListRemove(LIST *list) {
         /*
         * if list only has one item / one node
         */
+        curItem->nextNode = curFreeNode;
         curFreeNode = curItem;
         list->currentItem = NULL;
         list->headPointer = NULL;
