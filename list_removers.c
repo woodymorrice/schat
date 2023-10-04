@@ -44,6 +44,8 @@ void *ListRemove(LIST *list) {
             * Current item is at head 
             */
             nextItem = curItem->nextNode;
+            curItem->nextNode = curFreeNode;
+            curFreeNode = curItem;
             list->currentItem = nextItem;
             list->headPointer = nextItem;
             nextItem->prevNode = NULL;
@@ -52,9 +54,12 @@ void *ListRemove(LIST *list) {
             * Current item is at tail
             */
             prevItem = curItem->prevNode;
+            curItem->nextNode = curFreeNode;
+            curFreeNode = curItem;
+            curFreeNode->prevNode = NULL;
             list->currentItem = prevItem;
             list->tailPointer = prevItem;
-            prevItem->nextNode = NULL;     
+            prevItem->nextNode = NULL;
         }
         else {
             /*
