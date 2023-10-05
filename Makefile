@@ -14,7 +14,8 @@ POSINC = -pthread
 
 # Main Target
 ifeq ($(PLATFORM),Linux)
-all: mytestlist partA2 partA3 partA4
+all: mytestlist-Linuxx86_64 testlist-Linuxx86_64 \
+	 partA2 partA3 #partA4
 
 else ifeq (MSYS,$(findstring MSYS,$(PLATFORM)))
 all: partA1.exe
@@ -80,8 +81,13 @@ square.o: square.c square.h
 # List Library
 
 # Linking
-mytestlist: mytestlist.o liblist.a
-	$(CC) $(LILIB) -llist -o mytestlist mytestlist.o liblist.a
+mytestlist-Linuxx86_64: mytestlist.o liblist.a
+	$(CC) $(LILIB) -llist -o mytestlist-Linuxx86_64 \
+		mytestlist.o liblist.a
+
+testlist-Linuxx86_64: testlist.o liblist.a
+	$(CC) $(LILIB) -llist -o testlist-Linuxx86_64 \
+		testlist.o liblist.a
 
 # Archiving
 liblist.a : list_adders.o list_movers.o list_removers.o
@@ -101,10 +107,13 @@ list_removers.o: list_removers.c list.h
 mytestlist.o: mytestlist.c list.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c mytestlist.c -o mytestlist.o
 
+testlist.o: testlist.c list.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c testlist.c -o testlist.o
 
 # Misc
 .PHONY: clean all
 
 clean:
-	rm -f *.o partA1.exe partA2 partA3 partA4
-	rm -f liblist.a mytestlist
+	rm -f *.o partA1.exe partA2 partA3 partA4 \
+		liblist.a mytestlist testlist \
+		mytestlist-Linuxx86_64 testlist-Linuxx86_64

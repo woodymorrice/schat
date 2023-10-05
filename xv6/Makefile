@@ -140,7 +140,10 @@ UPROGS=\
 	$U/_zombie\
 	$U/_pingpong\
 	$U/_trace
-
+	# Begin CMPT 332 group14 change Fall 2023
+	# Phong Thanh Nguyen (David) - wdz468 - 11310824
+	# Woody Morrice - wam553 - 11071060
+	# End CMPT 332 group14 change Fall 2023
 
 fs.img: mkfs/mkfs README $(UEXTRA) $(UPROGS)
 	mkfs/mkfs fs.img README $(UEXTRA) $(UPROGS)

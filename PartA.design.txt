@@ -168,5 +168,6 @@ Preconditions: none
 Postconditions: none
 
 # A4
-Pending implementation...
+I started implementing A4 but I did not complete it according to
+the specifications so it was not included.
 

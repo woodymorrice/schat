@@ -101,7 +101,14 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
+
+/* Begin CMPT 332 group14 change Fall 2023 */
+/* Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+
 extern uint64 sys_trace(void);
+
+/* End CMPT 332 group14 change Fall 2023 */
 
 /* An array mapping syscall numbers from syscall.h */
 /* to the function that handles the system call. */
@@ -127,6 +134,9 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+
+/* Begin CMPT 332 group14 change Fall 2023 */
+
 [SYS_trace]   sys_trace,
 };
 
@@ -138,13 +148,20 @@ char* syscall_names[] = {
     "close", "trace"
 };
 
+/* End CMPT 332 group14 change Fall 2023 */
+
 void
 syscall(void)
 {
   int num;
   struct proc *p = myproc();
+
+  /* Begin CMPT 332 group14 change Fall 2023 */
+
   int i;
   int bit;
+
+  /* End CMPT 332 group14 change Fall 2023 */
 
   num = p->trapframe->a7;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
@@ -152,18 +169,22 @@ syscall(void)
     /* and store its return value in p->trapframe->a0 */
     p->trapframe->a0 = syscalls[num]();
 
-    /* New code for trace here */
+    /* Begin CMPT 332 group14 change Fall 2023 */
+
     if (p->tmask > 0) {
       for (i = 1; i < 32; i++) {
         bit = p->tmask & (1 << i);
         if (bit != 0) {
           if (i == num) {
             printf("%d: syscall %s -> %d\n",
-                   p->pid, syscall_names[i-1], p->trapframe->a0);
+              p->pid, syscall_names[i-1], p->trapframe->a0);
           }
         }
       }
     }
+
+    /* End CMPT 332 group14 change Fall 2023 */
+
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);

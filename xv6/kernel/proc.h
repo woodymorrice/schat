@@ -104,5 +104,12 @@ struct proc {
   struct file *ofile[NOFILE];  /* Open files */
   struct inode *cwd;           /* Current directory */
   char name[16];               /* Process name (debugging) */
+
+  /* Begin CMPT 332 group14 change Fall 2023 */
+  /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+   * Woody Morrice - wam553 - 11071060 */
+
   int tmask;                   /* Bitmask for syscall tracing */
+
+  /* End CMPT 332 group14 change Fall 2023 */
 };

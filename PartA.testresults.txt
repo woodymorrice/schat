@@ -519,3 +519,248 @@ exiting threads
 
 # Test 24
 
+
+
+wam553@tux5:~/332/cmpt332-g14> ./partB.bash partA3 < test.txt
+# Test 1
+
+# Test 2
+Child 139746473600704 finished: 2 square calls, 1 ms
+
+# Test 3
+Child 139981811566272 finished: 65 square calls, 1 ms
+
+# Test 4
+Child 139676560729792 finished: 5150 square calls, 1 ms
+
+# Test 5
+Child 139724451432128 finished: 200030000 square calls, 1912 ms
+
+# Test 6
+
+# Test 7
+Child 140689131849408 finished: 200009999 square calls, 1903 ms
+
+# Test 8
+
+# Test 9
+
+# Test 10
+
+# Test 11
+
+# Test 12
+
+# Test 13
+Child 139802451826368 killed by parent: 105270816 square calls, 1001 ms
+
+# Test 14
+Child 139819904198336 finished: 112522500 square calls, 9946 ms
+Child 139819895805632 finished: 112522500 square calls, 27730 ms
+Child 139819887412928 killed by parent: 97555502 square calls, 30001 ms
+Child 139819879020224 killed by parent: 43644794 square calls, 30001 ms
+Child 139819870627520 killed by parent: 60240273 square calls, 30001 ms
+Child 139819862234816 killed by parent: 32086504 square calls, 30000 ms
+Child 139819853842112 killed by parent: 28526816 square calls, 30000 ms
+Child 139819774637760 killed by parent: 28422273 square calls, 30000 ms
+Child 139819766245056 killed by parent: 28436738 square calls, 30000 ms
+Child 139819757852352 killed by parent: 26455553 square calls, 30000 ms
+Child 139819749459648 killed by parent: 25480072 square calls, 30000 ms
+Child 139819741066944 killed by parent: 23622941 square calls, 30000 ms
+Child 139819732674240 killed by parent: 25410368 square calls, 30000 ms
+Child 139819724281536 killed by parent: 22762410 square calls, 30000 ms
+Child 139819715888832 killed by parent: 24375625 square calls, 30000 ms
+Child 139819707496128 killed by parent: 22910793 square calls, 30001 ms
+
+# Test 15
+
+# Test 16
+
+# Test 17
+
+# Test 18
+Child 140487511201472 finished: 2 square calls, 0 ms
+
+# Test 19
+Child 139923517568704 finished: 112522500 square calls, 21300 ms
+Child 139923509176000 finished: 112522500 square calls, 34657 ms
+Child 139923492390592 finished: 112522500 square calls, 64602 ms
+Child 139923500783296 finished: 112522500 square calls, 70944 ms
+Child 139923483997888 finished: 112522500 square calls, 83250 ms
+Child 139923475605184 finished: 112522500 square calls, 96510 ms
+Child 139923467212480 finished: 112522500 square calls, 102008 ms
+Child 139923390723776 finished: 112522500 square calls, 105104 ms
+Child 139923373938368 finished: 112522500 square calls, 121260 ms
+Child 139923382331072 finished: 112522500 square calls, 121521 ms
+Child 139923365545664 finished: 112522500 square calls, 150025 ms
+Child 139923357152960 finished: 112522500 square calls, 151923 ms
+Child 139923348760256 finished: 112522500 square calls, 154388 ms
+Child 139923323582144 finished: 112522500 square calls, 175257 ms
+Child 139923340367552 finished: 112522500 square calls, 175601 ms
+Child 139923331974848 finished: 112522500 square calls, 183390 ms
+Child 139923306796736 finished: 112522500 square calls, 187801 ms
+Child 139923315189440 finished: 112522500 square calls, 194998 ms
+Child 139923256440512 finished: 112522500 square calls, 201619 ms
+Child 139923290011328 finished: 112522500 square calls, 201714 ms
+Child 139923298404032 finished: 112522500 square calls, 202269 ms
+Child 139923273225920 finished: 112522500 square calls, 203343 ms
+Child 139923281618624 finished: 112522500 square calls, 205046 ms
+Child 139923264833216 finished: 112522500 square calls, 208236 ms
+Child 139923239655104 finished: 112522500 square calls, 209295 ms
+Child 139923248047808 finished: 112522500 square calls, 212464 ms
+Child 139923206084288 finished: 112522500 square calls, 213504 ms
+Child 139923189298880 finished: 112522500 square calls, 213779 ms
+Child 139923222869696 finished: 112522500 square calls, 214932 ms
+Child 139923231262400 finished: 112522500 square calls, 215226 ms
+Child 139923214476992 finished: 112522500 square calls, 215375 ms
+Child 139923197691584 finished: 112522500 square calls, 215707 ms
+
+# Test 20
+Child 140649466205888 killed by parent: 2182955 square calls, 1003 ms
+Child 140649457813184 killed by parent: 1752061 square calls, 1004 ms
+Child 140649374414528 killed by parent: 632023 square calls, 1004 ms
+Child 140649366021824 killed by parent: 392370 square calls, 1004 ms
+Child 140649357629120 killed by parent: 549686 square calls, 1004 ms
+Child 140649349236416 killed by parent: 331997 square calls, 1004 ms
+Child 140649340843712 killed by parent: 474374 square calls, 1004 ms
+Child 140649332451008 killed by parent: 331979 square calls, 1004 ms
+Child 140649324058304 killed by parent: 213841 square calls, 1004 ms
+Child 140649315665600 killed by parent: 415418 square calls, 1004 ms
+Child 140649307272896 killed by parent: 365081 square calls, 1004 ms
+Child 140649298880192 killed by parent: 348125 square calls, 1004 ms
+Child 140649290487488 killed by parent: 245166 square calls, 1004 ms
+Child 140649282094784 killed by parent: 340566 square calls, 1003 ms
+Child 140649273702080 killed by parent: 255778 square calls, 1003 ms
+Child 140649265309376 killed by parent: 312517 square calls, 1003 ms
+Child 140649256916672 killed by parent: 212951 square calls, 1003 ms
+Child 140649248523968 killed by parent: 313863 square calls, 1003 ms
+Child 140649240131264 killed by parent: 187699 square calls, 1003 ms
+Child 140649231738560 killed by parent: 284017 square calls, 1003 ms
+Child 140649223345856 killed by parent: 188926 square calls, 1003 ms
+Child 140649214953152 killed by parent: 264679 square calls, 1003 ms
+Child 140649206560448 killed by parent: 147727 square calls, 1003 ms
+Child 140649198167744 killed by parent: 290275 square calls, 1003 ms
+Child 140649189775040 killed by parent: 180025 square calls, 1003 ms
+Child 140649181382336 killed by parent: 294587 square calls, 1003 ms
+Child 140649172989632 killed by parent: 180422 square calls, 1002 ms
+Child 140649164596928 killed by parent: 263739 square calls, 1002 ms
+Child 140649156204224 killed by parent: 178478 square calls, 1002 ms
+Child 140649147811520 killed by parent: 263706 square calls, 1002 ms
+Child 140649139418816 killed by parent: 186031 square calls, 1002 ms
+Child 140649131026112 killed by parent: 265191 square calls, 1002 ms
+Child 140649122633408 killed by parent: 178357 square calls, 1002 ms
+Child 140649114240704 killed by parent: 253733 square calls, 1002 ms
+Child 140649105848000 killed by parent: 193105 square calls, 1002 ms
+Child 140649097455296 killed by parent: 130857 square calls, 1002 ms
+Child 140649089062592 killed by parent: 202459 square calls, 1002 ms
+Child 140649080669888 killed by parent: 260286 square calls, 1002 ms
+Child 140649072277184 killed by parent: 215098 square calls, 1002 ms
+Child 140649063884480 killed by parent: 114697 square calls, 1002 ms
+Child 140649055491776 killed by parent: 121702 square calls, 1002 ms
+Child 140649047099072 killed by parent: 133055 square calls, 1002 ms
+Child 140649038706368 killed by parent: 117717 square calls, 1002 ms
+Child 140649030313664 killed by parent: 148603 square calls, 1002 ms
+Child 140649021920960 killed by parent: 140117 square calls, 1001 ms
+Child 140649013528256 killed by parent: 148646 square calls, 1001 ms
+Child 140649005135552 killed by parent: 157675 square calls, 1001 ms
+Child 140648996742848 killed by parent: 111652 square calls, 1001 ms
+Child 140648988350144 killed by parent: 146808 square calls, 1001 ms
+Child 140648979957440 killed by parent: 148419 square calls, 1001 ms
+Child 140648971564736 killed by parent: 140016 square calls, 1001 ms
+Child 140648963172032 killed by parent: 141140 square calls, 1001 ms
+Child 140648954779328 killed by parent: 145142 square calls, 1001 ms
+Child 140648946386624 killed by parent: 119916 square calls, 1001 ms
+Child 140648937993920 killed by parent: 146832 square calls, 1001 ms
+Child 140648929601216 killed by parent: 143113 square calls, 1001 ms
+Child 140648921208512 killed by parent: 144129 square calls, 1001 ms
+Child 140648912815808 killed by parent: 115512 square calls, 1001 ms
+Child 140648904423104 killed by parent: 131213 square calls, 1001 ms
+Child 140648896030400 killed by parent: 113596 square calls, 1001 ms
+Child 140648887637696 killed by parent: 137539 square calls, 1001 ms
+Child 140648879244992 killed by parent: 144075 square calls, 1001 ms
+Child 140648870852288 killed by parent: 146608 square calls, 1001 ms
+Child 140648862459584 killed by parent: 114439 square calls, 1001 ms
+
+# Test 21
+Child 140672434702016 finished: 200030000 square calls, 80878 ms
+Child 140672426309312 finished: 200030000 square calls, 115056 ms
+Child 140672417916608 finished: 200030000 square calls, 208580 ms
+Child 140672409523904 finished: 200030000 square calls, 246215 ms
+Child 140672325646016 finished: 200030000 square calls, 255010 ms
+Child 140672308860608 finished: 200030000 square calls, 287276 ms
+Child 140672317253312 killed by parent: 165988366 square calls, 300005 ms
+Child 140672300467904 killed by parent: 172689209 square calls, 300005 ms
+Child 140672292075200 killed by parent: 141067595 square calls, 300004 ms
+Child 140672283682496 killed by parent: 112163363 square calls, 300004 ms
+Child 140672275289792 killed by parent: 114279698 square calls, 300004 ms
+Child 140672266897088 killed by parent: 114327449 square calls, 300004 ms
+Child 140672258504384 killed by parent: 79734385 square calls, 300004 ms
+Child 140672250111680 killed by parent: 100614769 square calls, 300004 ms
+Child 140672241718976 killed by parent: 105135959 square calls, 300007 ms
+Child 140672233326272 killed by parent: 72104226 square calls, 300007 ms
+Child 140672224933568 killed by parent: 86598850 square calls, 300007 ms
+Child 140672216540864 killed by parent: 70515495 square calls, 300007 ms
+Child 140672208148160 killed by parent: 86856367 square calls, 300007 ms
+Child 140672199755456 killed by parent: 63819278 square calls, 300007 ms
+Child 140672191362752 killed by parent: 88160581 square calls, 300007 ms
+Child 140672182970048 killed by parent: 64538618 square calls, 300007 ms
+Child 140672174577344 killed by parent: 82985365 square calls, 300007 ms
+Child 140672166184640 killed by parent: 60365401 square calls, 300007 ms
+Child 140672157791936 killed by parent: 79473688 square calls, 300007 ms
+Child 140672149399232 killed by parent: 58631681 square calls, 300006 ms
+Child 140672141006528 killed by parent: 79426246 square calls, 300006 ms
+Child 140672132613824 killed by parent: 54795110 square calls, 300006 ms
+Child 140672124221120 killed by parent: 76752335 square calls, 300006 ms
+Child 140672115828416 killed by parent: 53594687 square calls, 300006 ms
+Child 140672107435712 killed by parent: 81812798 square calls, 300006 ms
+Child 140672099043008 killed by parent: 54159851 square calls, 300006 ms
+Child 140672090650304 killed by parent: 52540104 square calls, 300007 ms
+Child 140672082257600 killed by parent: 51960772 square calls, 300007 ms
+Child 140672073864896 killed by parent: 73729894 square calls, 300007 ms
+Child 140672065472192 killed by parent: 51382365 square calls, 300007 ms
+Child 140672057079488 killed by parent: 73670726 square calls, 300007 ms
+Child 140672048686784 killed by parent: 49891631 square calls, 300007 ms
+Child 140672040294080 killed by parent: 72179395 square calls, 300007 ms
+Child 140672031901376 killed by parent: 49862936 square calls, 300007 ms
+Child 140672023508672 killed by parent: 74539599 square calls, 300007 ms
+Child 140672015115968 killed by parent: 47849759 square calls, 300007 ms
+Child 140672006723264 killed by parent: 46030107 square calls, 300007 ms
+Child 140671998330560 killed by parent: 68593756 square calls, 300006 ms
+Child 140671989937856 killed by parent: 46347209 square calls, 300006 ms
+Child 140671981545152 killed by parent: 45822458 square calls, 300006 ms
+Child 140671973152448 killed by parent: 44466296 square calls, 300006 ms
+Child 140671964759744 killed by parent: 45866944 square calls, 300006 ms
+Child 140671956367040 killed by parent: 44344497 square calls, 300006 ms
+Child 140671947974336 killed by parent: 45693599 square calls, 300006 ms
+Child 140671939581632 killed by parent: 42256992 square calls, 300006 ms
+Child 140671931188928 killed by parent: 43476229 square calls, 300006 ms
+Child 140671922796224 killed by parent: 41584044 square calls, 300006 ms
+Child 140671914403520 killed by parent: 46199907 square calls, 300006 ms
+Child 140671906010816 killed by parent: 42629187 square calls, 300006 ms
+Child 140671897618112 killed by parent: 46332889 square calls, 300006 ms
+Child 140671889225408 killed by parent: 40874469 square calls, 300006 ms
+Child 140671880832704 killed by parent: 41553376 square calls, 300006 ms
+Child 140671872440000 killed by parent: 43440139 square calls, 300006 ms
+Child 140671864047296 killed by parent: 42830114 square calls, 300006 ms
+Child 140671855654592 killed by parent: 41805230 square calls, 300006 ms
+Child 140671847261888 killed by parent: 41170760 square calls, 300006 ms
+Child 140671838869184 killed by parent: 39710351 square calls, 300006 ms
+Child 140671830476480 killed by parent: 43568098 square calls, 300006 ms
+
+# Test 22
+Child 140615417329344 finished: 12507500 square calls, 963 ms
+Child 140615496582848 finished: 12507500 square calls, 1418 ms
+Child 140615408936640 finished: 12507500 square calls, 2463 ms
+Child 140615392151232 finished: 12507500 square calls, 3086 ms
+Child 140615400543936 finished: 12507500 square calls, 3651 ms
+Child 140615375365824 finished: 12507500 square calls, 4708 ms
+Child 140615383758528 finished: 12507500 square calls, 4935 ms
+Child 140615366973120 killed by parent: 8881095 square calls, 5000 ms
+Child 140615358580416 killed by parent: 8248000 square calls, 5000 ms
+Child 140615350187712 killed by parent: 6104950 square calls, 5000 ms
+
+# Test 23
+
+# Test 24
+
+

@@ -311,9 +311,15 @@ fork(void)
   safestrcpy(np->name, p->name, sizeof(p->name));
 
   pid = np->pid;
+  
+  /* Begin CMPT 332 group14 change Fall 2023 */
+  /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+   * Woody Morrice - wam553 - 11071060 */
 
   /* Copy trace mask to child */
   np->tmask = p->tmask;
+  
+  /* End CMPT 332 group14 change Fall 2023 */
 
   release(&np->lock);
 
@@ -691,9 +697,16 @@ procdump(void)
 }
 
 
+/* Begin CMPT 332 group14 change Fall 2023 */
+/* Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+
 void
 trace(int mask)
 {
   struct proc *p = myproc();
   p->tmask = mask;
 }
+
+/* End CMPT 332 group14 change Fall 2023 */
+

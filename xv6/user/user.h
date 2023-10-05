@@ -22,7 +22,14 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+
+/* Begin CMPT 332 group14 change Fall 2023 */
+/* Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+
 int trace(int);
+
+/* End CMPT 332 group14 change Fall 2023 */
 
 /* ulib.c */
 int stat(const char*, struct stat*);
