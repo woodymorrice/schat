@@ -2,7 +2,17 @@
 #include <stdlib.h>
 
 #include <list.h>
+void itemFreeChar(void *itemToBeFreed) {
+    char *addressChar = (char *)itemToBeFreed;
+    *addressChar = '&';                                            
+}
 
+int comparator (void *item1, void *item2) {
+    if (item1 == item2) {
+        return 1;
+    }
+    return 0;
+}
 
 int main() {
     LIST *testList;
@@ -988,6 +998,9 @@ int main() {
         printf(" passed!\n");
     } 
     
+    printf("\n\nTesting ListFree() on testList1\n\n");   
+    ListFree(testList1, itemFreeChar);
+     
     return EXIT_SUCCESS;
 
 }
