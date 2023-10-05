@@ -101,6 +101,10 @@ LIST *ListCreate () {
     }
     emptyList = curFreeList;
     memoryListUsed += sizeof(LIST);
+    if (curFreeList->nextLP == NULL) {
+        curFreeList->nextLP = curFreeList;
+        printf("Cannot add any more list\n");
+    }
     curFreeList = curFreeList->nextLP;
     return emptyList;
 }
