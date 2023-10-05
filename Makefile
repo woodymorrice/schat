@@ -9,7 +9,7 @@ CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 LILIB = -L.
 PLATFORM = $(shell uname -s)
 PTLIB = -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
-PTINC = -I. -I/student/cmpt332/pthreads/
+PTINC = -I/student/cmpt332/pthreads/
 POSINC = -pthread
 
 # Main Target

@@ -25,15 +25,21 @@ fi
 # with possible leading zeros
 ex="[0]*[1-9]\d*"
 
+testNum=1
+
 while read -r line;
 do
+    echo # Test $testNum
+    ((testNum+=1))
+
     IFS=' ' read a1 a2 a3 garbage <<< $line
-    
-    if [[ $a1 =~ $ex ]] && [[ $a1 -le 64    ]] &&
-       [[ $a2 =~ $ex ]] && [[ $a2 -le 300   ]] &&
-       [[ $a3 =~ $ex ]] && [[ $a3 -le 20000 ]]
+
+    if [[ "$a1" =~ $ex ]] && [[ "$a1" -le 64    ]] &&
+       [[ "$a2" =~ $ex ]] && [[ "$a2" -le 300   ]] &&
+       [[ "$a3" =~ $ex ]] && [[ "$a3" -le 20000 ]]
        then
            ./$1 $a1 $a2 $a3
     fi
+    echo 
 done
 
