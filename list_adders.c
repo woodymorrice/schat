@@ -8,13 +8,7 @@ Woody Morrice - wam553 - 11071060
 #include <stdlib.h>
 #include <stdbool.h>
 #include <list.h>
-/*
-convenience for testing size
-*/
-const int LIST_POOL_SIZE = 4;
-const int NODE_POOL_SIZE = 10;
  
-bool isAllocated = false;
 /*
 Amount of memory used for LIST / NODE
 */
@@ -32,40 +26,84 @@ LIST POOL
 NODE POOL
 */
 
-LIST *memoryList;
-struct NODE *memoryNode;
-
+LIST memoryList[LIST_POOL_SIZE];
+NODE memoryNode[NODE_POOL_SIZE];
+bool isInited = false;
+LIST* firstFreeList;
 /*
 Point to the current free list / free node
 */
 LIST *curFreeList;
-struct NODE *curFreeNode;
-struct NODE *nextFree;
+NODE *curFreeNode;
+
+
+
 
 LIST *ListCreate () {
     LIST *emptyList; 
-    if (isAllocated == false) {
-        memoryList = malloc(sizeof(LIST) * LIST_POOL_SIZE);
-        memoryNode = malloc(sizeof(struct NODE) * NODE_POOL_SIZE);
-        
+
+    if (!isInited) {
+    /*
+    * initialize nodes
+    */
+        int node;
+        int list;                                                                    
+                                                                                
+        memoryNode[0].prevNode= NULL;                                               
+        memoryNode[0].dataType = NULL;                                             
+        memoryNode[0].nextNode = &memoryNode[1];                                   
+                                                                                
+        for(node = 1; node < NODE_POOL_SIZE - 1; node++){                                  
+            memoryNode[node].prevNode = &memoryNode[node - 1];                         
+            memoryNode[node].dataType = NULL;                                       
+            memoryNode[node].nextNode = &memoryNode[node + 1];                         
+        }                                                                           
+                                                                                
+        memoryNode[NODE_POOL_SIZE-1].prevNode = &memoryNode[node - 1];                  
+        memoryNode[NODE_POOL_SIZE-1].dataType = NULL;                    
+        memoryNode[NODE_POOL_SIZE-1].nextNode = NULL;          
+   
+    /*
+    * initialize lists
+    */   
+        memoryList[0].headPointer = NULL;                                              
+        memoryList[0].tailPointer  = NULL;                                             
+        memoryList[0].currentItem = NULL;
+        memoryList[0].totalItem = 0;
+        memoryList[0].nextLP = &memoryList[1];
+        memoryList[0].prevLP = NULL;                                   
+                                                                                
+        for(list = 1; list < LIST_POOL_SIZE - 1; list++){                             
+            memoryList[list].headPointer = NULL;                       
+            memoryList[list].tailPointer = NULL;                                      
+            memoryList[list].currentItem = NULL;
+            memoryList[list].totalItem = 0;
+            memoryList[list].prevLP = &memoryList[list - 1];
+            memoryList[list].nextLP = &memoryList[list + 1];                        
+        }                                                                           
+                                                                                
+        memoryList[LIST_POOL_SIZE - 1].headPointer = NULL;                  
+        memoryList[LIST_POOL_SIZE - 1].tailPointer = NULL;                              
+        memoryList[LIST_POOL_SIZE - 1].currentItem = NULL;
+        memoryList[LIST_POOL_SIZE - 1].totalItem = 0;
+        memoryList[LIST_POOL_SIZE - 1].prevLP = &memoryList[list - 1];
+        memoryList[LIST_POOL_SIZE - 1].nextLP = NULL;
+                       
         curFreeList = &memoryList[listBlock];
         curFreeNode = &memoryNode[nodeBlock];
-        nextFree = curFreeNode->nextNode;
-        nextFree = &memoryNode[nodeBlock + 1];
-        isAllocated = true;
+        isInited = true;
     }
+
+
     if (memoryListUsed > sizeof(LIST) * LIST_POOL_SIZE) {
         printf("Error ListCreated(): memory list used exceed the limit\n");
         return NULL;
     }
     emptyList = curFreeList;
-    emptyList->headPointer = NULL;
-    emptyList->tailPointer = NULL;
-    emptyList->currentItem = NULL;
-    emptyList->totalItem = 0;
     memoryListUsed += sizeof(LIST);
     listBlock += 1;
-    curFreeList = &memoryList[listBlock];
+    curFreeList->nextLP = &memoryList[listBlock];
+    curFreeList = curFreeList->nextLP;
     return emptyList;
 }
     
@@ -74,32 +112,32 @@ int ListCount (LIST *list) {
 }
 
 int ListAppend (LIST *list, void *item) {
-    struct NODE *prevTail;
-    struct NODE *newItem;
+    NODE *prevTail;
+    NODE *newItem;
 
-    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) {
+    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
+        prevTail = list->tailPointer;
         list->currentItem = list->tailPointer;
         newItem = curFreeNode;
         newItem->dataType = item;
-        prevTail = list->tailPointer;
          
-        if(list->totalItem == 0) {
+        if (list->totalItem == 0) {
+            curFreeNode = curFreeNode->nextNode;
             list->headPointer = newItem;
             list->tailPointer = newItem;
             newItem->prevNode = NULL;
             newItem->nextNode = NULL;
         }
         else {
+            curFreeNode = curFreeNode->nextNode;
             list->tailPointer = newItem;
+            prevTail->nextNode = newItem;
             newItem->prevNode = prevTail;
             newItem->nextNode = NULL;
             list->currentItem = list->tailPointer;
         }
         list->totalItem += 1;
-        memoryNodeUsed += sizeof(struct NODE);
-        nodeBlock += 1;
-        curFreeNode = curFreeNode->nextNode;
-        curFreeNode->nextNode = &memoryNode[nodeBlock];
+        memoryNodeUsed += sizeof(NODE);
         return 0;
     }
     printf("Error ListAppend(): memory NODE used exceed the limit\n");
@@ -108,33 +146,35 @@ int ListAppend (LIST *list, void *item) {
     
 
 int ListPrepend (LIST *list, void *item) {
-    struct NODE *prevHead;
-    struct NODE *newItem;
-    prevHead = list->headPointer;
-    newItem = curFreeNode;
-    newItem->dataType = item;
+    NODE *prevHead;
+    NODE *newItem;
     /*
     * If the current pointer is at the head of list,
     * item is added at the end.
     */
-    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) {
+    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
+        prevHead = list->headPointer;
+        newItem = curFreeNode;
+        newItem->dataType = item;
+
         if (list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
+            curFreeNode = curFreeNode->nextNode;
             newItem->prevNode = NULL;
-            newItem->nextNode = prevHead;
+            newItem->nextNode = NULL;
         }
         else {
-            ListFirst(list);
+            list->currentItem = list->headPointer;
+            curFreeNode = curFreeNode->nextNode;
             list->headPointer = newItem;
             newItem->prevNode = NULL;
             newItem->nextNode = prevHead;
             prevHead->prevNode = newItem;
         }
-        ListFirst(list);
+        list->currentItem = newItem;
         list->totalItem += 1;
-        memoryNodeUsed += sizeof(struct NODE);
-        nodeBlock += 1;
+        memoryNodeUsed += sizeof(NODE);
         return 0;
     }
     printf("Error ListPrepend(): memory NODE used exceed the limit\n");
@@ -142,11 +182,11 @@ int ListPrepend (LIST *list, void *item) {
 }
 
 int ListAdd(LIST *list, void *item) {
-    struct NODE *curItem;
-    struct NODE *curNext;
-    struct NODE *newItem;
+    NODE *curItem;
+    NODE *curNext;
+    NODE *newItem;
 
-    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) {
+    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
         newItem = curFreeNode;
         newItem->dataType = item;
         /*
@@ -155,43 +195,41 @@ int ListAdd(LIST *list, void *item) {
         if (list->totalItem == 0) {
             list->headPointer = newItem;
             list->tailPointer = newItem;
+            curFreeNode = curFreeNode->nextNode; 
             newItem->prevNode = NULL;
             newItem->nextNode = NULL;
             list->currentItem = list->headPointer;
-        } else if (list->currentItem == 
-                   list->tailPointer) {
-            /*
-            * current item is at tail
-            */
-            curItem = list->currentItem;
-            curItem->nextNode = newItem; 
-            newItem->nextNode = NULL;
-            newItem->prevNode = curItem;
-            list->tailPointer = newItem;
-            list->currentItem = list->tailPointer;
-        }
-        else {
-            /*
-            * current item is at other positions
-            */
-            curItem = list->currentItem;
-            curNext = curItem->nextNode;
+        } 
+        else { 
+            if (list->currentItem == list->tailPointer) {
+                /*
+                * current item is at tail
+                */
+                curItem = list->currentItem;
+                curItem->nextNode = newItem;
+                curFreeNode = curFreeNode->nextNode; 
+                newItem->nextNode = NULL;
+                newItem->prevNode = curItem;
+                list->tailPointer = newItem;
+                list->currentItem = list->tailPointer;
+            }
+            else {
+                /*
+                * current item is at other positions
+                */
+                curItem = list->currentItem;
+                curNext = curItem->nextNode;
+                curFreeNode = curFreeNode->nextNode; 
+                curItem->nextNode = newItem;
+                curNext->prevNode = newItem;
+                newItem->nextNode = curNext;
+                newItem->prevNode = curItem;
             
-            curItem->nextNode = newItem;
-            curNext->prevNode = newItem;
-            newItem->nextNode = curNext;
-            newItem->prevNode = curItem;
-            
-            list->currentItem = newItem;
+                list->currentItem = newItem;
+            }
         }
-        memoryNodeUsed += sizeof(struct NODE);
+        memoryNodeUsed += sizeof(NODE);
         list->totalItem += 1;
-        nodeBlock += 1;
-        curFreeNode = nextFree;
-        if (nodeBlock + 1 < NODE_POOL_SIZE) {
-            nextFree = curFreeNode->nextNode;
-            nextFree = &memoryNode[nodeBlock + 1];
-        }
         return 0;
     }
     printf("Error ListAdd(): memory NODE used exceed the limit\n");
@@ -199,14 +237,14 @@ int ListAdd(LIST *list, void *item) {
 }
 
 int ListInsert(LIST *list, void *item) {
-    struct NODE *curItem;
-    struct NODE *curPrev;
-    struct NODE *newItem;
+    NODE *curItem;
+    NODE *curPrev;
+    NODE *newItem;
     curItem = list->currentItem;
     curPrev = curItem->prevNode;
     newItem = curFreeNode;
     newItem->dataType = item;
-    if (memoryNodeUsed < sizeof(struct NODE) * NODE_POOL_SIZE) {
+    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
         /*
         * if current item is at head
         */
@@ -224,7 +262,7 @@ int ListInsert(LIST *list, void *item) {
         ListPrev(list);
         }
         list->totalItem += 1;
-        memoryNodeUsed += sizeof(struct NODE);
+        memoryNodeUsed += sizeof(NODE);
         nodeBlock += 1;
         return 0;
     }
@@ -233,8 +271,8 @@ int ListInsert(LIST *list, void *item) {
 }
 
 void ListConcat(LIST *list1, LIST *list2) {
-    struct NODE *list1Tail;
-    struct NODE *list2Head;
+    NODE *list1Tail;
+    NODE *list2Head;
     if (list1 == NULL) {
         return;
     } else if (list2 == NULL) {

@@ -4,24 +4,29 @@
 
 #ifndef _LIST_H_
 #define _LIST_H_
+typedef struct NODE NODE;
+typedef struct LIST LIST;
 
-typedef struct {
-    struct NODE *headPointer;
-    struct NODE *tailPointer;
-    struct NODE *currentItem;
-    int totalItem;
-} LIST;
-
-typedef struct NODE{
-    struct NODE *prevNode;
-    struct NODE *nextNode;
+struct NODE {
+    NODE *prevNode;
+    NODE *nextNode;
     void *dataType;
-} NODE;
+};
 
-typedef struct {
-    struct NODE *curFree;
-    struct NODE *nextFree;
-} freeNode;
+struct LIST {
+    NODE *headPointer;
+    NODE *tailPointer;
+    NODE *currentItem;
+    int totalItem;
+
+    LIST *prevLP;
+    LIST *nextLP; 
+
+};
+
+
+#define LIST_POOL_SIZE 4
+#define NODE_POOL_SIZE 10
 /* Makes a new, empty list, and returns its reference on success.
  * Returns a NULL pointer on failure */
 
