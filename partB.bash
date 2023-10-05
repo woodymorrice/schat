@@ -29,7 +29,7 @@ testNum=1
 
 while read -r line;
 do
-    echo # Test $testNum
+    echo "# Test" $testNum
     ((testNum+=1))
 
     IFS=' ' read a1 a2 a3 garbage <<< $line

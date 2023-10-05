@@ -2,6 +2,248 @@
 # Phong Thanh Nguyen (David) - wdz468 - 11310824
 # Woody Morrice - wam553 - 11071060
 
+# Part A1
+# Test 1
+
+# Test 2
+2 square calls, 0 ms
+
+# Test 3
+65 square calls, 0 ms
+
+# Test 4
+5150 square calls, 0 ms
+
+# Test 5
+200030000 square calls, 1609 ms
+
+# Test 6
+
+# Test 7
+200009999 square calls, 1640 ms
+
+# Test 8
+
+# Test 9
+
+# Test 10
+
+# Test 11
+
+# Test 12
+
+# Test 13
+112522500 square calls, 922 ms
+
+# Test 14
+112522500 square calls, 19656 ms
+112522500 square calls, 20141 ms
+112522500 square calls, 21672 ms
+112522500 square calls, 24016 ms
+112522500 square calls, 24922 ms
+112522500 square calls, 27031 ms
+112522500 square calls, 27062 ms
+112522500 square calls, 28203 ms
+88385159 square calls, 30016 ms
+85301390 square calls, 30016 ms
+82721952 square calls, 30016 ms
+80258114 square calls, 30016 ms
+86731034 square calls, 30016 ms
+96584150 square calls, 30016 ms
+101438645 square calls, 30016 ms
+77010254 square calls, 30016 ms
+
+# Test 15
+
+# Test 16
+
+# Test 17
+
+# Test 18
+2 square calls, 0 ms
+
+# Test 19
+112522500 square calls, 24687 ms
+112522500 square calls, 27156 ms
+112522500 square calls, 31734 ms
+112522500 square calls, 34718 ms
+112522500 square calls, 36265 ms
+112522500 square calls, 42718 ms
+112522500 square calls, 44343 ms
+112522500 square calls, 44703 ms
+112522500 square calls, 45656 ms
+112522500 square calls, 51875 ms
+112522500 square calls, 60750 ms
+112522500 square calls, 60812 ms
+112522500 square calls, 62531 ms
+112522500 square calls, 63547 ms
+112522500 square calls, 63625 ms
+112522500 square calls, 64859 ms
+112522500 square calls, 65140 ms
+112522500 square calls, 66047 ms
+112522500 square calls, 71687 ms
+112522500 square calls, 72578 ms
+112522500 square calls, 73328 ms
+112522500 square calls, 74796 ms
+112522500 square calls, 75843 ms
+112522500 square calls, 76015 ms
+112522500 square calls, 76359 ms
+112522500 square calls, 76843 ms
+112522500 square calls, 80750 ms
+112522500 square calls, 81234 ms
+112522500 square calls, 81312 ms
+112522500 square calls, 81656 ms
+112522500 square calls, 81656 ms
+112522500 square calls, 81765 ms
+
+# Test 20
+1090025 square calls, 1110 ms
+816002 square calls, 1063 ms
+1180415 square calls, 1110 ms
+1076777 square calls, 1063 ms
+1758749 square calls, 1110 ms
+1321124 square calls, 1110 ms
+1013175 square calls, 1063 ms
+0 square calls, 0 ms
+1519895 square calls, 1063 ms
+214184 square calls, 485 ms
+1098902 square calls, 1063 ms
+2372930 square calls, 1110 ms
+303809 square calls, 625 ms
+3560445 square calls, 1110 ms
+1985027 square calls, 1110 ms
+1383615 square calls, 1063 ms
+4048434 square calls, 1110 ms
+1094459 square calls, 1063 ms
+2241902 square calls, 1063 ms
+1526877 square calls, 1063 ms
+1122750 square calls, 1063 ms
+124749 square calls, 360 ms
+803277 square calls, 1110 ms
+1272809 square calls, 1110 ms
+2118710 square calls, 1110 ms
+1741910 square calls, 1110 ms
+803277 square calls, 1110 ms
+1018877 square calls, 1110 ms
+3049214 square calls, 1110 ms
+2007005 square calls, 1110 ms
+1560260 square calls, 1110 ms
+3774377 square calls, 1110 ms
+0 square calls, 0 ms
+77420 square calls, 188 ms
+4065525 square calls, 1110 ms
+495509 square calls, 829 ms
+993344 square calls, 1063 ms
+40469 square calls, 32 ms
+0 square calls, 0 ms
+742370 square calls, 938 ms
+389402 square calls, 735 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+703890 square calls, 1110 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+0 square calls, 0 ms
+
+# Test 21
+200030000 square calls, 75047 ms
+200030000 square calls, 77734 ms
+200030000 square calls, 78297 ms
+200030000 square calls, 95532 ms
+200030000 square calls, 108000 ms
+200030000 square calls, 127719 ms
+200030000 square calls, 130328 ms
+200030000 square calls, 132219 ms
+200030000 square calls, 133985 ms
+200030000 square calls, 138547 ms
+200030000 square calls, 156234 ms
+200030000 square calls, 161156 ms
+200030000 square calls, 171938 ms
+200030000 square calls, 176578 ms
+200030000 square calls, 189234 ms
+200030000 square calls, 194422 ms
+200030000 square calls, 202594 ms
+200030000 square calls, 206438 ms
+200030000 square calls, 206969 ms
+200030000 square calls, 211391 ms
+200030000 square calls, 225282 ms
+200030000 square calls, 233453 ms
+200030000 square calls, 235203 ms
+200030000 square calls, 235563 ms
+200030000 square calls, 236172 ms
+200030000 square calls, 240063 ms
+200030000 square calls, 251031 ms
+200030000 square calls, 251562 ms
+200030000 square calls, 263906 ms
+200030000 square calls, 266828 ms
+200030000 square calls, 267000 ms
+200030000 square calls, 267891 ms
+200030000 square calls, 269016 ms
+200030000 square calls, 272484 ms
+200030000 square calls, 273438 ms
+200030000 square calls, 274313 ms
+200030000 square calls, 291562 ms
+200030000 square calls, 293187 ms
+200030000 square calls, 297610 ms
+159516590 square calls, 297250 ms
+138786129 square calls, 299687 ms
+129484277 square calls, 295781 ms
+178236639 square calls, 297687 ms
+188034527 square calls, 299047 ms
+180376520 square calls, 297890 ms
+141094800 square calls, 299828 ms
+147052674 square calls, 298390 ms
+148049027 square calls, 298578 ms
+126381150 square calls, 299531 ms
+191443527 square calls, 297031 ms
+160841079 square calls, 296422 ms
+188849894 square calls, 299187 ms
+161451464 square calls, 299953 ms
+141902280 square calls, 296016 ms
+161146127 square calls, 297468 ms
+159641645 square calls, 299953 ms
+190329804 square calls, 296828 ms
+169160420 square calls, 298906 ms
+185464169 square calls, 299969 ms
+164321255 square calls, 296641 ms
+143608877 square calls, 296219 ms
+126095139 square calls, 299375 ms
+127832054 square calls, 295547 ms
+167344364 square calls, 298766 ms
+
+# Test 22
+12507500 square calls, 1328 ms
+12507500 square calls, 1343 ms
+12507500 square calls, 1468 ms
+12507500 square calls, 1687 ms
+12507500 square calls, 1703 ms
+12507500 square calls, 2093 ms
+12507500 square calls, 2171 ms
+12507500 square calls, 2187 ms
+12507500 square calls, 2203 ms
+12507500 square calls, 2218 ms
+
+# Test 23
+
+# Test 24
+
 
 
 # Part A2
