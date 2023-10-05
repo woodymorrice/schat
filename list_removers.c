@@ -18,7 +18,7 @@ extern NODE *memoryNode;
 extern NODE *curFreeNode;
 extern LIST *curFreeList;
 
-bool notEmpty = false;
+bool notEmpty = true;
 
 void *ListRemove(LIST *list) {
     NODE *curItem;
@@ -84,30 +84,23 @@ void *ListRemove(LIST *list) {
 
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     NODE *curItem;
-    LIST *curList;
-    int i;
-    ListFirst(list);
-    /* Booleans dont exist in c90 so we have to use ints
-     * 0 = true, 1 = false */
-    while (notEmpty) {
-        if (list == NULL) {
-            notEmpty = true;
+
+    list->currentItem = list->headPointer;
+    for (;;) {
+        if (list->currentItem == NULL) {
+            break;
         }
         curItem = list->currentItem;
         itemFree(curItem->dataType);
-        ListNext(list);
+        list->currentItem = curItem->nextNode;
+        memoryNodeUsed -= sizeof(NODE);
     }
     list->headPointer = NULL;
     list->tailPointer = NULL;
     list->currentItem = NULL;
     list->totalItem = 0;
-    for (i = 0; i < LIST_POOL_SIZE; i++) {
-        curList = &memoryList[i];
-        if (curList->headPointer == NULL &&
-            curList->tailPointer == NULL) {
-            curFreeList = &memoryList[i];
-        }
-    }
+    curFreeList->nextLP = curFreeList;
+    curFreeList = list;
     memoryListUsed -= sizeof(LIST);
     
 }
