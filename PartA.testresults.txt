@@ -2,366 +2,278 @@
 # Phong Thanh Nguyen (David) - wdz468 - 11310824
 # Woody Morrice - wam553 - 11071060
 
-# Tests 1-4
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 1 0
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 1 1
-2 square calls, 0 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 1 10
-65 square calls, 0 ms
+# Part A2
+wam553@tux5:~/332/cmpt332-g14> ./partB.bash partA2 < test.txt
+# Test 1
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 1 100
-5150 square calls, 0 ms
+# Test 2
+Child 2 finished: 2 square calls, 0 ms
 
-# The first few tests seem to indicate that 
-# the calculation of square calls is accurate.
+exiting threads
+
+# Test 3
+Child 2 finished: 65 square calls, 0 ms
+
+exiting threads
+
+# Test 4
+Child 2 finished: 5150 square calls, 0 ms
+
+exiting threads
 
 # Test 5
-# I wanted the program to be able to support at
-# a size value of between 10000 and 50000, and found
-# during implementation that the default stack size
-# of 1 mb was not quite enough. I chose a stack size
-# of 2 mb for the next stage of testing.
+Child 2 finished: 200030000 square calls, 2140 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 20 50000
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 20 25000
-312537500 square calls, 3234 ms
+# Test 6
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 20 35000
+# Test 7
+Child 2 finished: 200009999 square calls, 2140 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 20 30000
-450045000 square calls, 4718 ms
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 20 32000
-512048000 square calls, 5547 ms
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 10 33000
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 10 32768
-536920064 square calls, 5750 ms
-
-# So with a stack size of 2 mbs, size = 2^15 works.
-# If I reduce the stack size to 1 mb:
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 10 32768
-
-# So I'll stick with at stack size of 2mb and set the
-# max allowable value for size to be 32768.
-
-# Tests 6 and 7
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 0 32768
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 1 32768
-97405902 square calls, 1000 ms
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 1 32768
-96459104 square calls, 1000 ms
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 1 32768
-96320259 square calls, 1000 ms
-
-# The number of calls to square done in 1 ms seem to
-# fluctate quite a bit but I think that could be
-# attributed to the background processes running on my
-# pc.
+exiting threads
 
 # Test 8
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 5 32768
-471045470 square calls, 5000 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 10 32768
-536920064 square calls, 5672 ms
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 10 32768
-536920064 square calls, 5609 ms
+# Test 9
 
-# It takes about 5.6 seconds to calculate number of square
-# calls with the maximum allowable value for size, but I
-# will have to test it with more threads to determine what
-# the maximum deadline should be.
+# Test 10
 
-# Tests 9 and 10
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 0 10 32768
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 1 10 32768
-536920064 square calls, 5656 ms
+# Test 11
 
-# It appears to function as expected with 0 or 1 threads,
-# so now ill try so different values for threads that 
-# will keep the hash table load factor around 0.75 and
-# decide what level of performance is acceptable.
+# Test 12
 
-# Tests 11-13
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 48 20 32768
-60055319 square calls, 20110 ms
-57122015 square calls, 20110 ms
-96459104 square calls, 20110 ms
-20323499 square calls, 20110 ms
-99694259 square calls, 20110 ms
-58476704 square calls, 20110 ms
-86467824 square calls, 20110 ms
-77569739 square calls, 20110 ms
-89251479 square calls, 20110 ms
-62457075 square calls, 20110 ms
-97531560 square calls, 20110 ms
-98301230 square calls, 20110 ms
-57325277 square calls, 20110 ms
-112597520 square calls, 20110 ms
-90592529 square calls, 20110 ms
-81300375 square calls, 20110 ms
-55403600 square calls, 20110 ms
-149256002 square calls, 20110 ms
-59247054 square calls, 20110 ms
-19000529 square calls, 20110 ms
-29702777 square calls, 20110 ms
-160841079 square calls, 20110 ms
-69001877 square calls, 20110 ms
-76106952 square calls, 20110 ms
-42490370 square calls, 20110 ms
-22562402 square calls, 20110 ms
-65625695 square calls, 20110 ms
-37311840 square calls, 20110 ms
-73732295 square calls, 20110 ms
-44269344 square calls, 20110 ms
-99088002 square calls, 20110 ms
-87814377 square calls, 20110 ms
-53060450 square calls, 20110 ms
-124102134 square calls, 20110 ms
-58877525 square calls, 20110 ms
-30392705 square calls, 20110 ms
-177463379 square calls, 20110 ms
-51293255 square calls, 20110 ms
-37623474 square calls, 20110 ms
-83198549 square calls, 20110 ms
-32445539 square calls, 20110 ms
-26386479 square calls, 20110 ms
-62133377 square calls, 20110 ms
-70146089 square calls, 20110 ms
-40802060 square calls, 20110 ms
-37104804 square calls, 20110 ms
-70406910 square calls, 20110 ms
-164557010 square calls, 20110 ms
+# Test 13
+Child 2 killed by parent: 93556220 square calls, 1000 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 48 30 32768
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 48 30 32768
+# Test 14
+Child 2 finished: 112522500 square calls, 19270 ms
+Child 3 finished: 112522500 square calls, 22830 ms
+Child 4 finished: 112522500 square calls, 25340 ms
+Child 5 finished: 112522500 square calls, 29190 ms
+Child 6 killed by parent: 101985489 square calls, 29760 ms
+Child 7 killed by parent: 92174496 square calls, 29700 ms
+Child 8 killed by parent: 82439891 square calls, 29640 ms
+Child 9 killed by parent: 75562220 square calls, 29580 ms
+Child 10 killed by parent: 69243055 square calls, 29520 ms
+Child 11 killed by parent: 63863785 square calls, 29460 ms
+Child 12 killed by parent: 58952670 square calls, 29400 ms
+Child 13 killed by parent: 55214285 square calls, 29340 ms
+Child 14 killed by parent: 51592037 square calls, 29280 ms
+Child 15 killed by parent: 48735556 square calls, 29220 ms
+Child 16 killed by parent: 45191912 square calls, 29160 ms
+Child 17 killed by parent: 42312238 square calls, 29100 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 44 30 32768
-132950970 square calls, 30078 ms
-27073760 square calls, 30078 ms
-200450252 square calls, 30078 ms
-76663152 square calls, 30078 ms
-156990339 square calls, 30078 ms
-116716280 square calls, 30078 ms
-136513025 square calls, 30078 ms
-146932652 square calls, 30078 ms
-101495627 square calls, 30078 ms
-104105234 square calls, 30078 ms
-103413770 square calls, 30078 ms
-129919139 square calls, 30078 ms
-157557875 square calls, 30078 ms
-138220250 square calls, 30078 ms
-96264749 square calls, 30078 ms
-264304535 square calls, 30078 ms
-62033090 square calls, 30078 ms
-58498335 square calls, 30078 ms
-92378027 square calls, 30078 ms
-29036009 square calls, 30078 ms
-50909094 square calls, 30078 ms
-133032515 square calls, 30078 ms
-185117660 square calls, 30078 ms
-223227884 square calls, 30078 ms
-42425865 square calls, 30078 ms
-92065664 square calls, 30078 ms
-131730795 square calls, 30078 ms
-101082870 square calls, 30078 ms
-151197354 square calls, 30078 ms
-80537085 square calls, 30078 ms
-112057934 square calls, 30078 ms
-90754127 square calls, 30078 ms
-129629150 square calls, 30078 ms
-74560365 square calls, 30078 ms
-164285000 square calls, 30078 ms
-128007999 square calls, 30078 ms
-114602229 square calls, 30078 ms
-60121094 square calls, 30078 ms
-122328260 square calls, 30078 ms
-180129689 square calls, 30078 ms
-98455527 square calls, 30078 ms
-237020877 square calls, 30078 ms
-160070777 square calls, 30078 ms
-83754152 square calls, 30078 ms
+exiting threads
 
-# 48 threads would not produce output reliably,
-# and 44 threads caused my console to freeze
-# after output.
+# Test 15
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 32 60 32768
-Segmentation fault
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 24 60 32768
-536920064 square calls, 20828 ms
-Segmentation fault
+# Test 16
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ vi square.c
+# Test 17
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 24 60 32768
-Segmentation fault
+# Test 18
+Child 2 finished: 2 square calls, 0 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 24 5 32768
-95973584 square calls, 5016 ms
-18147299 square calls, 5016 ms
-68638185 square calls, 5016 ms
-22596002 square calls, 5016 ms
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 24 5 32768
-57261050 square calls, 5031 ms
-43678530 square calls, 5031 ms
-29710485 square calls, 5031 ms
-43725275 square calls, 5031 ms
-24182534 square calls, 5031 ms
-35908574 square calls, 5031 ms
-59694200 square calls, 5031 ms
-27221130 square calls, 5031 ms
-24981845 square calls, 5031 ms
+# Test 19
+Child 2 finished: 112522500 square calls, 36550 ms
+Child 3 finished: 112522500 square calls, 47650 ms
+Child 4 finished: 112522500 square calls, 51250 ms
+Child 5 finished: 112522500 square calls, 59910 ms
+Child 6 finished: 112522500 square calls, 68250 ms
+Child 7 finished: 112522500 square calls, 73070 ms
+Child 8 finished: 112522500 square calls, 80840 ms
+Child 9 finished: 112522500 square calls, 86830 ms
+Child 10 finished: 112522500 square calls, 93990 ms
+Child 11 finished: 112522500 square calls, 99470 ms
+Child 12 finished: 112522500 square calls, 106020 ms
+Child 13 finished: 112522500 square calls, 111020 ms
+Child 14 finished: 112522500 square calls, 116970 ms
+Child 15 finished: 112522500 square calls, 121500 ms
+Child 16 finished: 112522500 square calls, 126850 ms
+Child 17 finished: 112522500 square calls, 130890 ms
+Child 18 finished: 112522500 square calls, 135650 ms
+Child 19 finished: 112522500 square calls, 139190 ms
+Child 20 finished: 112522500 square calls, 143370 ms
+Child 21 finished: 112522500 square calls, 146460 ms
+Child 22 finished: 112522500 square calls, 150040 ms
+Child 23 finished: 112522500 square calls, 152660 ms
+Child 24 finished: 112522500 square calls, 155640 ms
+Child 25 finished: 112522500 square calls, 157790 ms
+Child 26 finished: 112522500 square calls, 160170 ms
+Child 27 finished: 112522500 square calls, 162220 ms
+Child 28 finished: 112522500 square calls, 163640 ms
+Child 29 finished: 112522500 square calls, 165080 ms
+Child 30 finished: 112522500 square calls, 166030 ms
+Child 31 finished: 112522500 square calls, 166740 ms
+Child 32 finished: 112522500 square calls, 167420 ms
+Child 33 finished: 112522500 square calls, 167610 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 24 5 32768
-31106327 square calls, 5016 ms
-75848085 square calls, 5016 ms
-73453259 square calls, 5016 ms
-32752370 square calls, 5016 ms
-60044360 square calls, 5016 ms
-82067265 square calls, 5016 ms
-44797844 square calls, 5016 ms
-65305305 square calls, 5016 ms
-47829089 square calls, 5016 ms
-101752244 square calls, 5016 ms
-69649502 square calls, 5016 ms
-16764944 square calls, 5016 ms
-87801125 square calls, 5016 ms
-39484940 square calls, 5016 ms
-60175934 square calls, 5016 ms
-82118519 square calls, 5016 ms
-45510569 square calls, 5016 ms
-70537502 square calls, 5016 ms
-53204769 square calls, 5016 ms
-43893764 square calls, 5016 ms
-24671799 square calls, 5016 ms
-24826580 square calls, 5016 ms
-35359844 square calls, 5016 ms
-40621590 square calls, 5016 ms
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 24 5 32768
-63410690 square calls, 5031 ms
-30533204 square calls, 5031 ms
+# Test 20
+Child 2 killed by parent: 6323099 square calls, 1000 ms
+Child 3 killed by parent: 4616240 square calls, 930 ms
+Child 4 killed by parent: 4108174 square calls, 870 ms
+Child 5 killed by parent: 3576246 square calls, 810 ms
+Child 6 killed by parent: 2829748 square calls, 750 ms
+Child 7 killed by parent: 2829190 square calls, 690 ms
+Child 8 killed by parent: 2518010 square calls, 630 ms
+Child 9 killed by parent: 2345763 square calls, 570 ms
+Child 10 killed by parent: 2102022 square calls, 510 ms
+Child 11 killed by parent: 1948388 square calls, 450 ms
+Child 12 killed by parent: 1797914 square calls, 390 ms
+Child 13 killed by parent: 1686496 square calls, 330 ms
+Child 14 killed by parent: 1571249 square calls, 270 ms
+Child 15 killed by parent: 1485542 square calls, 210 ms
+Child 16 killed by parent: 1394389 square calls, 150 ms
+Child 17 killed by parent: 1326762 square calls, 90 ms
+Child 18 killed by parent: 627107 square calls, 30 ms
+Child 19 killed by parent: 0 square calls, 1000 ms
+Child 20 killed by parent: 0 square calls, 1000 ms
+Child 21 killed by parent: 0 square calls, 1000 ms
+Child 22 killed by parent: 0 square calls, 1000 ms
+Child 23 killed by parent: 0 square calls, 1000 ms
+Child 24 killed by parent: 0 square calls, 1000 ms
+Child 25 killed by parent: 0 square calls, 1000 ms
+Child 26 killed by parent: 0 square calls, 1000 ms
+Child 27 killed by parent: 0 square calls, 1000 ms
+Child 28 killed by parent: 0 square calls, 1000 ms
+Child 29 killed by parent: 0 square calls, 1000 ms
+Child 30 killed by parent: 0 square calls, 1000 ms
+Child 31 killed by parent: 0 square calls, 1000 ms
+Child 32 killed by parent: 0 square calls, 1000 ms
+Child 33 killed by parent: 0 square calls, 1000 ms
+Child 34 killed by parent: 0 square calls, 1000 ms
+Child 35 killed by parent: 0 square calls, 1000 ms
+Child 36 killed by parent: 0 square calls, 1000 ms
+Child 37 killed by parent: 0 square calls, 1000 ms
+Child 38 killed by parent: 0 square calls, 1000 ms
+Child 39 killed by parent: 0 square calls, 1000 ms
+Child 40 killed by parent: 0 square calls, 1000 ms
+Child 41 killed by parent: 0 square calls, 1000 ms
+Child 42 killed by parent: 0 square calls, 1000 ms
+Child 43 killed by parent: 0 square calls, 1000 ms
+Child 44 killed by parent: 0 square calls, 1000 ms
+Child 45 killed by parent: 0 square calls, 1000 ms
+Child 46 killed by parent: 0 square calls, 1000 ms
+Child 47 killed by parent: 0 square calls, 1000 ms
+Child 48 killed by parent: 0 square calls, 1000 ms
+Child 49 killed by parent: 0 square calls, 1000 ms
+Child 50 killed by parent: 0 square calls, 1000 ms
+Child 51 killed by parent: 0 square calls, 1000 ms
+Child 52 killed by parent: 0 square calls, 1000 ms
+Child 53 killed by parent: 0 square calls, 1000 ms
+Child 54 killed by parent: 0 square calls, 1000 ms
+Child 55 killed by parent: 0 square calls, 1000 ms
+Child 56 killed by parent: 0 square calls, 1000 ms
+Child 57 killed by parent: 0 square calls, 1000 ms
+Child 58 killed by parent: 0 square calls, 1000 ms
+Child 59 killed by parent: 0 square calls, 1000 ms
+Child 60 killed by parent: 0 square calls, 1000 ms
+Child 61 killed by parent: 0 square calls, 1000 ms
+Child 62 killed by parent: 0 square calls, 1000 ms
+Child 63 killed by parent: 0 square calls, 1000 ms
+Child 64 killed by parent: 0 square calls, 1000 ms
+Child 65 killed by parent: 0 square calls, 1000 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 16 5 32768
-101481380 square calls, 5031 ms
-91361402 square calls, 5031 ms
-177293864 square calls, 5031 ms
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 16 5 32768
-48015099 square calls, 5015 ms
-187608134 square calls, 5015 ms
-68474252 square calls, 5015 ms
-53680340 square calls, 5015 ms
-111444984 square calls, 5015 ms
-68603040 square calls, 5015 ms
-199670135 square calls, 5015 ms
-107142840 square calls, 5015 ms
-58174290 square calls, 5015 ms
+# Test 21
+Child 2 finished: 200030000 square calls, 134610 ms
+Child 3 finished: 200030000 square calls, 168660 ms
+Child 4 finished: 200030000 square calls, 187250 ms
+Child 5 finished: 200030000 square calls, 212850 ms
+Child 6 finished: 200030000 square calls, 241670 ms
+Child 7 finished: 200030000 square calls, 266470 ms
+Child 8 finished: 200030000 square calls, 297810 ms
+Child 9 killed by parent: 184237897 square calls, 299580 ms
+Child 10 killed by parent: 168761443 square calls, 299520 ms
+Child 11 killed by parent: 156805155 square calls, 299460 ms
+Child 12 killed by parent: 145164984 square calls, 299400 ms
+Child 13 killed by parent: 135951804 square calls, 299340 ms
+Child 14 killed by parent: 126710220 square calls, 299280 ms
+Child 15 killed by parent: 119994341 square calls, 299220 ms
+Child 16 killed by parent: 112448676 square calls, 299160 ms
+Child 17 killed by parent: 107450699 square calls, 299100 ms
+Child 18 killed by parent: 100987325 square calls, 299040 ms
+Child 19 killed by parent: 96730196 square calls, 298980 ms
+Child 20 killed by parent: 91864352 square calls, 298920 ms
+Child 21 killed by parent: 88026098 square calls, 298860 ms
+Child 22 killed by parent: 84181804 square calls, 298800 ms
+Child 23 killed by parent: 81088873 square calls, 298740 ms
+Child 24 killed by parent: 77832787 square calls, 298680 ms
+Child 25 killed by parent: 74991007 square calls, 298620 ms
+Child 26 killed by parent: 72026673 square calls, 298560 ms
+Child 27 killed by parent: 70045923 square calls, 298500 ms
+Child 28 killed by parent: 67133361 square calls, 298440 ms
+Child 29 killed by parent: 65262141 square calls, 298380 ms
+Child 30 killed by parent: 63012622 square calls, 298320 ms
+Child 31 killed by parent: 61220296 square calls, 298260 ms
+Child 32 killed by parent: 59445690 square calls, 298200 ms
+Child 33 killed by parent: 57691717 square calls, 298140 ms
+Child 34 killed by parent: 56214244 square calls, 298080 ms
+Child 35 killed by parent: 46984972 square calls, 298020 ms
+Child 36 killed by parent: 51342688 square calls, 297960 ms
+Child 37 killed by parent: 45969610 square calls, 297900 ms
+Child 38 killed by parent: 45790918 square calls, 297840 ms
+Child 39 killed by parent: 43491895 square calls, 297780 ms
+Child 40 killed by parent: 44561519 square calls, 297720 ms
+Child 41 killed by parent: 40681932 square calls, 297660 ms
+Child 42 killed by parent: 39856794 square calls, 297600 ms
+Child 43 killed by parent: 40741607 square calls, 297540 ms
+Child 44 killed by parent: 38309501 square calls, 297480 ms
+Child 45 killed by parent: 37562491 square calls, 297420 ms
+Child 46 killed by parent: 36975642 square calls, 297360 ms
+Child 47 killed by parent: 36106442 square calls, 297300 ms
+Child 48 killed by parent: 35469252 square calls, 297240 ms
+Child 49 killed by parent: 34970322 square calls, 297180 ms
+Child 50 killed by parent: 34246921 square calls, 297120 ms
+Child 51 killed by parent: 33762920 square calls, 297060 ms
+Child 52 killed by parent: 33314830 square calls, 297000 ms
+Child 53 killed by parent: 32512079 square calls, 296940 ms
+Child 54 killed by parent: 32006457 square calls, 296880 ms
+Child 55 killed by parent: 31683214 square calls, 296820 ms
+Child 56 killed by parent: 30933858 square calls, 296760 ms
+Child 57 killed by parent: 30482746 square calls, 296700 ms
+Child 58 killed by parent: 30164942 square calls, 296640 ms
+Child 59 killed by parent: 29741516 square calls, 296580 ms
+Child 60 killed by parent: 29176694 square calls, 296520 ms
+Child 61 killed by parent: 28857045 square calls, 296460 ms
+Child 62 killed by parent: 28401949 square calls, 296400 ms
+Child 63 killed by parent: 27941030 square calls, 296340 ms
+Child 64 killed by parent: 27622539 square calls, 296280 ms
+Child 65 killed by parent: 27249561 square calls, 296220 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 8 5 32768
-347464340 square calls, 5015 ms
-191502234 square calls, 5015 ms
-148290030 square calls, 5015 ms
-134094875 square calls, 5015 ms
-139086180 square calls, 5015 ms
-367408277 square calls, 5015 ms
-94057469 square calls, 5015 ms
-351694980 square calls, 5015 ms
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 8 5 32768
-355417790 square calls, 5016 ms
-371731010 square calls, 5016 ms
-361361285 square calls, 5016 ms
-129114414 square calls, 5016 ms
-122187527 square calls, 5016 ms
-64020269 square calls, 5016 ms
-368520525 square calls, 5016 ms
-215104910 square calls, 5016 ms
+# Test 22
+Child 2 finished: 12507500 square calls, 1200 ms
+Child 3 finished: 12507500 square calls, 1190 ms
+Child 4 finished: 12507500 square calls, 1610 ms
+Child 5 finished: 12507500 square calls, 1580 ms
+Child 6 finished: 12507500 square calls, 1880 ms
+Child 7 finished: 12507500 square calls, 1840 ms
+Child 8 finished: 12507500 square calls, 2020 ms
+Child 9 finished: 12507500 square calls, 1990 ms
+Child 10 finished: 12507500 square calls, 1980 ms
+Child 11 finished: 12507500 square calls, 2010 ms
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 8 30 32768
-Segmentation fault
+exiting threads
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 8 15 32768
-536920064 square calls, 9781 ms
-536920064 square calls, 13828 ms
-275995764 square calls, 15015 ms
-320184164 square calls, 15015 ms
-158322114 square calls, 15015 ms
-187666250 square calls, 15015 ms
-279483902 square calls, 15015 ms
-534040220 square calls, 15015 ms
+# Test 23
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 8 15 32768
-536920064 square calls, 8156 ms
-166430889 square calls, 12781 ms
-536920064 square calls, 12781 ms
-Segmentation fault
+# Test 24
 
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 8 10 32768
-536920064 square calls, 7719 ms
-Segmentation fault
-
-woody@woodpc UCRT64 ~/332/c332-g14
-$ ./partA1.exe 8 10 32768
-Segmentation fault
-
-# My program started having a lot of issues at this point.
-# Clearly it has some pretty glaring flaws in its implementation.
-# I will need to test more and fix it but at this point I
-# need to submit what I have because it will be due soon.
