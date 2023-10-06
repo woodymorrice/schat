@@ -10,7 +10,15 @@ and a result: passed! / Not passed!.
 
 To a point where we have "out of memory", simply print out the error message
 
-indicating the adding function return -1 and cannot add anymore. 
+indicating the adding function return -1 and cannot add anymore.
+
+
+For Phase 3: 
+Changed the test case to match with the latest advice to make the test result 
+become more details 
+
+When memory exceed, everything after that will return NULL in order not to make
+the program crashs. 
 
 # ListCreate()
 
