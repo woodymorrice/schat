@@ -293,6 +293,7 @@ int ListInsert(LIST *list, void *item) {
 void ListConcat(LIST *list1, LIST *list2) {
     NODE *list1Tail;
     NODE *list2Head;
+    NODE *list2Tail;
     if (list1 == NULL) {
         return;
     } else if (list2 == NULL) {
@@ -300,9 +301,10 @@ void ListConcat(LIST *list1, LIST *list2) {
     }
     list1Tail = list1->tailPointer;
     list2Head = list2->headPointer;
+    list2Tail = list2->tailPointer;
     list1Tail->nextNode = list2->headPointer;
-    list2Head->prevNode = list1->tailPointer;
-    list1Tail = list2->tailPointer;
+    list2Head->prevNode = list1Tail;
+    list1->tailPointer = list2Tail;
     list1->totalItem += list2->totalItem;
   
     /*

@@ -1153,7 +1153,7 @@ int main() {
     }
     
     prev = (testList2->currentItem)->prevNode;
-    next = (testList2->currentItem)->nextNode;
+    next = testList2->currentItem;
     result = ListInsert(testList2, &h);
     current = testList2->currentItem;
     head = testList2->headPointer;
@@ -1281,7 +1281,64 @@ int main() {
         printf(" passed!\n"); 
     }
      
-    
+    printf("\n\nTesting ListTrim() on testList1\n\n");
+    prev = (testList1->tailPointer)->prevNode;
+    resultPointer = ListTrim(testList1);
+    compare = &d;
+    tail = testList1->tailPointer;
+    if (resultPointer != compare) {
+        printf("testList1: ListTrim() fail to return 'd' deleted dataType");
+        printf("\n Not passed!\n");
+    }
+    else {
+        printf("testList1: ListTrim() return correct 'd' deleted dataType\n");
+        printf(" passed!\n");
+    }
+    if (testList1->totalItem != 5) {
+        printf("testList1: ListTrim() fail to decrease the total item\n");
+        printf(" Not passed!\n");
+    }
+    else {
+        printf("testList1: ListTrim() return total item correct\n");
+        printf(" passed!\n");
+    }
+    if (tail != prev) {
+        printf("testList1: ListTrim() fail to obtain the new tail\n");
+        printf(" Not passed!\n");
+    }
+    else {
+        printf("testList1: ListTrim() obtain new tail successfully\n");
+        printf(" passed!\n");
+    }
+
+    prev = (testList1->tailPointer)->prevNode;                                  
+    resultPointer = ListTrim(testList1);                                        
+    compare = &g;                                                               
+    tail = testList1->tailPointer;                                              
+    if (resultPointer != compare) {                                             
+        printf("testList1: ListTrim() fail to return 'g' deleted dataType");    
+        printf("\n Not passed!\n");                                             
+    }                                                                           
+    else {                                                                      
+        printf("testList1: ListTrim() return correct 'g' deleted dataType\n");  
+        printf(" passed!\n");                                                     
+    }                                                                           
+    if (testList1->totalItem != 4) {                                            
+        printf("testList1 (2): ListTrim() fail to decrease the total item\n");      
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList1 (2): ListTrim() return total item correct\n");            
+        printf(" passed!\n");                                                   
+    }                                                                           
+    if (tail != prev) {                                                         
+        printf("testList1 (2): ListTrim() fail to obtain the new tail\n");          
+        printf(" Not passed!\n");                                               
+    }                                                                           
+    else {                                                                      
+        printf("testList1 (2): ListTrim() obtain new tail successfully\n");         
+        printf(" passed!\n");                                                   
+    } 
     
     printf("\n\nTesting ListFree() on testList1\n\n");   
     ListFree(testList1, itemFreeChar);
