@@ -7,6 +7,11 @@ void itemFreeChar(void *itemToBeFreed) {
     *addressChar = '&';                                            
 }
 
+void itemFreeInt(void *itemToBeFreed) {
+    int * addressInt = (int *)itemToBeFreed;
+    *addressInt = -1;
+}
+
 int comparator (void *item1, void *item2) {
     if (item1 == item2) {
         return 1;
@@ -1340,9 +1345,9 @@ int main() {
         printf(" passed!\n");                                                   
     } 
     
-    printf("\n\nTesting ListFree() on testList1\n\n");   
+    printf("\n\nTesting ListFree() on testList and testList1\n\n");   
     ListFree(testList1, itemFreeChar);
-    if (c != '&' && b != '&') {
+    if (c != '&' && b != '&' && e != '&' && h != '&') {
         printf("testList1: ListFree() fail to free 'char' item as designed");
         printf("\n Not passed!\n");
     }
@@ -1350,14 +1355,17 @@ int main() {
         printf("testList1: ListFree() free 'char' item\n");
         printf(" passed!\n");
     }
-    if (testList1 != NULL) {
-        printf("testList1: ListFree() fail to remove the deleted list\n");
-        printf(" Not passed!\n");
+    
+    ListFree(testList, itemFreeInt);
+    if (n0 != -1  && n1 != -1 && n2 != -1 && n3 != -1 && n4 != -1 && n5 != -1) {
+        printf("testList: ListFree() fail to free 'int' item as designed");
+        printf("\n Not passed!\n");
     }
     else {
-        printf("testList1: ListFree() delete the existence of testList1\n");
+        printf("testList1: ListFree() free 'int' item\n");
         printf(" passed!\n");
-    }
+    }         
+    
      
     return EXIT_SUCCESS;
 
