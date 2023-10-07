@@ -5,6 +5,8 @@ Woody Morrice - wam553 - 11071060
 # Design Details 
 Styling: we agreed that we will follow QEMU styles as recommended on class.
 
+** Phase 3 change: Adding psuedocode to functions.  
+
 # list.h
 
 Contains all requested functions given in A1-Final.txt specification, 
@@ -46,7 +48,6 @@ Phase 2 changes to list_adders.c:
 
     sizeof(NODE) or sizeof(LIST). 
 
-** Pseudocode update for phase 3. 
     
 
 LIST *ListCreate ()
@@ -227,6 +228,7 @@ void ListConCat(LIST *list1, LIST *list2)
         change list2 head previous node become list1 tail;
         update list1 tail pointer;
         udpate the size of list1;
+        change memoryListUsed and update on curFreeList space
     }
 
 @Pre-condition: list must not be NULL, if LIST is NULL, simply return
@@ -417,7 +419,7 @@ void *ListSearch (LIST *list, int (* comparator)(void *item1, void* item2),
 
     Keep searching until the function comparator(compariArg, 
     
-    itemToCompare->dataType) equal to 1 (1 means success, 0 means failure) and 
+    itemToCompare->dataType) equal to 1 (1 means success, 0 means failure) and
 
     current pointer is left at the matched item and the pointer to that item 
     
@@ -477,7 +479,46 @@ void *ListRemove(LIST *list)
 
     by 1 and return (list->currentItem)->dataType. 
 
-    
+    void *ListRemove(LIST *list) {
+        reference to current pointer
+        for an empty list {
+            return NULL;
+        }
+        else if that list has one item {
+            update the linking to the curFreeNode
+            update curFreeNode space
+            change the linking of node that contain the deleted item   
+        }
+        else {
+            if current pointer is at head {
+                store the reference of the current next node
+                update the linking to curFreeNode
+                update curFreeNode space
+                change the linking of deleted item
+                change the linking of the new head
+                change current pointer
+            } 
+            else if current is at tail {
+                store the refrence to the current previous node
+                update the linking to curFreeNode
+                update curFreeNode space
+                change the linking of deleted item
+                change the linking of new tail
+                change current pointer 
+            }
+            else if current is at item in the middle {
+                store nextItem reference
+                store prevItem reference
+                change the linking of deleted item
+                update nextItem previous node linking
+                update prevItem next node linking
+                change the current pointer
+            }
+        }
+        decrease memoryNodeUsed
+        decrease list total item
+        return deleted item dataType
+    }
 
 
 void ListFree (LIST *list, void (*itemFree)(void* itemToBeFreed))
@@ -490,6 +531,19 @@ void ListFree (LIST *list, void (*itemFree)(void* itemToBeFreed))
 
     of the (list) back to NULL and completely delete the list.
 
+    void ListFree (LIST *list, void (*itemFree)(void *itemToBeFreed)) {
+        reference to the current item 
+        forever loop to iterate through node space {
+            break only if the current item is at NULL
+            otherwise 
+            itemFree(data of the item)
+            update the cursor pointer
+            decrease memoryNodeUsed 
+        }
+        delete list
+        update curFreeNode linking
+        decrease memoryListUsed
+    }
      
 void *ListTrim(LIST *list)
 
@@ -499,7 +553,21 @@ void *ListTrim(LIST *list)
 
     LIST and take the item out of list. The current pointer shall be 
 
-    the new last item in the list. 
+    the new last item in the list.
+
+     void ListTrim (LIST *list) {
+        reference to old tail 
+        reference to newTail
+        if it is an empty list {
+            return NULL
+        }
+        change the linking of old tail
+        change the linking of new tail
+        decrease memoryNodeUsed
+        decrease list item 
+        change the current pointer to new tail
+        return old tail dataType
+     } 
      
 # mytestlist.c
 

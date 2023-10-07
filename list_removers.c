@@ -85,6 +85,9 @@ void *ListRemove(LIST *list) {
 void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     NODE *curItem;
     list->currentItem = list->headPointer;
+    if (list == NULL) {
+        return;
+    }
     for (;;) {
         if (list->currentItem == NULL) {
             break;
@@ -104,8 +107,8 @@ void ListFree(LIST *list, void (*itemFree)(void *itemToBeFreed)) {
     else {
         curFreeList->nextLP = curFreeList;
         curFreeList = list;
-        memoryListUsed -= sizeof(LIST);
     }
+    memoryListUsed -= sizeof(LIST);
 }
 
 void *ListTrim(LIST *list) {

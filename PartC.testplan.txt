@@ -18,7 +18,7 @@ Changed the test case to match with the latest advice to make the test result
 become more details 
 
 When memory exceed, everything after that will return NULL in order not to make
-the program crashs. 
+the program crashes. 
 
 # ListCreate()
 
@@ -141,3 +141,88 @@ the program crashs.
 
         is inserting the newItem at the proper position.
 
+# ListConcat()
+
+    This function is to concatenate the given 2 lists and delete the second 
+
+    list. First, I will check if two actual valid lists can concatenate
+
+    probably, the test checks on the totalItem, head pointer, tail pointer
+
+    their linking and double check again to see if the second list is deleted
+
+    or not. In order to confirm second list is deleted, I will look into the 
+
+    variable memoryListUsed and curFreeList.
+
+# ListRemove()
+        
+    Since this function is to remove the item where the current cursor is
+    
+    pointing at and make the next item the current one. 
+
+    I will do the test as following: 
+    
+        First, call function to delete on an empty list, and check if the value
+        
+        return is a NULL or not.
+
+        Second, remove an item when the current list has 1 item, the function
+        
+        should return NULL because there is no other item in the list. I also
+
+        will check on the list total item and check on current free node to see
+
+        if that item is actually deleted.
+
+        Finally, I will operate multiple ListRemove() on a list that contains
+
+        multiple items and check for return value, as well as if the current 
+
+        free node space is linking probably or not.
+
+# ListFree()
+
+    This function is supposed to delete a list and free all the item in there.
+
+    I created 2 functions in the main test file one for itemFreeChar() and 
+
+    itemFreeInt() because my list mostly contain 'int' or 'char'.
+
+        To check if this is actually work, assume we will never use the
+    
+        variable that points to the list that we created at first, I will 
+
+        check if the function returns the right data type and check if that 
+
+        item changed its value to indicate that they are deleted out of the 
+
+        list. '&' for deleted 'char' and '-1' for deleted 'int'
+
+# ListTrim()
+
+    This function will delete the last item in the list and make the previous
+    
+    become the new tail. For that, I will check the for totalItem remains,
+
+    new tail value to see if they actually acquire new tail, current free node
+
+    space and finally the linking of newTail to other nodes. Also check for 
+
+    some special case, such as trimming an empty list, trimming list that has
+
+    one item. 
+
+# ListSearch()
+
+    This function returns the dataType of item if it found a match, otherwise 
+
+    return a NULL and left the current pointer at the end of list. I will 
+
+    check when the item actually exists in the list and when that item does
+
+    not exist in the list, based on the return value, we can determine if the
+
+    function is working probably.
+
+ 
