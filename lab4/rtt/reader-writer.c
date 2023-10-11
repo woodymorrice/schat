@@ -1,6 +1,8 @@
+/*# CMPT 332 - 2023 - Group 14 */
+/*# Phong Thanh Nguyen (David) - wdz468 - 11310824 */
+/*# Woody Morrice - wam553 - 11071060 */
+
 /*# Dwight Makaroff   */
-/*# student number    */
-/*# nsid              */
 /*# November 7, 2008  */
 /* modified to use RT-Threads October 2018 */
 /* No part of this program may be used for any profit or example for any

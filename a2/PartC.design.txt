@@ -5,3 +5,61 @@
 
 // Should describe our solution strategy,
 // including general pseudocode
+
+** Design Details **
+Our solution will consist of 6 main functions. The mainp() function
+will initialize the five necessary threads. The first thread will
+run the function sGetInput(), which waits for user input, records
+the characters typed, and upon reading a newline character, sends
+everything that has been recorded up to that point in a message to
+the server.
+The second thread runs sServer(), which receives messages from
+sGetInput(), and places them in a list.
+The third thread runs sSendData(), which waits for an item to be
+added to the message list of the server function, then takes that
+item off the list, and transmits it over the network via UDP
+protocol to any remote UNIX processes that are listening on the
+specified port.
+The fourth thread runs sGetData(), which listens on the specified
+port for UDP packets being sent, and retrieves them.
+The fifth thread runs sDisplayData(), which prints the messages
+received from the network to the local terminal.
+
+** Pseudocode **
+mainp()
+    initialize threads
+
+sGetInput()
+    wait for input from keyboard
+        if input is exit command
+            send exit message to all processes
+            exit
+        if input is newline
+            send all recorded input to server process
+        else
+            record input
+
+sServer()
+    wait for messages from server
+        if message received
+            add data package to list
+            send message to sSendData() that a data package is available 
+
+sSendData()
+    wait for message from server
+        if message received
+            convert message data to universal type
+            transmit data over UDP
+
+sGetData()
+    listen on port for datagram
+        if datagram received
+            convert message data to local type
+            add data to list
+            send message to sDisplayData() that data is available
+
+sDisplayData()
+    wait for message from sGetData()
+        if message received
+            display message data on local console
+

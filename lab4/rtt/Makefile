@@ -1,29 +1,35 @@
-.PHONY: clean
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
 
 CC = gcc
-CFLAGS = -g -I.
+CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
-LILIB = -L/student/cmpt332/rtt/lib/Linuxx86_64 -ltirpc
-CINCLUDE = -I$(THREADINCIR) -I/usr/include/tirpc
-THREADINCIR = /student/cmpt332/rtt/include
+INC = -I. -I/student/cmpt332/rtt/include -I/usr/include/tirpc
+LIB1 = -L/student/cmpt332/rtt/lib/Linuxx86_64 -ltirpc
+LIB2 = -lRtt -lRttUtils -L. -llist liblist.a
+
 
 all: lab4
 
 lab4: reader-writer-monitor.o monitor.o reader-writer.o liblist.a 
-	$(CC) $(LILIB) -o lab4 monitor.o reader-writer.o reader-writer-monitor.o \
-		-lRtt -lRttUtils -L. -llist liblist.a  
+	$(CC) $(LIB1) -o lab4 monitor.o reader-writer.o reader-writer-monitor.o \
+		$(LIB2)
 
 reader-writer-monitor.o: reader-writer-monitor.c reader-writer-monitor.h
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c reader-writer-monitor.c -o \
-		reader-writer-monitor.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) -c reader-writer-monitor.c \
+	    -o reader-writer-monitor.o
 	
-reader-writer.o: reader-writer.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(CINCLUDE) -c reader-writer.c -o \
-		reader-writer.o 
+reader-writer.o: reader-writer.c reader-writer-monitor.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) -c reader-writer.c \
+		-o reader-writer.o 
 
 monitor.o: monitor.h monitor.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(CINCLUDE) -c monitor.c -o monitor.o
- 
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) -c monitor.c -o monitor.o
+
+
+.PHONY: clean all
+
 clean: 
-	rm -f *.o
+	rm -f *.o lab4
 	
