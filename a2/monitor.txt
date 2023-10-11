@@ -1,0 +1,17 @@
+// Monitor has one main mutex that is held by the process currently accessing the data stored within
+
+Monitor Structure
+// Think of this monitor as an Object, with instance variables,
+// methods, and a constructor
+
+Shared Data: // instance variables
+// provides mutual exclusion for this data
+// the list lives here
+mutex busy: indicates whether or not a process is accessing the monitor
+List(PID) queue: a list of PIDs of currently waiting processes
+
+Subroutines: // methods
+// monitor operations
+
+Init Code: //constructor
+// initializes a list in the shared data section

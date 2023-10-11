@@ -1,0 +1,154 @@
+Only in ./xv6-orig: .git
+diff -r ./xv6/kernel/proc.c ./xv6-orig/kernel/proc.c
+314,322d313
+<   
+<   /* Begin CMPT 332 group14 change Fall 2023 */
+<   /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+<    * Woody Morrice - wam553 - 11071060 */
+< 
+<   /* Copy trace mask to child */
+<   np->tmask = p->tmask;
+<   
+<   /* End CMPT 332 group14 change Fall 2023 */
+698,712d688
+< 
+< 
+< /* Begin CMPT 332 group14 change Fall 2023 */
+< /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+<  * Woody Morrice - wam553 - 11071060 */
+< 
+< void
+< trace(int mask)
+< {
+<   struct proc *p = myproc();
+<   p->tmask = mask;
+< }
+< 
+< /* End CMPT 332 group14 change Fall 2023 */
+< 
+diff -r ./xv6/kernel/proc.h ./xv6-orig/kernel/proc.h
+107,114d106
+< 
+<   /* Begin CMPT 332 group14 change Fall 2023 */
+<   /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+<    * Woody Morrice - wam553 - 11071060 */
+< 
+<   int tmask;                   /* Bitmask for syscall tracing */
+< 
+<   /* End CMPT 332 group14 change Fall 2023 */
+diff -r ./xv6/kernel/syscall.c ./xv6-orig/kernel/syscall.c
+105,112d104
+< /* Begin CMPT 332 group14 change Fall 2023 */
+< /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+<  * Woody Morrice - wam553 - 11071060 */
+< 
+< extern uint64 sys_trace(void);
+< 
+< /* End CMPT 332 group14 change Fall 2023 */
+< 
+137,148d128
+< 
+< /* Begin CMPT 332 group14 change Fall 2023 */
+< 
+< [SYS_trace]   sys_trace,
+< };
+< 
+< char* syscall_names[] = {
+<     "fork", "exit", "wait", "pipe", "read",
+<     "kill", "exec", "fstat", "chdir", "dup",
+<     "getpid", "sbrk", "sleep", "uptime", "open",
+<     "write", "mknod", "unlink", "link", "mkdir",
+<     "close", "trace"
+151,152d130
+< /* End CMPT 332 group14 change Fall 2023 */
+< 
+159,165d136
+<   /* Begin CMPT 332 group14 change Fall 2023 */
+< 
+<   int i;
+<   int bit;
+< 
+<   /* End CMPT 332 group14 change Fall 2023 */
+< 
+171,187d141
+< 
+<     /* Begin CMPT 332 group14 change Fall 2023 */
+< 
+<     if (p->tmask > 0) {
+<       for (i = 1; i < 32; i++) {
+<         bit = p->tmask & (1 << i);
+<         if (bit != 0) {
+<           if (i == num) {
+<             printf("%d: syscall %s -> %d\n",
+<               p->pid, syscall_names[i-1], p->trapframe->a0);
+<           }
+<         }
+<       }
+<     }
+< 
+<     /* End CMPT 332 group14 change Fall 2023 */
+< 
+diff -r ./xv6/kernel/syscall.h ./xv6-orig/kernel/syscall.h
+23,31d22
+< 
+< /* Begin CMPT 332 group14 change Fall 2023 */
+< /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+<  * Woody Morrice - wam553 - 11071060 */
+< 
+< #define SYS_trace  22
+< 
+< /* End CMPT 332 group14 change Fall 2023 */
+< 
+diff -r ./xv6/kernel/sysproc.c ./xv6-orig/kernel/sysproc.c
+94,112d93
+< 
+< /* Begin CMPT 332 group14 change Fall 2023 */
+< /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+<  * Woody Morrice - wam553 - 11071060 */
+< 
+< /* enables tracing for the process that calls it */
+< /* and children that it subsequently forks. */
+< uint64
+< sys_trace(void)
+< {
+<   int mask;
+< 
+<   argint(0, &mask);
+<   myproc()->tmask = mask;
+<   return 0;
+< }
+< 
+< /* End CMPT 332 group14 change Fall 2023 */
+< 
+diff -r ./xv6/Makefile ./xv6-orig/Makefile
+141,146c141
+< 	$U/_pingpong\
+< 	$U/_trace
+< 	# Begin CMPT 332 group14 change Fall 2023
+< 	# Phong Thanh Nguyen (David) - wdz468 - 11310824
+< 	# Woody Morrice - wam553 - 11071060
+< 	# End CMPT 332 group14 change Fall 2023
+---
+> 
+Only in ./xv6/user: pingpong.c
+diff -r ./xv6/user/user.h ./xv6-orig/user/user.h
+26,33d25
+< /* Begin CMPT 332 group14 change Fall 2023 */
+< /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+<  * Woody Morrice - wam553 - 11071060 */
+< 
+< int trace(int);
+< 
+< /* End CMPT 332 group14 change Fall 2023 */
+< 
+diff -r ./xv6/user/usys.pl ./xv6-orig/user/usys.pl
+39,47d38
+< 
+< # Begin CMPT 332 group14 change Fall 2023
+< # Phong Thanh Nguyen (David) - wdz468 - 11310824
+< # Woody Morrice - wam553 - 11071060
+< 
+< entry("trace");
+< 
+< # End CMPT 332 group14 change Fall 2023
+< 

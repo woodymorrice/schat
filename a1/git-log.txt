@@ -1,0 +1,926 @@
+# Group 14 - CMPT 332
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+commit 2055ebc89fa59e5b88bf01f2d4b7fcd933e83f30
+Author: phong <wdz468@usask.ca>
+Date:   Thu Oct 5 20:09:24 2023 -0600
+
+    Pushing test result for partC
+
+commit 20a56967366245b4a52f5b2a7cdac13383f1ee08
+Author: phong <wdz468@usask.ca>
+Date:   Thu Oct 5 19:57:39 2023 -0600
+
+    Updated design, testplan, and testresult for PartC
+
+commit 5f1ee967443635d564b209e613b66a64862b5bdf
+Author: phong <wdz468@usask.ca>
+Date:   Thu Oct 5 18:17:15 2023 -0600
+
+    Finishing touch for test file and update ListFree()
+
+commit d0f1f4e118ecd1ec97306d4874b675617401c32b
+Author: phong <wdz468@usask.ca>
+Date:   Thu Oct 5 18:05:37 2023 -0600
+
+    Fixed error caused by ListTrim() and ListConcat()
+
+commit 5c28ee476bcc5a8a1c5ec17be9633e6893660f8c
+Author: phong <wdz468@usask.ca>
+Date:   Thu Oct 5 08:15:25 2023 -0600
+
+    Modified ListConcat(), tested ListSearch() and ListInsert()
+
+commit 5bbfe4a203ae970e893a837da69e50cb83a82a56
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Oct 4 21:34:26 2023 -0600
+
+    Makefile updated for testlist.c, ID added to xv6 files
+
+commit b0a8a62f03351d1bfdbd6902017d206761a280d1
+Merge: 90a848c 298af88
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Wed Oct 4 20:02:38 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 90a848c7606af32fecb11aab7f91b1ae8097776d
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Wed Oct 4 20:02:15 2023 -0600
+
+    partA1 tested and works properly
+
+commit 298af8892f1552f2ac7861e9a94ae983e1c78242
+Author: phong <wdz468@usask.ca>
+Date:   Wed Oct 4 19:40:33 2023 -0600
+
+    Fixing ListCreate() and ListFree() when memory exceeded
+
+commit 34320ac71d666673b30c325512c9f1cf771a7000
+Merge: ec010ec 3cb1b1c
+Author: phong <wdz468@usask.ca>
+Date:   Wed Oct 4 19:38:20 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 3cb1b1c5005315e5bc0c30ddb419637abac43265
+Merge: c8f139d da228b7
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Oct 4 19:26:31 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit c8f139dea9d226b2d11651726dbf055c5d9ebeb4
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Oct 4 19:26:22 2023 -0600
+
+    partA2 tested and works properly
+
+commit ec010ec764a5be3ead11a49c8d9b442f0eba4c27
+Author: phong <wdz468@usask.ca>
+Date:   Wed Oct 4 18:54:36 2023 -0600
+
+    Adding itemFree() on test file, fixing the SegFault from it
+
+commit da228b70b91a6b5e62c75b72b8fe16389e763db7
+Author: phong <wdz468@usask.ca>
+Date:   Wed Oct 4 03:32:34 2023 -0600
+
+    Test ListPrepend() and fix curFreeNode pointing to wrong address
+
+commit b85f3abf29eba67d55bd5a168514072f2e5ff979
+Author: phong <wdz468@usask.ca>
+Date:   Wed Oct 4 02:41:29 2023 -0600
+
+    Test ListAppend(), function produced no error so far
+
+commit 8dbb333a00532f21dc5c35b117cfd7aaff2f3691
+Author: phong <wdz468@usask.ca>
+Date:   Wed Oct 4 00:04:49 2023 -0600
+
+    Test ListRemove() head and tail condition proceed with no error
+
+commit 267c4ee65d81c17adc4cb48ed65a63d849768a55
+Merge: 2f5f4ca a9f55f7
+Author: phong <wdz468@usask.ca>
+Date:   Wed Oct 4 00:03:03 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit a9f55f7fc68004e1e45a7bd0ac4fa58ed36854b7
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Tue Oct 3 23:17:52 2023 -0600
+
+    Completed part B script and design
+
+commit 2f5f4ca080c7d947f11f4c88588f3c5628016f98
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 3 21:42:53 2023 -0600
+
+    Test ListRemove() on the first two conditions, proceed with no error
+
+commit 52a11da7c2ef48180df45e45e11533db9b1dcc14
+Merge: b66b6db 9fe02c1
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 3 21:40:20 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 9fe02c10b57600773e48c5c888a6b1504c56ed06
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Tue Oct 3 21:20:28 2023 -0600
+
+    PartE source, design and testing complete
+
+commit b66b6dbceacac4c8f0569c4e6fcc8247974c03b7
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 3 18:08:36 2023 -0600
+
+    Rough draft of ListRemove() after redesigning
+
+commit 2cadf46454379af25a365d3d6b1568cebba920c0
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 3 16:31:46 2023 -0600
+
+    Fixed memory address not pointing in the right place error in ListAdd()
+
+commit e7bc351306481025b31c3f6fe9d613fabd4d0ecf
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 3 09:46:05 2023 -0600
+
+    Rough draft of ListAdd() after redesigning the logic
+
+commit 3a06107391717cb0dd897a526c19ed653c225b75
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 3 09:06:05 2023 -0600
+
+    Resolved initial SegFault, testing different scenarioes
+
+commit 29cbc1a8d1e6faa792ccd7923e0dc76fa93266b7
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 3 00:31:23 2023 -0600
+
+    Redesigning logic for ListCreate() and fix struct error
+
+commit 96571f73e54461b32b4974f3ca93155a19d06323
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Mon Oct 2 23:45:07 2023 -0600
+
+    Created partA4 with the same design as partA3
+
+commit 23facc9d29ba4024a9df72cc68bfd30a980a9918
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Mon Oct 2 17:40:15 2023 -0600
+
+    PartA1.c complete, working properly
+
+commit c246281f55bed7b096c3850ad64df673c32189bc
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Mon Oct 2 15:51:14 2023 -0600
+
+    Part D design, testing, implementation complete
+
+commit 0cf1d14d850f5d69f810cac5d12eab8b68d072c0
+Merge: 7dd7f10 401db6a
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Oct 1 20:52:26 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 7dd7f10439094c6a60dd7b4fb8f73cc907b6ee3c
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Oct 1 20:52:12 2023 -0600
+
+    Added all the 'right things' so xv6 compiles with trace skeleton
+
+commit 401db6ae42f8f5d0d8e4d0bfbec098668c2ff6f3
+Author: phong <wdz468@usask.ca>
+Date:   Sun Oct 1 00:37:22 2023 -0600
+
+    Making progress with the SegFaultl, further modify with other functions
+
+commit e5e5e765ffaf17d1d8f7a153930071601aef7769
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 30 23:02:27 2023 -0600
+
+    Adding pointer logic to the current free space, SegFault happend
+
+commit 57d1ec166a180fd1d3c15e32f48c870c68b44c0c
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 30 14:59:08 2023 -0600
+
+    Modified test file to have a better output
+
+commit 08720672b5914d53d4c0ee6489d178f6d5607040
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 30 01:00:42 2023 -0600
+
+    Rewrite mytestlist.c and fixed some logic errors
+
+commit 2db286dcb052ee1085bebf3726467d6d909a5ce5
+Author: phong <wdz468@usask.ca>
+Date:   Fri Sep 29 22:01:12 2023 -0600
+
+    Rough draft for ListSearch()
+
+commit a8faf249ebc1724adf51cc211910ec00aeb48e51
+Author: phong <wdz468@usask.ca>
+Date:   Fri Sep 29 20:58:13 2023 -0600
+
+    Rough draft for ListConcat() and ListFree()
+
+commit c333afbf90b13490daa4cebe476dfab8505e2daa
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Fri Sep 29 20:52:16 2023 -0600
+
+    partA2 tested, runs properly
+
+commit 465610af45f37e74220f62740c4ef822161723ab
+Merge: afcead3 a9b0722
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Fri Sep 29 19:46:18 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit afcead3b60192bb544cf7966f9644934beda8fad
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Fri Sep 29 19:46:10 2023 -0600
+
+    Tested partA2 with no deadline for upper bounds of threads and size
+
+commit a9b0722a24aef6237b72af8d9d5d3a2e929c860f
+Author: phong <wdz468@usask.ca>
+Date:   Fri Sep 29 19:41:46 2023 -0600
+
+    Spotted logic error with LIST and NODE memory, modified
+
+commit cfe08b302a838ab0ad32a14973c25699039256ef
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Thu Sep 28 23:38:37 2023 -0600
+
+    Created pingpong.c, added to xv6 makefile
+
+commit 8d1cbfb0f628fe423f707dc6a509d6a79a428bb2
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Sep 27 23:22:15 2023 -0600
+
+    Implemented child thread creation in partA2
+
+commit a59b382c78e64c02c69bc46559716cbef55b45ea
+Merge: 5f409c4 1cef29c
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Sep 27 20:08:40 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+    Diverged from main.
+
+commit 5f409c4710c3f3cc05be9f9f0012f7695351e9f9
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Sep 27 20:08:31 2023 -0600
+
+    Removing relics of hashtable from square.h and parts A1-3
+
+commit 1cef29c7dd989d6f141fadf89bd3678b43fc3782
+Author: U-USASK\wam553 <wam553@MINION21.usask.ca>
+Date:   Tue Sep 26 13:14:22 2023 -0600
+
+    Thread array working properly (no segfaults) in partA1
+
+commit 6d42dd299842837c3baa2d2858d4f15abb50e7d5
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Tue Sep 26 12:34:20 2023 -0600
+
+    Began converting thread storage from hash table to regular array (K.I.S.S.)
+
+commit 840c3cd2475890f164568a961b12095592d2e0b7
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Mon Sep 25 16:20:16 2023 -0600
+
+    Forgot PartA.testplan.txt
+
+commit 9fd73e7f9fdb0df1d8995e49280334907822fd93
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Mon Sep 25 16:18:58 2023 -0600
+
+    Forgot to add PartA test results
+
+commit 214b3c2ca31d65fd4e55c3bd6b6bd1a76c2c5841
+Merge: 95d4e4a 90c33fb
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Mon Sep 25 16:18:09 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 95d4e4ae7f89720336f871e9e1988f69e6a35a9b
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Mon Sep 25 16:17:57 2023 -0600
+
+    Final commit for A1-Phase 2, god help us
+
+commit 90c33fb1a59a196d2483c42972def3953eb48cfb
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 15:03:55 2023 -0600
+
+    Adjust malloc() call to make sure the function only call once
+
+commit 90ff2ab847e3db8e7352663a7e197fa265a9f22d
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 14:35:30 2023 -0600
+
+    Updating design for phase 2 part C
+
+commit 469d844365deea4386d156c708c28933819b3b7f
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 14:22:28 2023 -0600
+
+    Adding Part C test result
+
+commit 21f66acadf3536799cd0b1fad0f483e7c3b3c23b
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 14:11:55 2023 -0600
+
+    Adding PartC test plan to git repo
+
+commit e8dc16fe3c9ed9905a77a8b28cd74576ee823211
+Author: U-USASK\wam553 <wam553@PEON25.usask.ca>
+Date:   Mon Sep 25 14:01:52 2023 -0600
+
+    Changed thread size in design doc
+
+commit 7f414d9ee2666ae9f0e1383e11e55d52bb02188b
+Merge: 5a445a3 9a09073
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 13:01:41 2023 -0600
+
+    Changes that prevent from pushing other files
+
+commit 5a445a357aae7a6e5315fd5be4c3327c3d12e19a
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 12:57:31 2023 -0600
+
+    Removing files part2
+
+commit 67cb6911dcf728e0d51d650c408c04a0521b52aa
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 12:42:08 2023 -0600
+
+    Still having error with git push, removes unecessary files
+
+commit d8895497439279af1da39a3060513d4653f1728f
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 12:04:36 2023 -0600
+
+    Adding details to test, deal with out of memory
+
+commit 9a09073ccb8baeb5f4b15b116505c15ff52d2fab
+Author: U-USASK\wam553 <wam553@PEON25.usask.ca>
+Date:   Mon Sep 25 12:04:16 2023 -0600
+
+    partB not reading arguments properly, removed regex checking for now
+
+commit 54f0b13258af3733c1e8b8aab0fd7c076de86f92
+Merge: 3f60c63 e6651ab
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Mon Sep 25 10:42:23 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 3f60c63779678f8dedcfa8854e379e6929207276
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Mon Sep 25 10:42:16 2023 -0600
+
+    Reduced line length in Part A text files < 80
+
+commit 26c65b4c30653c1b09bd4b1fc48452ffa42c0cc6
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 03:20:45 2023 -0600
+
+    List()Append initil test
+
+commit d7f3f986b96b5c0734e3c6225555f5a08df42dc8
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 02:08:11 2023 -0600
+
+    Got SegFault for ListAppend(), made some minor changes
+
+commit a96574d9d3cc4cfc1bc04bf8ad79a5fedeb9894e
+Author: phong <wdz468@usask.ca>
+Date:   Mon Sep 25 00:56:44 2023 -0600
+
+    ListCreate() and ListAdd() are working with no error for now
+
+commit e6651abdae83d1fcca1d0a26d4c8fe2a541b46ce
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sun Sep 24 23:10:21 2023 -0600
+
+    Tested partB.bash for partA1
+
+commit 3ceda13752b36dae63825f9bb5dc1d09a83f68bb
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 24 21:44:36 2023 -0600
+
+    Made recommended changes to partB.bash
+
+commit 7e0d45d2b2728cd2297a0d7def955ed2474bface
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 24 14:39:20 2023 -0600
+
+    Created source files for partA2 and partA3
+
+commit 8cf2fe1818aa3820faba5f09ddaa2a3e86553f65
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sun Sep 24 12:55:32 2023 -0600
+
+    Updated part A design and outlined test plan
+
+commit d971cdbde82f95c13caaaf75eaa901201cbf6af4
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 24 10:38:16 2023 -0600
+
+    Minor changes to the list_adders.c and mytestlist.c
+
+commit d09575b4d0c1fc4c2f037f6809f58084466d61d4
+Author: Woody Morrice (wam553) <wam553@mail.usask.ca>
+Date:   Sat Sep 23 15:23:03 2023 -0600
+
+    recovering backup list.h after a minor mishap
+
+commit 5af22619495615ef0e9b5a8de85b3d9d89d28e49
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sat Sep 23 15:08:25 2023 -0600
+
+    Makefile expecting dependencies not yet created.. fixed
+
+commit bdd69bae170b58b7534bda4973d402779103d82d
+Merge: dabc279 fdb7528
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sat Sep 23 15:07:34 2023 -0600
+
+    Commit merge changes before pull
+
+commit dabc279572bd3f7afeba8430bb2a6f9622ac4347
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sat Sep 23 15:01:07 2023 -0600
+
+    Makefile was expecting dependencies not yet created.. fixed
+
+commit fdb75282003729d19af1583b6828cc23059c0399
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 23 14:55:25 2023 -0600
+
+    Testing ListCreate()
+
+commit c91843c624331ffed6f9f286d64ebfd82cded373
+Merge: 6045ad8 0c85102
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sat Sep 23 14:42:25 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 6045ad894bf4fe0b9bb0c724f8b4bdd83c36c31b
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sat Sep 23 14:42:17 2023 -0600
+
+    Created rough draft of PartA testplan
+
+commit 0c851020d4b312087b928ba1a28219c08c406a15
+Merge: 7d4312e cd081b2
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 23 09:32:19 2023 -0600
+
+    Update changes to git push
+
+commit 7d4312e6305dbe072b0d4ac65d39b8cabc76a205
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 23 09:27:09 2023 -0600
+
+    Having error with sourcefile, updating to see change
+
+commit 609e1da2e9ffdf664fd99cd6fda505be2c2b3ccb
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Fri Sep 22 20:14:18 2023 -0600
+
+    PartA1 compiles and works properly! (pending testing)
+
+commit 6a37c93a5d911ad28901043c3eecef5f52a6206b
+Author: phong <wdz468@usask.ca>
+Date:   Fri Sep 22 14:11:57 2023 -0600
+
+    Made changes on ListCreate() to make it work but SegFault
+
+commit cd081b23c223b9f044cd94c549ba16b6626fb57b
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Fri Sep 22 12:02:45 2023 -0600
+
+    Changed handling of command line arguments in pthreads_main.c
+
+commit 7758491fbd3be95a221e12a35e84d63476f7abd1
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Thu Sep 21 22:51:06 2023 -0600
+
+    Hashtable and hash function compile
+
+commit ffc8465cfb6f492d16ba8bba7d662dee1ab8b089
+Author: phong <wdz468@usask.ca>
+Date:   Thu Sep 21 18:55:23 2023 -0600
+
+    Rename txt file for gdb and having task png file done
+
+commit 4322ade7a2189fdc2680ea985145c04133967284
+Author: phong <wdz468@usask.ca>
+Date:   Thu Sep 21 18:29:48 2023 -0600
+
+    Adding name into the png file
+
+commit 038bc34be515a0a794f31c3eab9d2ea7c3d33a56
+Author: phong <wdz468@usask.ca>
+Date:   Thu Sep 21 18:04:14 2023 -0600
+
+    Screenshot of xv6 running
+
+commit 51e874c80932a082b41c6daa109c2f5fa29eaae0
+Author: phong <wdz468@usask.ca>
+Date:   Thu Sep 21 18:01:19 2023 -0600
+
+    Able to print out asked information from the spec
+
+commit 1225088d2fde2418d2cc505493db818801f1db34
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Thu Sep 21 01:23:18 2023 -0600
+
+    Created multiple skeleton files:
+    htable.c, htable.h, posix_main.c, unix_main.c
+    Added new recipes to Makefile for new source files
+    Minor formatting fixes to list.h, square.h
+
+commit cfe6b5bccc75211ad3f5d0fdce85bd71125cb78c
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Sep 20 22:31:44 2023 -0600
+
+    Created skeleton pthreads_main.c
+
+commit 59aa79ca294e7605c60d9e2bd97e5d9632efec32
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Wed Sep 20 21:41:49 2023 -0600
+
+    Minor modifications to Makefile recipes per todays class discussion
+
+commit ec2e73afab6fc50e15ab3e208db59f5e6a00e1e4
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Wed Sep 20 19:56:53 2023 -0600
+
+    Added elapsed time calculation to childThread in windows_main.c
+
+commit 639bcd57b009554d8dd56495f093962fef160e4c
+Author: phong <wdz468@usask.ca>
+Date:   Wed Sep 20 18:20:40 2023 -0600
+
+    iPtr2 accessed outside of array, breakpoint condition is set
+
+commit fe2c52ea868a4b25cba6e697e5c3a044754d5375
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Tue Sep 19 23:49:42 2023 -0600
+
+    Parent thread now properly calls child threads
+
+commit 014be9b91804e71285b8ddcbe9454ca7b5d971b6
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Tue Sep 19 23:31:52 2023 -0600
+
+    Began implementing windows threads proper
+
+commit c83b199f8f3e6fda33efcefa2f4073180aa8893d
+Author: phong <wdz468@usask.ca>
+Date:   Tue Sep 19 11:48:13 2023 -0600
+
+    Adding .c file and makefile for lab2
+
+commit 52dbbb72f5e9fad83b6940ec5bd4c998b4745a10
+Merge: 171388c 7ace972
+Author: phong <wdz468@usask.ca>
+Date:   Tue Sep 19 11:34:39 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 171388cc0726cd3e04d7bfc814e8d4c04e299bae
+Merge: d5a2399 02b687c
+Author: phong <wdz468@usask.ca>
+Date:   Tue Sep 19 11:33:56 2023 -0600
+
+    add xv6
+
+commit 7ace972571521591d02f0667e943686c47a4c3d7
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Mon Sep 18 11:30:53 2023 -0600
+
+    Put all includes in angle brackets and added -I. to all relevant recipes in Makefile
+
+commit d5a23993cf11a2515214c2e9172b4a792dd29488
+Merge: 9afc4b2 29849bf
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 23:41:18 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 9afc4b2087bfa0bbbe9e828796c3d7d8ea052628
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 23:40:34 2023 -0600
+
+    Tar file upload
+
+commit d8e9112039a0da01964ec2801bcd0c191033366e
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 23:35:14 2023 -0600
+
+    Final tar file to hand in for a1-phase1
+
+commit 29849bffe0fe7c54999ab67b829c89d79399a643
+Author: David Nguyen (wdz468) <wdz468@mail.usask.ca>
+Date:   Sun Sep 17 22:48:16 2023 -0600
+
+    Replace mytestlist.c
+
+commit dc988f72b3a251076fe16fa95cf272eebbeb17e5
+Author: David Nguyen (wdz468) <wdz468@mail.usask.ca>
+Date:   Sun Sep 17 22:44:44 2023 -0600
+
+    Replace list.h
+
+commit a540b699e4096f7e78d87639befb9384a9edf9d5
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 22:20:11 2023 -0600
+
+    Fixing some errors come from IC90
+
+commit 313e41042623cdcab23b85793613c9838beadab2
+Merge: 5f908ad 7be7d92
+Author: U-USASK\wam553 <wam553@STEALTH7.usask.ca>
+Date:   Sun Sep 17 20:40:31 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 5f908ad638af2a84ce3310ee5ecdbad4b561911c
+Author: U-USASK\wam553 <wam553@STEALTH7.usask.ca>
+Date:   Sun Sep 17 20:39:34 2023 -0600
+
+    Added functionality to properly compile on any version of MSYS
+
+commit 7be7d9206953acfb10d86146427a2b8ce93dedf3
+Merge: 3558896 a981bdf
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 20:32:03 2023 -0600
+
+    Pushing some changes on files
+
+commit 35588968a5e98aeaf20bd03f1971bebd5d226777
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 20:28:43 2023 -0600
+
+    Changing name of some of the function syntax and add last 2 functions
+
+commit bc1bac021a7802898deb04101c18913e3bb595d3
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 20:26:12 2023 -0600
+
+    Changing name of some of the function syntax and add last 2 functions
+
+commit a981bdfd6db6da28d1b11a2a7bb1259ba105756b
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 17 20:14:49 2023 -0600
+
+    Added uniform identification to several files
+
+commit 224ce9b6d2c4479a65385497f37761b99fb31997
+Merge: 17096a9 48efc9e
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 17 18:54:26 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 17096a963afa1503f4d21ae6dd332cc6b27dcb97
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 17 18:54:19 2023 -0600
+
+    Changes to mytestlist.c
+
+commit 48efc9e7584e308bc450a77458dc6141c1be2af9
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 18:32:32 2023 -0600
+
+    Added some changes to the files to have enough required information
+
+commit 0382a58a7260cb998f1f772f6501beed1d48fc34
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 18:27:21 2023 -0600
+
+    Part C design complete
+
+commit 1d4669a7f510d08d2ec3fe18283f25b475e1cc7a
+Merge: 2dba00f 8746467
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 17 15:53:18 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 2dba00f7a297a210ccf9ec23095a35e2b744356e
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 17 15:53:11 2023 -0600
+
+    Added details to PartA.design.txt
+
+commit 874646759152dc92d4a6922bf3bcb7fe295b1ddc
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 15:45:45 2023 -0600
+
+    Finishing some missing functions and change the parameter names
+
+commit 16abf4711df4363cdae587f44faf1b591974f01f
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sun Sep 17 12:38:19 2023 -0600
+
+    Changed local library includes to " "
+
+commit 4c4549542e9b0ea9d1dff4dee3e0f540d70ab20a
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sun Sep 17 12:09:09 2023 -0600
+
+    Added conditional targets to Makefile
+
+commit eed5804e26416c2f3da3679cc4aff005f232e339
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sun Sep 17 11:57:00 2023 -0600
+
+    Merged makefiles
+
+commit 0b6e1a9f54c44789cdc2aa4f97bf7dbb0fb38191
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 11:47:35 2023 -0600
+
+    Copied files for testing
+
+commit 734df783b22b466d088767c3e9bebf9f5109328e
+Merge: 45d8a04 5392fa8
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 10:59:11 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 45d8a04514333f957c73a53a814022b60ca77d5a
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 10:26:32 2023 -0600
+
+    Mostly done with initial errors for what was written
+
+commit 5e6d4fc0dbab5423a4028a8093f760db00cf23a6
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 09:57:08 2023 -0600
+
+    Fixed initial errors for list_removers.c
+
+commit a95880d46dfd260abd8c0355e592984edfca4aa7
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 09:37:12 2023 -0600
+
+    Fixed some initial errors for list_movers.c
+
+commit 5392fa881dfe77b226c52087e3ba3eef00e13acb
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sun Sep 17 02:21:22 2023 -0600
+
+    Added parameter testing to windows_main.c and square.c
+
+commit 2c4bdac7a23758a0b275d45e721acb9a579f3945
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 01:29:11 2023 -0600
+
+    Fixed errors for list_adders.c
+
+commit 5d7a8cac706285a0e562dcd21151d738adc3e0f1
+Merge: c33b6a3 3906823
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 00:04:22 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit c33b6a35a050866434cf1c0b9290ebc62b23b98a
+Author: phong <wdz468@usask.ca>
+Date:   Sun Sep 17 00:04:04 2023 -0600
+
+    (void *) issue in NODE
+
+commit 390682322f4283c008eceb221755d7eb0d157d57
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Sat Sep 16 22:51:22 2023 -0600
+
+    Created design for part A and bash script for part B
+
+commit 415f10ef3a66e8b65d101020311eb34dd7dffabe
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 16 21:36:58 2023 -0600
+
+    Some errors fixed with defined type LIST and NODE
+
+commit 3878a72aa3d483eb541c438257fe7b83e4526451
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 16 18:34:28 2023 -0600
+
+    Fixing errors, LIST and NODE are not recognized
+
+commit 9a5adb219e42d18482806151109225cbddf676e2
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 16 17:14:07 2023 -0600
+
+    Draf for list_removers.c
+
+commit 4d5608af293d5ccdeaf4a9f9ff82c22510b9f3eb
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 16 16:21:21 2023 -0600
+
+    Draft for list_adders.c
+
+commit 902c28c629210160601b5a92c4da21c9e23c8acf
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 16 15:08:57 2023 -0600
+
+    Draft for list_movers.c
+
+commit 3d5520e62d3eb9001304040f22c3536f5222e3a7
+Merge: 64b8eb6 63aea10
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 16 13:36:51 2023 -0600
+
+    Merge branch 'main' of https://git.cs.usask.ca/cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 64b8eb65360f9a4ab31f9edfb57ea03c86ce0524
+Author: phong <wdz468@usask.ca>
+Date:   Sat Sep 16 13:23:05 2023 -0600
+
+    Draft for list_adders.c
+
+commit 63aea10bc7e9e7a17779ab12a7ce2fca54edd104
+Author: Woody Morrice (wam553) <wam553@mail.usask.ca>
+Date:   Sat Sep 16 12:01:40 2023 -0600
+
+    Update 332-style-guidelines-team14.txt
+
+commit ed0e3f51c43b6e29ac4c8648ed8aaf139e4c37cd
+Author: Woody Morrice (wam553) <wam553@mail.usask.ca>
+Date:   Sat Sep 16 11:42:42 2023 -0600
+
+    Update 332-style-guidelines-team14.txt
+
+commit 752e2aca448c3ce861aa985b26a2d8b726ac5052
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sat Sep 16 01:20:36 2023 -0600
+
+    Created skeletons for square.c and square.h
+
+commit 0019761cf57926b60c01d339eb79505548523a48
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Sat Sep 16 00:59:13 2023 -0600
+
+    Added initial draft of style guidelines
+
+commit 5017b854d64ffb8551866258a876689dc4a250af
+Merge: 395f0fb 57ac826
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Fri Sep 15 23:43:26 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/cmpt332-2023-group14
+
+commit 57ac82640c9e78a9482089515147ec3922a356ea
+Author: Woody Morrice <wam553@mail.usask.ca>
+Date:   Fri Sep 15 23:40:49 2023 -0600
+
+    windows_main.c skeleton compiles properly
+
+commit 395f0fb85b90416d50041c76417e7d2fa71155c5
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Fri Sep 15 20:56:49 2023 -0600
+
+    Rough design draft
+
+commit a0de592263e396ba651dfb999c4b7c9d4658b6ed
+Author: phong <wdz468@usask.ca>
+Date:   Fri Sep 15 19:01:53 2023 -0600
+
+    Add more details into part C of assignment
+
+commit d44d32dae61ab4100f67fea0764ea91299e605f7
+Author: phong <wdz468@usask.ca>
+Date:   Fri Sep 15 17:08:42 2023 -0600
+
+    Demo guildline how to proceed the assignment 1 phase 1
+
+commit 56a82a1d88189a7605eda0d83d7597110da2f070
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Fri Sep 15 11:19:09 2023 -0600
+
+    Created notes/summary of the assignment spec
+
+commit 9450a171bc465dc4c274fbf400c7ae9926e42020
+Author: Dwight Makaroff (dwm138) <makaroff@cs.usask.ca>
+Date:   Tue Sep 12 15:57:39 2023 -0600
+
+    Initial commit

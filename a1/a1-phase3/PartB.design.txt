@@ -1,0 +1,25 @@
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+# Design Documentation for Part B
+
+# Work Plan
+Woody will be in charge of design and implementation for part B.
+
+# Design Details
+I redesigned the bash script based on input I received from
+phase 1 and 2. The bash script first checks the command line argument
+and makes sure the user is using the correct OS for that particular
+version of partA. If not, the script exits.
+Then the script reads through each line of the input file, reads the
+first three white space separated arguments into a variables and
+discards any remaining arguments (by reading them into a garbage
+variable).
+It then checks that each argument is a positive integer and is
+within the acceptable range for that argument. Then it executes
+the chosen partA program with the provided arguments.
+
+# Implementation Details
+Regular expressions are used to verify all arguments.
+

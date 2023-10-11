@@ -1,0 +1,47 @@
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+
+
+testList: ListCreate():
+passed!
+testList: ListAdd() adding 1st item:
+passed!
+testList: assigning head and tail :
+passed!
+testList: ListAdd() adding 2nd item:
+passed!
+testList: (2nd) head and tail correct:
+passed!
+testList1: ListCreate():
+passed!
+testList1: ListAdd() adding 1st item:
+passed!
+testList1: head and tail point the same:
+passed!
+testList1: ListAdd() adding 2nd item:
+passed!
+testList1: (2nd) head and tail correct:
+passed!
+testList1: ListAdd() adding 3rd item:
+passed!
+testList1: nextNode assigning:
+passed!
+testList1: tail prevNode assigning:
+passed!
+testList: return item:
+passed!
+testList1: return item:
+passed!
+testList: ListAppend() first item:
+passed!
+testList1: ListAppend() first item:
+passed!
+testList: ListPrepend() first item:
+passed!
+testList: head return 21 :
+passed!
+
+// this is when the function is out of memory
+testList: (2nd) ListInsert() out of memory: Success
+testList: ListInsert() fails to change item

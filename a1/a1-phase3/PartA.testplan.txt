@@ -1,0 +1,142 @@
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+# Part A Test Plan
+
+All portions of part A have been designed so that the same set of unit
+tests can be used and similar results can be expected. Through testing
+in phase two I have determined suitable upper limits for the command 
+line arguments, so I will test the upper and lower bounds for each
+argument (edge cases) individually with different combinations of values
+for the other arguments. I will test all arguments at the maximum
+allowable value together, then I will test some unacceptable values for
+each argument. Like testing in phase two, because of the nature of
+multithreaded applications I wont be able to test for exact results in
+most cases, so I will look for consistent and predictable behaviour.
+
+For the first few tests I will ensure that the the size argument is
+being interpreted correctly and the square function is returning the
+correct values. I will use arbitrary values for the other arguments.
+
+# Test 1: size = 0
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 2: size = 1
+# Expected Outcome:
+2 square calls
+
+# Test 3: size = 10
+# Expected Outcome:
+65 square calls
+
+# Test 4: size = 100
+# Expected Outcome:
+5150 square calls
+
+Next I will perform some tests around the maximum allowed value for
+size.
+
+# Test 5: size = 20000
+# Expected Outcome:
+200030000 square calls (I used a calculator)
+
+# Test 6: size = 20001
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 7: size = 19999
+# Expected Outcome:
+200009999 square calls
+
+Negative integers and non-integer values will be rejected by the bash
+script, but I will make some tests for them anyways.
+
+# Test 8: size = -100
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 9: size = string
+# Expected Outcome:
+Silently exit and print nothing
+Now that I am satisfied that size is sufficiently tested in a vaccuum,
+I will test the deadline argument. I will test short deadlines with a
+small amount of threads, and unacceptable deadline values. I will wait
+to test the maximum deadline until I am testing the maximum number of
+threads. Again, the shell script will catch the arguments that cannot
+be accepted, but the tests are included anyways.
+
+# Test 10: deadline = -100
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 11: deadline = string
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 12: deadline = 0
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 13: deadline = 1, with a high value for size
+# Expected Outcome:
+Thread is killed by parent before it can complete calculations
+
+# Test 14: deadline = 30, many threads and high value for size
+# Expected Outcome:
+Some threads are killed by parent before they can complete
+
+Once deadline appears to be functioning correctly, threads can be
+tested, and the maximums for all arguments will be tested together.
+
+# Test 15: threads = -100
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 16: threads = string
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 17: threads = 0
+# Expected Outcome:
+Silently exit and print nothing
+
+# Test 18: threads = 1
+# Expected Outcome:
+Output consistent with test 2
+
+# Test 19: threads = 32, max deadline and high size
+# Expected Outcome:
+All threads should complete calculations
+
+# Test 20: threads = 64, 1s deadline, high size
+# Expected Outcome:
+All threads should output but will not complete
+calculations, some threads may not even begin calculations
+
+# Test 21: threads = 64, deadline and size max
+# Expected Outcome:
+Some threads complete, most threads are killed,
+all threads output something
+
+Finally I will include one test that has an extra argument
+to show that the bash script will ignore it, and tests with
+too few arguments, where the behaviour should be the same
+
+# Test 22: 4 arguments
+Expected Outcome:
+Silently exit and print nothing
+
+# Test 23: 0 arguments
+Expected Outcome:
+Silently exit and print nothing
+
+# Test 24: 1 arguments
+Expected Outcome:
+Silently exit and print nothing
+
+# Test 25: 2 arguments
+Expected Outcome:
+Silently exit and print nothing
+

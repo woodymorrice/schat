@@ -1,0 +1,143 @@
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+
+For Phase 2: 
+
+For every test cases, there will be a message to indicate what it is doing
+
+and a result: passed! / Not passed!.
+
+To a point where we have "out of memory", simply print out the error message
+
+indicating the adding function return -1 and cannot add anymore.
+
+
+For Phase 3: 
+Changed the test case to match with the latest advice to make the test result 
+become more details 
+
+When memory exceed, everything after that will return NULL in order not to make
+the program crashs. 
+
+# ListCreate()
+
+    For this function, I basically check if the reference returns a NULL
+    
+    pointer, if it returns NULL that mean the functions is not working properly
+
+# ListCount()
+    For this function, simply check the return value of the (list->totalItem).
+
+# ListAdd()
+
+    Since the function supposed to add new item directly after current item. 
+
+    There are some scenarioes that we can check: 
+    
+        First, if the (list->totalItem) equals zero, then we make the new item
+        
+        to be both the head and tail. If the (list->headPointer) and 
+
+        (list->tailPointer) return NULL, means the functions is not adding
+        
+        and fail to assign the value to head and tail pointer. 
+
+        
+
+        Second, if (list->currentItem) is at (list->tailPointer), the function
+        
+        should make the newItem the new tail and check for number of totalItem
+
+        (Check for tail value if it is pointing to newItem and totalItem)
+
+        
+        
+        Finally, if (currentItem) is at the middle, we check for the
+
+        (newItem->prevNode), (newItem->nextNode) to make sure the function
+        
+        is inserting the newItem at the proper position. 
+         
+  
+
+# ListAppend()
+
+    Since the function supposed to add newItem to become the new tail.
+
+    There are some scenarioes that we can check:
+
+        First, if the (list->totalItem) equals zero, then we make the new item
+
+        to be both the head and tail. If the (list->headPointer) and
+
+        (list->tailPointer) return NULL, means the functions is not adding
+
+        and fail to assign the value to head and tail pointer.
+
+
+
+        Second, we always want to make sure the (currentItem) is always at the
+    
+        end of the List or not pointing to NULL , simply check for the 
+
+        new (list->tailPointer) and the (totalItem) when adding newItem, 
+
+        if does not pass, mean the function does not work correctly.
+
+
+# ListPrepend()
+
+    Since the function supposed to add newItem to become the new head.
+
+    There are some scenarioes that we can check:
+
+        First, if the (list->totalItem) equals zero, then we make the new item
+
+        to be both the head and tail. If the (list->headPointer) and
+
+        (list->tailPointer) return NULL, means the functions is not adding
+
+        and fail to assign the value to head and tail pointer.
+
+
+
+        Second, we always want to make sure the (currentItem) is always at the
+
+        start of the List or not pointing to NULL, simply check for the 
+
+        new (list->headPointer) and the (totalItem) when adding newItem, 
+
+        if does not pass, mean the function does not work correctly.
+
+        
+# ListInsert()
+
+    Since the function supposed to add new item directly before current item.
+
+    There are some scenarioes that we can check:
+
+        First, if the (list->totalItem) equals zero, then we make the new item
+
+        to be both the head and tail. If the (list->headPointer) and
+
+        (list->tailPointer) return NULL, means the functions is not adding
+
+        and fail to assign the value to head and tail pointer.
+
+
+
+        Second, if (list->currentItem) is at (list->headPointer), the function
+
+        should make the newItem the new head and check for number of totalItem
+
+        (Check for head value if it is pointing to newItem and totalItem)
+
+
+
+        Finally, if (currentItem) is at the middle, we check for the
+
+        (newItem->prevNode), (newItem->nextNode) to make sure the function
+
+        is inserting the newItem at the proper position.
+

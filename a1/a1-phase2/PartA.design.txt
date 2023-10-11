@@ -1,0 +1,96 @@
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+# Design Documentation for Part A
+
+# Work Plan
+Woody will be in charge of design and implementation for part A.
+
+# Design Details
+The overall design for Part A is relatively simple and straightforward,
+with most of the details outlined in the assignment spec. All that was
+really left up to us was to decide on the details of the implementation.
+Each portion (A.1, A.2, etc) will have its own source file and will be
+compiled into a separate executable so that they can each be run 
+independently of each other, and will have no interface or interaction
+between them. The general code structure for each portion will be similar.
+The main function will ensure that three command line arguments were given
+and check them for validity. It will then create the 'parent' thread and
+pass the arguments to it, check that the thread was created successfully,
+then sleep until the deadline. When the deadline is reached, the main
+function will exit. The parent thread will create the specified number of
+child threads, ensuring they are created successfully, then sleep until 
+the deadline. When the deadline is reached the parent thread will notify 
+the child threads, then exit. The child threads will record their thread
+id and the time at which they were created, then begin calling the square
+function in a loop. The loop will end when the square calculations have
+completed, or when the parent thread signals that the deadline has been
+reached. At that point, the child thread will print the number of times
+its particular instance of the square function was called, and its elapsed
+run time, then it will exit. The square function will calculate its output
+recursively, recording the number of times it is called.
+
+# Implementation Details
+# All Parts
+The command line arguments will be stored in an array by the main function,
+and the address of the array will be passed to the created threads. If any
+of the provided arguments are not within the acceptable range, the program
+will exit silently but emit an exit code that indicates the program did
+not complete its operations successfully. Child thread information will
+be stored in a hash table. Each thread will have a unique hash entry object
+with three fields: threadId will store the thread identifier as an unsigned
+long integer, beginTime will store the system time when the thread was
+created as an unsigned long integer, and sqCalls will store the number of
+calls to the square function from that thread as an unsigned integer.
+The hashIn function will hash the thread id to an open index in the hash
+table and return that index. The child thread will index into the hash
+table and insert the necessary information. The hFind function hashes the
+thread id and finds the index with a matching thread id, and is used by the
+square function to identify the appropriate entry in the table to increment.
+The three API independent functions (square, hashIn and hFind) will be
+located in the square.c source file and included via the square.h header
+file.
+Each individual part of A will implement the getThrId function which will
+call its API specific function to retrieve the thread id, and return it as
+an unsigned long integer. 
+
+# A1
+Each thread will be created with a stack size of 2 mb, which will allow
+a size argument of up to 100000 without causing an overflow. The main
+function and parent thread will call the Sleep() function to wait until
+the deadline. The SYSTEMTIME structure documentation page located at
+learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime
+explains not to use the GetSystemTime() function to determine elapsed time,
+and refers to the Windows Time page
+learn.microsoft.com/en-us/windows/win32/sysinfo/windows-time
+that suggests using some combination of the GetTickCount, GetTickCount64
+and GetMessageTime functions. I chose to use GetTickCount64() since there
+could be some problems with time wrap around using the normal GetTickCount()
+function if the computers in the Spinks lab haven't been restarted recently
+enough.
+
+# Function Specifics
+# DWORD WINAPI parentThread(LPVOID lPtr)
+Preconditions: Command line parameters must be integers of an appropriate
+size. Appropriate size will be determined during implementation.
+Postconditions: Child threads must complete and call exit().
+
+# DWORD WINAPI childThread(LPVOID lPtr)
+Preconditions: Parameters passed from parentThread should be valid and
+appropriate.
+Postconditions: keepRunning global variable must be set to false.
+
+# int square(int n)
+Preconditions: n must be a positive integer.
+Postconditions: n == 0
+
+# A2
+Pending implementation...
+
+# A3
+Pending implementation...
+
+# A4
+Pending implementation...
+

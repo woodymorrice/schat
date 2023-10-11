@@ -1,0 +1,508 @@
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+
+# Design Details 
+Styling: we agreed that we will follow QEMU styles as recommended on class.
+
+# list.h
+
+Contains all requested functions given in A1-Final.txt specification, 
+each functions will have comments on top to describe the tasks 
+that it needs to carry out. 
+
+Phase 2 changes: 
+Removes all define variables
+
+For structure definition of LIST: 
+    We have: 
+        struct NODE *headPointer;   // pointer points to fist NODE (head)
+        struct NODE *tailPointer:   // pointer points to last NODE (tail)
+        struct NODE *currentItem;   // pointer points to current NODE
+        int totalItem;              // tells us how many items / nodes 
+        
+
+For structure definition of NODE:
+    We have: 
+        struct NODE *prevNode;      // pointer points to the previous NODE
+        struct NODE *nextNode;      // pointer points to the next NODE 
+        void *dataType;             // (dataType) or (item), hold actual data
+
+# list_adders.c
+
+Phase 2 changes to list_adders.c: 
+    In order for ListCreate() to create LIST preference, we need a malloc() 
+    to allocate enough memory base on the amount of LIST POOL and NODE POOL.
+    
+    
+    For LIST and NODE, by setting a bool value to make sure the function call 
+
+    can be allowed to call malloc() once.
+
+    
+    There will size_t (memoryNodeUsed) and (memoryListUsed). These 2 variables
+    
+    will be used to keep track of new NODE or new LIST base on their
+
+    sizeof(NODE) or sizeof(LIST). 
+
+** Pseudocode update for phase 3. 
+    
+
+LIST *ListCreate ()
+    Receive no parameters, at first we make all of the members in LIST becomes 
+    NULL, except totalItem = 0. This function will make a new, empty list 
+    and returns its reference on success. Otherwise, return NULL.
+
+    Design change: Receive no parameters, at first we set up a boolean value 
+    to check for the first execution of the function, if it is a false, we 
+    create for-loop to do the initialization, one for NODEo and another one 
+    for LIST, no more malloc(). Once the boolean become true, no more 
+    initialization should be done again. Keep track of the memory used by 
+    variable memoryListUsed, if the memory exceed, simply return NULL.
+    
+    LIST *ListCreate() {
+        LIST *emptyList             // reference to the new empty list
+        if (the initialization is not done) {
+            intialized members in first NODE;
+            for(start from the 2nd NODE; ++) {
+                intialized members;
+            }
+            intialized members in last NODE;
+            
+            intialized members in first LIST;
+            for(start from the 2nd LIST; ++) {
+                initialized members;
+            }
+            initialized members in last LIST;
+        }
+        udpate memoryListUsed;
+        if memory exceed {
+            return NULL;
+        } 
+        return reference;
+    }  
+    
+@Pre-condition: list must not be NULL
+int ListCount (LIST *list) 
+    Receive a pointer to LIST and request this function to return the number 
+    of items in list by calling (list->totalItem).
+    
+    int ListCount (LIST *list) {
+        return totalItem of list;
+    } 
+
+int ListAdd (LIST *list, void *item)
+
+    Creates 3 NODE * variables (curItem & curNext & newItem) one for 
+
+    holding the pointer to the currentItem and one for pointer points to the 
+
+    nextNode (or next item of currentItem). Last one is for holding the
+    
+    reference to the new item which we want to add.  
+
+    If **memoryNodeUsed is smaller than the designed size** then
+
+    for LIST that has size of 0, simply make everything point to the 
+
+    (item). For currentItem that is at tail of LIST,
+
+    **update curFreeNode** to add the new item to the end. Otherwise
+
+    add the (item) in the middle, plus (totalItem) by 1, adjust the 
+    
+    current pointer and return 0 on success, -1 on failure.
+
+    
+    int ListAdd(LIST *list, void *item) {
+        NODE * reference to the current item;
+        NODE * reference to the next of current;
+        NODE * reference to new item we want to add;
+
+        if (memoryNodeUsed is smaller than the designed size) {
+            update newItem equal to currentFreeNode;
+            update newItem datatype;
+            
+            if (empty list) {
+                head points to the newItem;
+                tail points to the newItem;
+                update currentFreeNode space;
+                update newItem linking;
+                point the current item to newItem; 
+            }
+            else {
+                if (currentItem is at tail) {
+                    add newItem to the end;
+                    update curFreeNode space;
+                    update the newItem linking;
+                    currentItem to the new tail;
+                }
+                
+                else {
+                    add newItem to the middle;
+                    update curFreeNode space; 
+                    udpate linking;
+                    change current pointer;
+                }
+            }
+            update memoryNodeUsed;
+            increase list item;
+            return 0;
+        }
+        return -1;
+    } 
+
+int ListInsert(LIST *list, void* item)
+
+    Creates 3 struct NODE * variables (curItem & curPrev & newItem) one for 
+
+    holding the pointer to the currentItem and one for pointer points to the
+
+    nextNode (or next item of currentItem). One for holding newItem
+
+    If (list->totalItem) is smaller than the constant MAX_ITEM then
+
+    for LIST that has size of 0, simply make everything point to the
+
+    (item). For currentItem that is at head of LIST, call
+
+    ListPrepend(list, item) to add the new item to the head. Otherwise
+
+    add the (item) in the middle, plus (totalItem) by 1, adjust the
+
+    current pointer and return 0 on success, -1 on failure.
+
+    int ListInsert(LIST *list, void *item) {
+        NODE * reference to the current item;
+        NODE * reference to the prev of current;
+        NODE * reference to new item we want to add;
+
+        if (memoryNodeUsed is smaller than the designed size) {
+            update newItem equal to currentFreeNode;
+            update newItem datatype;
+            
+            if (empty list) {
+                head points to the newItem;
+                tail points to the newItem;
+                update currentFreeNode space;
+                update newItem linking;
+                point the current item to newItem; 
+            }
+            else {
+                if (currentItem is at head) {
+                    add newItem to the front;
+                    update curFreeNode space;
+                    update the newItem linking;
+                    currentItem to the new head;
+                }
+                
+                else {
+                    add newItem to the middle;
+                    update curFreeNode space; 
+                    udpate linking;
+                    change current pointer;
+                }
+            }
+            update memoryNodeUsed;
+            increase list item;
+            return 0;
+        }
+        return -1;
+    }     
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+void ListConCat(LIST *list1, LIST *list2) 
+    Simply make the tail of (list1->nextNode) points to the head of (list2)
+    
+    and vice versa for head of (list2->prevNode) to tail of (list1). Change
+
+    the tail of (list1) equals to last item of (list2). Combine the size.
+
+    Delete(list2). 
+
+    void ListConcat(LIST* list1, LIST* list2) {
+        change list1 tail next node become to list2 head;
+        change list2 head previous node become list1 tail;
+        update list1 tail pointer;
+        udpate the size of list1;
+    }
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+int ListAppend (LIST *list, void *item)
+
+    Create (struct NODE *prevTail) to hold the current pointer to tail.
+
+    If (list->totalItem) is smaller than the constant MAX_ITEM then
+
+    for LIST that has size of 0, simply make everything point to the
+
+    (item). For currentItem that is at somewhere not tail, call
+
+    ListLast(list, item) to go to the tail and make the new tail, plus 
+
+    (totalItem) by 1, adjust the current pointer and return 0 on success, 
+
+    -1 on failure.
+
+    int ListAppend(LIST *list, void *item) {
+        NODE * reference to the oldTail;
+        NODE * reference to new item we want to add;
+
+        if (memoryNodeUsed is smaller than the designed size) {
+            update newItem equal to currentFreeNode;
+            update newItem datatype;
+            
+            if (empty list) {
+                tail points to the newItem;
+                update currentFreeNode space;
+                update newItem linking;
+                point the current item to newItem; 
+            }
+            else {
+                update currentItem pointer to tail;
+                update curFreeNode space;
+                update new tail linking; 
+            }
+            update memoryNodeUsed;
+            increase list item;
+            return 0;
+        }
+        return -1;
+    }  
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+int ListPrepend (LIST *list, void *item)
+
+    Create (struct NODE *prevHead) to hold the current pointer to head.
+
+    If (list->totalItem) is smaller than the constant MAX_ITEM then
+
+    for LIST that has size of 0, simply make everything point to the
+
+    (item). For currentItem that is at somewhere not tail, call
+
+    ListFirst(list, item) to go to the head and make the new head, plus
+
+    (totalItem) by 1, adjust the current pointer and return 0 on success,
+
+    -1 on failure.
+     int ListPrepend(LIST *list, void *item) {
+        NODE * reference to the oldhead;
+        NODE * reference to new item we want to add;
+
+        if (memoryNodeUsed is smaller than the designed size) {
+            update newItem equal to currentFreeNode;
+            update newItem datatype;
+            
+            if (empty list) {
+                head points to the newItem;
+                update currentFreeNode space;
+                update newItem linking;
+                point the current item to newItem; 
+            }
+            else {
+                update currentItem pointer to head;
+                update curFreeNode space;
+                update new head linking; 
+            }
+            update memoryNodeUsed;
+            increase list item;
+            return 0;
+        }
+        return -1;
+    } 
+
+# list_movers.c
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+void *ListFirst (LIST *list)
+    Receive a pointer to LIST and request this function to return first item    
+    and make the list->currentItem points to the first item.
+    
+    void *ListFirst (LIST *list) {
+        return curItem to headPointer;
+    }
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+void *ListLast (LIST *list)
+    Receive a pointer to LIST and request this function to return last item
+
+    and make the list->currentItem points to the last item.
+
+    void *ListLast (LIST *list) {
+        return curItem to tailPointer;
+    } 
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+void *ListNext (LIST *list)
+    Receive a pointer to LIST and request this function to: 
+    
+    Here there are 3 scenarioes that can happen: 
+    
+        First, if the list only has 1 items (node) then simply return NULL.
+
+        Second, if (list->currentItem) is at the last item in the LIST, we
+
+        also return NULL.
+    
+        Finally, if (list->currentItem) is at middle of LIST or on an
+    
+        appropriate position, simply change (list->currentItem) to point
+        
+        to the next item and return its dataType.
+        
+   
+    void *ListNext(LIST *list) {
+        return curItem to curItem->nextNode;
+    }  
+   
+
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+void *ListPrev (LIST *list)
+    Receive a pointer to LIST and request this function to:
+
+    Here there are 3 scenarioes that can happen:
+
+        First, if the list only has 1 items (node) then simply return NULL.
+
+        Second, if (list->currentItem) is at the first item in the LIST, we
+
+        also return NULL.
+
+        Finally, if (list->currentItem) is at middle of LIST or on an
+
+        appropriate position, simply change (list->currentItem) to point
+
+        to the previous item and return its dataType.
+
+
+   
+    void *ListPrev(LIST *list) {
+        return curItem to curItem->prevNode;
+    }
+
+   
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing or NULL.
+void *ListCurr (LIST *list)
+    Receive a pointer to LIST and request this function to return 
+    
+    (list->currentItem)->dataType.
+
+   
+    void *ListCurr(LIST *list) {
+        return curItem;
+    }   
+
+@Pre-condition: list must not be NULL, if LIST is NULL, simply return
+nothing
+void *ListSearch (LIST *list, int (* comparator)(void *item1, void* item2),
+
+    void* comparisonArg)
+    Receive a pointer to LIST and request this function to:
+
+    Create struct NODE *itemToCompare to hold the referenc of 
+    
+    (list->currentItem)
+
+
+    Keep searching until the function comparator(compariArg, 
+    
+    itemToCompare->dataType) equal to 1 (1 means success, 0 means failure) and 
+
+    current pointer is left at the matched item and the pointer to that item 
+    
+    is return.
+
+    
+    If no match is found, current pointer is left at the end of list and 
+
+    return NULL;
+    
+    void ListSearch(LIST *list, comparator, comparisonArg) {
+        current node refrence;
+        check for edge cases if one of parameter is NULL;
+        while (comparator != 1) {
+            if current node is at tail return NULL;
+            if not, move forward;
+        }
+        return reference of match item;
+    }
+
+# list_removers.c
+
+void *ListRemove(LIST *list)
+
+    Receive a pointer to LIST and ask the functions to do the following: 
+    
+    Create (struct NODE *item1) to hold the pointer to the currentItem 
+
+    then there are 4 scenarioes that can happen: 
+
+    First, if the LIST only has 1 item, simply make everything NULL and 
+    
+    minus (totalItem) by 1, plus return the removed dataType.
+
+    
+    Second, if current pointer is at the head of LIST, delete the oldHead
+
+    and make the (oldHead->nextNode) to become the new head,adjust the
+
+    current pointer. Minus (list->totalItem) by 1 and return 
+
+    (oldHead->dataType). 
+
+    
+    Third, if current pointer is at the tail of LIST, delete the oldTail
+
+    and make the (oldTail->nextNode) to become the new tail, adjust the
+
+    current pointer. Minus (list->totalItem) by 1 and return
+
+    (oldTail->dataType).
+
+    
+    Finally, if current pointer is at appropriate position in LIST, delete 
+
+    the currentItem and adjust the current pointer. Minus (list->totalItem) 
+
+    by 1 and return (list->currentItem)->dataType. 
+
+    
+
+
+void ListFree (LIST *list, void (*itemFree)(void* itemToBeFreed))
+
+    Create boolean value named (empty) and pointer (itemToRemove) to hold
+
+    the current item. After that we generate a while-loop that uses
+
+    itemFree() until all the nodes are freed. Finally we set the members
+
+    of the (list) back to NULL and completely delete the list.
+
+     
+void *ListTrim(LIST *list)
+
+    Receive pointer to a list  and return last item by calling 
+
+    ListLast(list) to move the current pointer points to the tail of 
+
+    LIST and take the item out of list. The current pointer shall be 
+
+    the new last item in the list. 
+     
+# mytestlist.c
+
+    Checking on if the function has enough arguments and use all 
+    
+    white-test and black-test cases for all possible inputs. 
