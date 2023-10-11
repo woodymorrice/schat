@@ -3,6 +3,7 @@
  * necessary because I split up the 2 source files
  * for the reader-writer problem
  */
+#include <list.h>
 
 void Initialize(void);
 void StartRead(void);
