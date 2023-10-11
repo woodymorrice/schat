@@ -3,8 +3,8 @@
 # Woody Morrice - wam553 - 11071060
 
 CC = gcc
-ARMCC = arm-linux-gnueabihf-gcc-10
-PPCCC = powerpc-linux-gnu-gcc-10
+ARM = arm-linux-gnueabihf-gcc
+PPC = powerpc-linux-gnu-gcc
 CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 INC = -I.
@@ -12,10 +12,12 @@ LIB = -L.
 UBCINC = -I/student/cmpt332/pthreads/
 UBCLIB = -lpthreads \
 		 -L/student/cmpt332/pthreads/lib/Linux
+ARCH = $(shell uname -m)
 
 
-all: #reader_writer_test #s-chat
-		 
+all: s-chat liblist.a #reader_writer_test
+
+s-chat: s-chat-x86_64 #s-chat-ppc s-chat-arm
 
 # Part B
 #
@@ -30,6 +32,31 @@ all: #reader_writer_test #s-chat
 #
 # s-chat for three different architectures:
 # 	x86_64, ppc, arm
+
+s-chat-x86_64: s-chat-x86_64.o
+	$(CC) $(UBCLIB)x86_64 \
+		-o s-chat-x86_64 s-chat-x86_64.o
+
+s-chat-ppc: s-chat-ppc.o
+	$(PCC) $(UBCLIB)ppc64 \
+		-o s-chat-ppc s-chat-ppc.o
+
+s-chat-arm: s-chat-arm.o
+	$(ARM) $(UBCLIB)arm \
+		-o s-chat-arm s-chat-arm.o
+
+
+s-chat-x86_64.o: s-chat.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(UBCINC) \
+		-o s-chat-x86_64.o -c s-chat.c
+
+s-chat-ppc.o: s-chat.c
+	$(PPC) $(CPPFLAGS) $(CFLAGS) $(UBCINC) \
+		-o s-chat-ppc.o -c s-chat.c
+
+s-chat-arm.o: s-chat.c
+	$(ARM) $(CPPFLAGS) $(CFLAGS) $(UBCINC) \
+		-o s-chat-arm.o -c s-chat.c
 
 
 # Other
@@ -56,7 +83,7 @@ list_removers.o: list_removers.c list.h
 
 
 # Misc
-.PHONY: clean all
+.PHONY: clean all s-chat
 
 clean:
 	rm -f *.o liblist.a \

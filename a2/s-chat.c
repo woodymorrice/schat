@@ -2,8 +2,13 @@
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
 
+#include <stdio.h>
 
-int main(int argc, char* argv[]) {
+#include <standards.h>
+#include <os.h>
+
+
+int mainp() {
 
     return 0;
 }
