@@ -1,0 +1,44 @@
+/* CMPT332 - Group 14
+ * Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+
+Mark any changes to existing xv6 files with:
+/* CMPT 332 GROUP 14 Change, Fall 2023 */
+
+** User level threading support **
+- Allows concurrency within a single user-level process
+
+Requirements:
+- context switching mechanism
+  - void thread_create(void (*tmain)());
+    creates a new thread that starts execution
+    at the function tmain, allocates a new user
+    stack using malloc() given in umalloc.c
+  - thread_schedule();
+    in user/uthread.c, switches between threads
+  - thread_switch();
+    in user/uthread_switch.S, does the thread
+    switching. Should store register contents in
+    struct thread (will have to add some new
+    variables). Can take any arguments necessary
+    but should switch from thread t to next_thread
+- mutex lock
+  implemented using a spinlock
+  - int mtx_create(int locked);
+    creates a mutex lock and returns an opaque ID.
+    Can typedef a separate type for the lock ID,
+    but it isn't necessary. The lock starts in the
+    locked state (binary true or false)
+  - int mtx_lock(int lock_id);
+    blocks until the lock has been acquired
+  - int mtx_unlock(int lock_id);
+    releases the lock, potentially unblocking a
+    waiting thread
+- producer/consumer testing program
+  shares a bounded buffer between a parent and child
+  (or sibling) threads and uses the mutex as a
+  primitive for implementing synchronization. Can
+  be implemented without counting semaphores by
+  having the buffer size and buffer space be integers
+  that are atomically updated
+

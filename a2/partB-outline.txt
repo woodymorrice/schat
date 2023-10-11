@@ -1,0 +1,25 @@
+/* CMPT332 - Group 14
+ * Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+
+ ** Monitors using RT Threads Semaphores **
+ - A library utility that provides the functions of
+   a monitor facility
+ - Requires the implementation of k condition variables
+   where k is specified as a COMPILE-TIME constant, and
+   the wait() and signal() operations
+ - should only use the Rttp() and RttV() operations
+ - monitor procedures are "placed inside" the monitor
+   by calling MonEnter() as their first statement, and
+   MonLeave() as the final statement before returning
+ - will utilize list implementation from assignment 1
+ - tested using the provided readers-writers problem
+
+Requirements:
+- MonEnter()
+- MonLeave()
+- MonWait()
+- MonSignal()
+- libMonitor.a -- the whole monitor implementation
+  bundled up as a library
+

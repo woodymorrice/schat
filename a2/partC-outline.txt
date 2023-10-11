@@ -1,0 +1,51 @@
+/* CMPT332 - Group 14
+ * Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+
+ ** Chat Program using UBC Pthreads IPC **
+ - a 'simple' chat-like facility that enables someone
+   at one terminal to communicate with another user
+   at another terminal using the UDP transport
+   protocol and the UBC pthreads package
+ - users initiate a chat using the machine name (on
+   tuxworld) and the port
+   Ex. Fred on "minion12", port 30001, and Barney on
+       machine "peon34", port 39001. To initiate
+       chat, Fred types:
+       s-chat 30001 peon34 39001
+       and Barney types:
+       s-chat 39001 minion12 30001
+- every LINE typed at each terminal should appear on
+  all terminals participating in the chat as they are
+  typed, along with the time at which the message was
+  sent in seconds and microseconds.
+  - BONUS: can be altered so that characters appear AS
+           they are typed using "curses" and "cbreak"
+- each user leaves the session by typing a special
+  character or sequence on a line by itself (defined
+  by the student)
+- use tuxworld machines and ports 30001-40000
+
+** Process Structure **
+- use semaphores for coordination
+- use 5 threads:
+  - one thread waits on input from the keyboard
+  - one thread waits for a UDP datagram
+  - one thread prints characters to the screen
+  - one thread sends data to the remote UNIX
+    processes over the network using UDP. Requests
+    messages from the server thread and sends them
+    across the network
+  - one thread acts as the server, coordinating
+    the sending of messages. Puts messages from
+    the keyboard thread on a LIST that are then
+    transmitted by the UDP transmit thread
+- UDP input and keyboard input threads cannot make
+  any blocking UNIX calls since that would block
+  ALL threads, so they must perform non-blocking
+  input by setting the respective file descriptors
+  to non-blocking status using the O_NDELAY or
+  O_NONBLOCK flags
+  - try out UNIX I/O primitives to read from the
+    keyboard without blocking (man 2 read, sendto,
+
