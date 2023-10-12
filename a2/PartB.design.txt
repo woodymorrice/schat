@@ -7,44 +7,69 @@
 // its correct
 
 ** Desgin Details **
-File (monitor.c) will consists of 5 functions. MonServer() will intialized all
-the needed condition queues, enter queue and urgent queue. For each queue that
-the server intialized, there will be a mutex semaphore lock to be able to lock
-a specific queue through out the program. After that function will call
-MonEnter() which allows incoming thead to enter the monitor, decide whether 
-new thread is able to enter directly into the monitor, or has to wait on
-a specific queue by calling MonWait().When the thread done its job, whatever
-it needs to do, and then MonSignal() to signal the waiting thread to wake up.
-When the thread decided to leave the monitor, MonLeave() will be called. 
-This function will check for waiting thread in the urgent queue and wake it up
-, if the urgent queue is empty, then nothing will happen and the function 
-will release the mutex lock on monitor, signalling other threads waiting in
-enter queue to enter. 
+File (monitor.c) will consists of 5 functions: 
+
+MonInit() - will intialized all the needed condition queues, enter queue 
+and urgent queue. Create the semaphore for each of the queue that exists. 
+
+MonEnter() - check the mutex lock and decide whether the new thread is 
+allow to enter. Function will return an integer value, 0 for success entering, 
+otherwise return -1 for failure.  
+
+MonLeave() - will responsible for releasing the mutex lock on the monitor, 
+checking whether if there are any other waiting threads in urgent queue, 
+condition queues and wake it up. Return 0 for success leaving, and -1 otherwise
+
+MonWait(int CV) - making the current thread to wait on the condition queue.
+Release the mutex lock so another thread can enter. The thread waiting on
+condition queue will have no effect on the monitor, until another new thread
+enters and wakes it up. 
+
+MonSignal(int CV) - waking up the waiting thread of that condition variable
+in the condition queue. 
+
+Assume all the created thread will be at user-level threads. 
 
 ** Pseudocode **
 
+int MonInit(int numConds) {
+    create the condition queue based on the parameter
+    for every condition queue
+        create new semaphore by using RttNewSem()
+    create enter queue semaphore
+    create urgent queue semaphore
+    create a semaphore for mutex
+    return 0 (on success) / -1 (on failure)
+}
+
 int MonEnter() {
     check if the mutex lock is released
-    check if there are any waiting threads in the condition queue
-    if (mutex is released and there are no waiting thread) { 
-        new thread acquire the mutual exclusion lock
+    if (mutex is released) { 
         new thread enter the monitor
-        return 0 (enter success)
     } 
-    else if (mutex is released and there are waiting thread in condition) {
+    else {
         making the new thread wait in the entering queue
-        taking waiting thread off the condition queue
-        return -1 (enter failure due to previous waiting thread)
+        return -1
     }
+    lock the monitor to prevent other threads to enter
+    return 0 (success)
 }
     
 int MonLeave() {
-    threads release the lock and allow another thread to come in
+    check if there are waiting thread in the urgent queue or condition queue
+    if (there are no waiting thread) {
+        do nothing
+    }
+    else {
+       signal to wake up the waiting threads
+    }
+    release mutex lock 
     return 0 (leave success) / -1 (leave failure)
 }
 
 void MonWait(int CV) {
     make current thread wait on the CV
+    release mutex lock 
 }
 
 void MonSignal(int CV) {
@@ -52,14 +77,7 @@ void MonSignal(int CV) {
         do nothing
     }
     else {
-        tell monitor, the space is available 
-        let waiting process come in
-        take the thread waitinng on CV to enter
+        wake up the waiting thread of that CV
     }
 }
 
-void MonServer(int CV) {
-    initialize the number of the condition queue
-    MonEnter()
-    MonLeave()
-}

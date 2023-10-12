@@ -11,13 +11,13 @@
 LIST enterq;
 LIST condq;
 LIST urgentq;
-
+RttSem mutex; 
  
 int MonInit (int numConds) {
     if (numConds < 1) {
         return -1;
     }
-
+    RttSem() 
     return 0;
 }
 
@@ -38,8 +38,4 @@ void  MonWait (int CV) {
 
 void  MonSignal (int CV) {
    printf("MonSignal() reached, %d\n", CV); 
-}
-
-void MonServer (int CV) { 
-    printf("MonServer() reached, %d\n", CV);
 }
