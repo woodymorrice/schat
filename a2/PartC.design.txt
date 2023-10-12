@@ -8,40 +8,56 @@
 
 ** Design Details **
 Our solution will consist of 6 functions as outlined in the
-assignment specification. The mainp() function
-will initialize the five necessary threads. The first thread will
-run the function sGetInput(), which waits for user input, scans
-user input into a string buffer, limiting the user to 126 characters,
-leaving room for a newline character and a tombstone.
-Then it sends a message to the server that a string is available,
-and the server signals back either that the outgoing string list
-is full, or that it will be waiting to receive the string, in which
-case sGetInput() sends another message, this time containing the
-string.
+assignment specification. The mainp() function will initialize
+the five necessary threads. ALL thread functions run on an
+infinite loop.
 
-The second thread runs sServer(), which receives messages from
-sGetInput() and places the received strings at the end of a list of
-outgoing strings. It removes strings from the start of the outgoing
-list and sends them to sSendData(). It also receives messages from 
-sGetData() and places the strings they contain at the end of the
-list of incoming messages, sDisplayData() that there are
-strings available to display.
+The first thread will run the function sGetInput(), which waits
+for user input and scans user input into a string buffer, limiting
+the user to 126 characters, leaving room for a newline character
+and a tombstone. Then it sends a message to the server containing
+the string held in the buffer and waits for a reply. If the server
+returns a failure message, sGetInput should emit a message
+indicating that the list is full.
 
-The third thread runs sSendData(), which waits for the server to
-signal that a string is available
-added to sServer()'s outgoing message list, then takes that
-string off the list, encodes it in an acceptable universal format,
-and transmits it over the network via UDP protocol to any remote
-UNIX processes that were specified by IP and port at runtime.
+The second thread runs sServer(), which receives messages, acts on
+those messages, and sends replies to the other threads. When it
+receives a message from sGetInput there are three possibilites:
+The message is an exit command, in which case the server should
+kill all the other threads and exit. The incoming list is full,
+in which case the server should reply with a failure message.
+Otherwise, it should reply with a success message.
+When it receives a messages from sSendData() it should either
+reply with a failure message if the outgoing list is empty, or
+reply with the first string in the outgoing list.
+When it receives a message from sGetData() it should reply with
+a failure message if the list is full, otherwise it should add
+the received string to the list of incoming messages.
+When it receives a messages from sDisplayData() it should send
+a failure message if the outgoing list is empty, otherwise it
+should send the first string in the outgoing list.
+
+The third thread runs sSendData() which send a message to the
+server indicating that it is waiting for a string to send,
+and upon receiving a reply, it either re-commences its loop
+on a failure reply, or takes the string from the received
+message, encodes it to a universal format, and sends it via
+UDP to the remote UNIX processes that were specified by IP
+and port at runtime.
 
 The fourth thread runs sGetData(), which listens on the specified
-port for UDP packets being sent, and retrieves them. It then 
+port for UDP packets, and retrieves them. It then 
 decodes the content of the message into the appropriate format for
 the local machine, and sends a message containing the resulting
-string to sServer() to add to the list of incoming messages.
+string to sServer() to add to the list of incoming messages. If
+the server replies with a failure messages, the incoming list is
+full, and sGetData() should emit an error message indicating as
+such.
 
-The fifth thread runs sDisplayData(), which prints the messages
-received from the network to the local terminal.
+The fifth thread runs sDisplayData(), which sends a message to 
+the server indicating that it is waiting, and upon reply,
+either prints the message to the local console, or does nothing
+if the server indicates that the incoming list is empty.
 
 
 ** Pseudocode **
