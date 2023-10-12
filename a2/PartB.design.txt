@@ -2,11 +2,8 @@
 * Phong Thanh Nguyen (David) - wdz468 - 11310824
 * Woody Morrice - wam553 - 11071060
 
-// Should describe our solution strategy,
-// including pseudocode, and explain why
-// its correct
 
-** Desgin Details **
+** Design Details **
 File (monitor.c) will consists of 5 functions: 
 
 MonInit() - will intialized all the needed condition queues, enter queue 
@@ -17,16 +14,22 @@ allow to enter. Function will return an integer value, 0 for success entering,
 otherwise return -1 for failure.  
 
 MonLeave() - will responsible for releasing the mutex lock on the monitor, 
-checking whether if there are any other waiting threads in urgent queue, 
-condition queues and wake it up. Return 0 for success leaving, and -1 otherwise
+checking whether if there are any other waiting threads in urgent queue, and 
+wake it up. If there is no thread waiting on urgent queue, simply do nothing. 
+Return 0 for success leaving, and -1 otherwise. 
 
 MonWait(int CV) - making the current thread to wait on the condition queue.
 Release the mutex lock so another thread can enter. The thread waiting on
 condition queue will have no effect on the monitor, until another new thread
-enters and wakes it up. 
+enters and wakes it up.
 
 MonSignal(int CV) - waking up the waiting thread of that condition variable
-in the condition queue. 
+in the condition queue. If there is no thread waiting on that condition, the 
+function simply does nothing. Else, put the current thread that is calling 
+the function in the urgent queue. Now the monitor is only released when the 
+thread in urgent enter the monitor again using MonEnter()  and  leave the 
+monitor by calling MonLeave(). Enforce the idea when the last person leave
+Saskatoon, turn off the light.  
 
 Assume all the created thread will be at user-level threads. 
 
@@ -56,7 +59,7 @@ int MonEnter() {
 }
     
 int MonLeave() {
-    check if there are waiting thread in the urgent queue or condition queue
+    check if there are waiting thread in the urgent queue
     if (there are no waiting thread) {
         do nothing
     }
@@ -79,6 +82,7 @@ int  MonSignal(int CV) {
     }
     else {
         wake up the waiting thread of that CV
+        put the current thread into the urgen queue 
     }
     return 0 (if the passed in argument is valid) / -1 (otherwise)
 }
