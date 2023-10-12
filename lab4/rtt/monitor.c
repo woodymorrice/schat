@@ -28,6 +28,42 @@
     /* RttSend() to server process with
      * params: serverID, void* sendData,
      * u_int sendLength, void* recData */
+#include <list.h>
+#include <stdio.h>
+#include <rtthreads.h>
+#include <RttCommon.h>
+/* check value*/
+int OKtoRead;
+int OKtoWrite;
+
+LIST *conQueue[10];
+
+LIST *enterq;
+LIST *urgentq;
+
+static RttThreadId server;
+static int STKSIZE = 65536;
+
+#define ENTER 0
+#define LEAVE 1
+#define REPLY 2
+#define WAIT 3
+#define SIGNAL 4
+
+static int size = 4;
+/* RttMonServer -- server PROCESS that handles
+ * the coordination by putting processes on lists
+ * according to the semantics of Monitors */
+RTTTHREAD MonServer() {
+    /* Receives messages from the client
+     * processes and determines which list they
+     * are moved onto and off of and who to
+     * reply to such that proper coordination
+     * is achieved 
+       waits for messages with RttReceive()
+       processes messages in the order they
+   */
+}
 
 
 /* RttMonInit -- initializes the monitor
@@ -35,7 +71,22 @@
  * variables */
 int RttMonInit(int numConds) {
     /* return 0 on success, -1 on failure */
-    return 0;
+    LIST *newConds;
+    int cond;
+    int check;
+    RttSchAttr attr;
+    attr.startingtime = RTTZEROTIME;
+    attr.priority = RTTNORM;
+    attr.deadline = RTTNODEADLINE;   
+    for (cond = 0; cond < numConds; cond ++) {
+        newConds = ListCreate();
+        conQueue[cond] = newConds;
+    }
+    enterq = ListCreate();
+    urgentq = ListCreate();
+    check = RttCreate(&server, (void(*)()) MonServer, STKSIZE, "Server", 
+                NULL, attr, RTTUSR);
+    return check;
 }
 
 
@@ -43,7 +94,7 @@ int RttMonInit(int numConds) {
  * that a process wishes to enter the
  * monitor */
 int RttMonEnter() {
-    // messages sent:
+    /*messages sent:
     // 0 = reader wants to enter
     // 1 = writer wants to enter
     // send message to enter monitor
@@ -55,9 +106,13 @@ int RttMonEnter() {
     // added to enter queue otherwise
     // all processes block in queue until
     // signal to enter is received
+    */
 
     /* return 0 on success, -1 on failure */
-    return 0;
+    int result = RttSend(server, (int*)ENTER, (unsigned int)size, 
+                (int*)REPLY, (unsigned int *)&size);
+    
+    return result;
 }
 
 
@@ -65,6 +120,7 @@ int RttMonEnter() {
  * that a process wishes to leave the
  * monitor */
 int RttMonLeave() {
+/*
     // messages sent:
     // 0 = reader wants to exit
     // 1 = writer wants to exit
@@ -72,8 +128,11 @@ int RttMonLeave() {
     // so that monitor can signal the
     // next thread to enter
 
-    /* return 0 on success, -1 on failure */
-    return 0;
+     return 0 on success, -1 on failure */
+    int result = RttSend(server, (int*)ENTER, (unsigned int)size, 
+                (int*)REPLY, (unsigned int *)&size);
+    
+    return result;  
 }
 
 
@@ -84,7 +143,7 @@ int RttMonWait(int CV) {
     /* Calling process exits the monitor,
      * is added to the associated CV queue,
      * and waits until it is signalled by
-     * another process */
+     * another process
     // messages sent:
     // 0 = reader wants to wait
     // 1 = writer wants to wait
@@ -94,8 +153,12 @@ int RttMonWait(int CV) {
     // if writer enters the monitor and
     // there is no spaces left to write
     // data, add it to the writer queue
-
+*/
     /* return 0 on success, -1 on failure */
+    RttThreadId curThread = RttMyThreadId();
+    RttSend(server, (int*)WAIT, (unsigned int)size, (int*)REPLY, 
+                    (unsigned int*)&size);
+    ListAppend(conQueue[CV], &curThread);    
     return 0;
 }
 
@@ -107,7 +170,7 @@ int RttMonSignal(int CV) {
      * is added to the urgent queue, and must
      * wait until the other process leaves the
      * monitor (ensures that only one process
-     * is running in the monitor at a time) */
+     * is running in the monitor at a time) 
     // messages sent:
     // 0 = reader wants to signal
     // 1 = writer wants to signal
@@ -118,25 +181,12 @@ int RttMonSignal(int CV) {
     // when all readers finish reading this is
     // called to allow a writer from the CV queue
     // to write (if there is any)
-
+*/
     /* return 0 on success, -1 on failure */
+    RttSend(server, (int*)SIGNAL, (unsigned int)size, (int*)REPLY, 
+                    (unsigned int*)&size);
+    ListTrim(conQueue[CV]);     
     return 0;
 }
 
 
-/* RttMonServer -- server PROCESS that handles
- * the coordination by putting processes on lists
- * according to the semantics of Monitors */
-int RttMonServer() {
-    /* Receives messages from the client
-     * processes and determines which list they
-     * are moved onto and off of and who to
-     * reply to such that proper coordination
-     * is achieved */
-    // waits for messages with RttReceive()
-    // processes messages in the order they
-    // are received
-
-    /* return 0 on success, -1 on failure */
-    return 0;
-}
