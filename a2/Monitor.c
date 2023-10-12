@@ -4,9 +4,16 @@
 
 
 #include <rtthreads.h>
+#include <stdio.h>
 #include <RttCommon.h>
+#include <list.h>
+ 
+LIST enterq;
+LIST condq;
+LIST urgentq;
 
-int MonInit(int numConds) {
+ 
+int MonInit (int numConds) {
     if (numConds < 1) {
         return -1;
     }
@@ -14,32 +21,25 @@ int MonInit(int numConds) {
     return 0;
 }
 
-int MonEnter() {
-
+int MonEnter () {
     return 0;
 }
 
 
-int MonLeave() {
-
+int MonLeave () {
     return 0;
 }
 
 
-int MonWait(int CV) {
-    if (CV < 0) {
-        return -1;
-    }
-
-    return 0;
+void  MonWait (int CV) {
+    printf("MonWait() reached, %d\n", CV);
 }
 
 
-int MonSignal(int CV) {
-    if (CV < 0) {
-        return -1;
-    }
-
-    return 0;
+void  MonSignal (int CV) {
+   printf("MonSignal() reached, %d\n", CV); 
 }
 
+void MonServer (int CV) { 
+    printf("MonServer() reached, %d\n", CV);
+}
