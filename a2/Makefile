@@ -1,10 +1,10 @@
-# CMPT332 - Group 14
+# CMPT332 - Group 14`
 # Phong Thanh Nguyen (David) - wdz468 - 11310824
 # Woody Morrice - wam553 - 11071060
 
 CC = gcc
 ARM = arm-linux-gnueabihf-gcc
-PPC = powerpc-linux-gnu-gcc
+PPC = ppc64-linux-gnu-gcc #powerpc-linux-gnu-gcc
 CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 INC = -I.
@@ -12,20 +12,43 @@ LIB = -L.
 UBCINC = -I/student/cmpt332/pthreads/
 UBCLIB = -lpthreads \
 		 -L/student/cmpt332/pthreads/lib/Linux
+RTTINC = -I/student/cmpt332/rtt/include \
+		 -I/usr/include/tirpc
+RTTLIB1 = -L/student/cmpt332/rtt/lib/Linuxx86_64 \
+		 -ltirpc
+RTTLIB2 = -lRtt -lRttUtils -L. -llist liblist.a \
+		  -lMonitor libMonitor.a
 ARCH = $(shell uname -m)
 
 
-all: s-chat liblist.a #reader_writer_test
+all: s-chat liblist.a reader-writer-test
 
-s-chat: s-chat-x86_64 #s-chat-ppc s-chat-arm
+s-chat: s-chat-x86_64 s-chat-ppc s-chat-arm
 
 # Part B
 #
 # reader_writer_test using libMonitor.a and
-# liblist.a with -l<<libraryname>>
-#
-# libMonitor.a
+# liblist.a with -l<<libraryname>> 
+reader-writer-test: reader-writer.o reader-writer-monitor.o \
+	liblist.a libMonitor.a
+	$(CC) $(RTTLIB1) -o reader-writer-test reader-writer.o \
+		reader-writer-monitor.o $(RTTLIB2)
 
+reader-writer.o: reader-writer.c reader-writer-monitor.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) $(RTTINC) \
+		-c reader-writer.c -o reader-writer.o
+
+reader-writer-monitor.o: reader-writer-monitor.c reader-writer-monitor.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) $(RTTINC) \
+		-c reader-writer-monitor.c -o reader-writer-monitor.o
+
+libMonitor.a: monitor.o
+	ar -rs libMonitor.a monitor.o
+	ranlib libMonitor.a
+
+monitor.o: monitor.c monitor.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) $(RTTINC) \
+		-c monitor.c -o monitor.o
 
 
 # Part C
@@ -61,14 +84,11 @@ s-chat-arm.o: s-chat.c
 
 # Other
 # liblist.a compiled from source
-
-# Archiving
 liblist.a: list_adders.o list_movers.o list_removers.o
 	ar -rs liblist.a list_adders.o \
 		list_movers.o list_removers.o
 	ranlib liblist.a
 
-# Compiling
 list_adders.o: list_adders.c list.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
 		-c list_adders.c -o list_adders.o
@@ -87,5 +107,6 @@ list_removers.o: list_removers.c list.h
 
 clean:
 	rm -f *.o liblist.a \
-		  s-chat reader_writer_test
+		  s-chat-x86_64 s-chat-ppc \
+		  s-chat-arm reader-writer-test
 
