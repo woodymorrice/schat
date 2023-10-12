@@ -2,64 +2,117 @@
 * Phong Thanh Nguyen (David) - wdz468 - 11310824
 * Woody Morrice - wam553 - 11071060
 
-
-// Should describe our solution strategy,
-// including general pseudocode
+**********
+* S-Chat *
+**********
 
 ** Design Details **
-Our solution will consist of 6 main functions. The mainp() function
+Our solution will consist of 6 functions as outlined in the
+assignment specification. The mainp() function
 will initialize the five necessary threads. The first thread will
-run the function sGetInput(), which waits for user input, records
-the characters typed, and upon reading a newline character, sends
-everything that has been recorded up to that point in a message to
-the server.
+run the function sGetInput(), which waits for user input, scans
+user input into a string buffer, limiting the user to 126 characters,
+leaving room for a newline character and a tombstone.
+Then it sends a message to the server that a string is available,
+and the server signals back either that the outgoing string list
+is full, or that it will be waiting to receive the string, in which
+case sGetInput() sends another message, this time containing the
+string.
+
 The second thread runs sServer(), which receives messages from
-sGetInput(), and places them in a list.
-The third thread runs sSendData(), which waits for an item to be
-added to the message list of the server function, then takes that
-item off the list, and transmits it over the network via UDP
-protocol to any remote UNIX processes that are listening on the
-specified port.
+sGetInput() and places the received strings at the end of a list of
+outgoing strings. It removes strings from the start of the outgoing
+list and sends them to sSendData(). It also receives messages from 
+sGetData() and places the strings they contain at the end of the
+list of incoming messages, sDisplayData() that there are
+strings available to display.
+
+The third thread runs sSendData(), which waits for the server to
+signal that a string is available
+added to sServer()'s outgoing message list, then takes that
+string off the list, encodes it in an acceptable universal format,
+and transmits it over the network via UDP protocol to any remote
+UNIX processes that were specified by IP and port at runtime.
+
 The fourth thread runs sGetData(), which listens on the specified
-port for UDP packets being sent, and retrieves them.
+port for UDP packets being sent, and retrieves them. It then 
+decodes the content of the message into the appropriate format for
+the local machine, and sends a message containing the resulting
+string to sServer() to add to the list of incoming messages.
+
 The fifth thread runs sDisplayData(), which prints the messages
 received from the network to the local terminal.
 
+
 ** Pseudocode **
+
 mainp()
     initialize threads
 
 sGetInput()
+    get server pid
+    infinite loop:
     wait for input from keyboard
-        if input is exit command
-            send exit message to all processes
-            exit
-        if input is newline
-            send all recorded input to server process
-        else
-            record input
+        if input
+            read input into buffer until newline
+            send message to server with buffer contents
+            if reply = failure
+                emit list full message
 
 sServer()
-    wait for messages from server
-        if message received
-            add data package to list
-            send message to sSendData() that a data package is available 
+    get pids for the other threads
+    infinite loop:
+    wait for messages
+        if message received from sGetInput()
+            if string is exit command
+                kill all threads
+            if outgoing list is full
+                reply that the list is full(failure)
+            else
+                add string to list
+                reply success
+
+        if message received from sSendData()
+            if outgoing list is empty
+                reply list is empty
+            else
+                send first string in list
+
+        if message received from sGetData()
+            if incoming list is full
+                reply that the list is full(failure)
+            else
+                add string to list
+                reply success
+        
+        if message received from sDisplayData()
+            if outgoing list is empty
+                reply list is empty
+            else
+                send first string in list
 
 sSendData()
-    wait for message from server
-        if message received
+    get server pid
+    infinite loop:
+    send waiting message to server
+        if reply not list empty
             convert message data to universal type
             transmit data over UDP
 
 sGetData()
+    get server pid
+    infinite loop:
     listen on port for datagram
         if datagram received
-            convert message data to local type
-            add data to list
-            send message to sDisplayData() that data is available
+            convert data(string) to local type
+            send message server containing string
+            if reply = failure
+                emit list full message
 
 sDisplayData()
-    wait for message from sGetData()
-        if message received
-            display message data on local console
+    get server pid
+    infinite loop:
+    send waiting message to server
+        if reply not list empty
+            display message string on local console
 
