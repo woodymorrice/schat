@@ -5,3 +5,61 @@
 // Should describe our solution strategy,
 // including pseudocode, and explain why
 // its correct
+
+** Desgin Details **
+File (monitor.c) will consists of 5 functions. MonServer() will intialized all
+the needed condition queues, enter queue and urgent queue. For each queue that
+the server intialized, there will be a mutex semaphore lock to be able to lock
+a specific queue through out the program. After that function will call
+MonEnter() which allows incoming thead to enter the monitor, decide whether 
+new thread is able to enter directly into the monitor, or has to wait on
+a specific queue by calling MonWait().When the thread done its job, whatever
+it needs to do, and then MonSignal() to signal the waiting thread to wake up.
+When the thread decided to leave the monitor, MonLeave() will be called. 
+This function will check for waiting thread in the urgent queue and wake it up
+, if the urgent queue is empty, then nothing will happen and the function 
+will release the mutex lock on monitor, signalling other threads waiting in
+enter queue to enter. 
+
+** Pseudocode **
+
+int MonEnter() {
+    check if the mutex lock is released
+    check if there are any waiting threads in the condition queue
+    if (mutex is released and there are no waiting thread) { 
+        new thread acquire the mutual exclusion lock
+        new thread enter the monitor
+        return 0 (enter success)
+    } 
+    else if (mutex is released and there are waiting thread in condition) {
+        making the new thread wait in the entering queue
+        taking waiting thread off the condition queue
+        return -1 (enter failure due to previous waiting thread)
+    }
+}
+    
+int MonLeave() {
+    threads release the lock and allow another thread to come in
+    return 0 (leave success) / -1 (leave failure)
+}
+
+void MonWait(int CV) {
+    make current thread wait on the CV
+}
+
+void MonSignal(int CV) {
+    if (no thread is waiting on CV) {
+        do nothing
+    }
+    else {
+        tell monitor, the space is available 
+        let waiting process come in
+        take the thread waitinng on CV to enter
+    }
+}
+
+void MonServer(int CV) {
+    initialize the number of the condition queue
+    MonEnter()
+    MonLeave()
+}
