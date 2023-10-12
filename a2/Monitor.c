@@ -7,6 +7,9 @@
 #include <RttCommon.h>
 
 int MonInit(int numConds) {
+    if (numConds < 1) {
+        return -1;
+    }
 
     return 0;
 }
@@ -24,12 +27,18 @@ int MonLeave() {
 
 
 int MonWait(int CV) {
+    if (CV < 0) {
+        return -1;
+    }
 
     return 0;
 }
 
 
 int MonSignal(int CV) {
+    if (CV < 0) {
+        return -1;
+    }
 
     return 0;
 }

@@ -21,8 +21,8 @@
 #include <stdio.h>
 
 
-#include <monitor.h>
-#include <reader-writer-monitor.h>
+#include <Monitor.h>
+#include <reader_writer_monitor.h>
 
 
 /* INITIALIZATION CODE */

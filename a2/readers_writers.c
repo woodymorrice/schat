@@ -20,7 +20,7 @@
 #include <rtthreads.h>
 #include <RttCommon.h>
 
-#include <reader-writer-monitor.h>
+#include <reader_writer_monitor.h>
 
 #define SLEEPMAX 20
 #define STKSIZE 65536
