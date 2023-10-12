@@ -67,17 +67,19 @@ int MonLeave() {
     return 0 (leave success) / -1 (leave failure)
 }
 
-void MonWait(int CV) {
+int MonWait(int CV) {
     make current thread wait on the CV
-    release mutex lock 
+    release mutex lock
+    return 0 (if the passed argument is valid) / -1 (otherwise) 
 }
 
-void MonSignal(int CV) {
+int  MonSignal(int CV) {
     if (no thread is waiting on CV) {
         do nothing
     }
     else {
         wake up the waiting thread of that CV
     }
+    return 0 (if the passed in argument is valid) / -1 (otherwise)
 }
 

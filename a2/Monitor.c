@@ -8,34 +8,34 @@
 #include <RttCommon.h>
 #include <list.h>
  
-LIST enterq;
-LIST condq;
-LIST urgentq;
-RttSem mutex; 
  
 int MonInit (int numConds) {
-    if (numConds < 1) {
-        return -1;
-    }
-    RttSem() 
+    if (numConds < 1) return -1;
+    printf("MonInit() reached, %d\n", numConds);
     return 0;
 }
 
 int MonEnter () {
+    printf("MonEnter() reached\n"); 
     return 0;
 }
 
 
 int MonLeave () {
+    printf("MonLeave() reached\n");
     return 0;
 }
 
 
-void  MonWait (int CV) {
+int  MonWait (int CV) {
+    if (CV < 0) return -1;
     printf("MonWait() reached, %d\n", CV);
+    return 0;
 }
 
 
-void  MonSignal (int CV) {
-   printf("MonSignal() reached, %d\n", CV); 
+int  MonSignal (int CV) {
+    if (CV < 0) return -1;
+    printf("MonSignal() reached, %d\n", CV);
+    return 0; 
 }
