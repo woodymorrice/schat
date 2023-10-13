@@ -16,15 +16,12 @@ LIST *conQueue[10];
 const int STKSIZE = 65536;
 const int ENTER = 20;
 const int LEAVE = 21;
-/* const int WAIT = 22;
-const int SIGNAL = 23; */
 const int SREPLY = 24;
 
 static RttThreadId server;
 static unsigned int size = 4;
 static int reply;
 static int conds;
-/* static int currentCV; */
 
 /* RttMonServer -- server PROCESS that handles
  * the coordination by putting processes on lists
@@ -58,15 +55,12 @@ RTTTHREAD MonServer() {
             case 7:
             case 8:
             case 9: /* WAIT */
-                /* printf("WAIT received\n"); */
                 if (messageType > conds - 1) {
                     fprintf(stderr, "Error: CV does not exist\n");
                 }
 
                 /* add to cv_waitinglist */
                 ListPrepend(conQueue[messageType], &sendArr[index]);
-                /* printf("%d items in conQueue[%d]\n",
-                        ListCount(conQueue[messageType]), messageType); */
 
                 /* if urgentq not empty, take item off urgentq, reply */
                 if (ListCount(urgentq) > 0) {
@@ -96,7 +90,6 @@ RTTTHREAD MonServer() {
             case 17:
             case 18:
             case 19:
-                /* printf("SIGNAL received\n"); */
                 messageType -= 10;
                 if (messageType > conds - 1) {
                     fprintf(stderr, "Error: CV does not exist\n");
@@ -111,7 +104,6 @@ RTTTHREAD MonServer() {
                              size);
                     /* add current thread to the urgentq */
                     ListPrepend(urgentq, &sendArr[index]);
-                    /* printf("%d items in urgentq\n", ListCount(urgentq)); */
                 } 
                 /* else reply to signaller */
                 else {
@@ -121,7 +113,6 @@ RTTTHREAD MonServer() {
                 break;
 
             case 20: /* ENTER */
-                /* printf("ENTER received\n"); */
 
                 /* if monitor is occupied add to entering queue */
                 if (occupied) {
