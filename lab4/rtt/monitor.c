@@ -2,39 +2,12 @@
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
 
-/* Condition Variables */
-/* CV #0 = OKtoRead
- * 0 if there are currently writers in CS
- * 1 if there are no writers in CS
- *
- * CV #1 = OKtoWrite
- * 0 if there are currently readers is CS
- * 1 if there are no readers in CS */
-
-/* Lists */
-/* enter queue -- threads waiting in MonEnter()
- * CV reader queue -- readers waiting with RttMonWait()
- * CV writers queue -- writers waiting with RttMonWait()
- * urgent queue -- threads waiting after calling
- * RttMonSignal, these threads always have top
- * priority to re-enter the monitor
- * CVlist -- list of conditions variables
- * data list -- data being read from and written
- * to */
-
-
-/* - use RttSend() to communicate with server
- * - server manages queues and replies to messages */
-    /* RttSend() to server process with
-     * params: serverID, void* sendData,
-     * u_int sendLength, void* recData */
-#include <list.h>
 #include <stdio.h>
+
 #include <rtthreads.h>
 #include <RttCommon.h>
-/* check value*/
-int OKtoRead;
-int OKtoWrite;
+
+#include <list.h>
 
 LIST *conQueue[10];
 
@@ -42,151 +15,185 @@ LIST *enterq;
 LIST *urgentq;
 
 static RttThreadId server;
-static int STKSIZE = 65536;
+const int STKSIZE = 65536;
 
-#define ENTER 0
-#define LEAVE 1
-#define REPLY 2
-#define WAIT 3
-#define SIGNAL 4
+const int ENTER = 0;
+const int LEAVE = 1;
+const int WAIT = 2;
+const int SIGNAL = 3;
+const int SREPLY = 4;
 
-static int size = 4;
+static unsigned int size = 4;
+static int reply;
+static int conds;
+static int currentCV;
+
 /* RttMonServer -- server PROCESS that handles
  * the coordination by putting processes on lists
  * according to the semantics of Monitors */
 RTTTHREAD MonServer() {
-    /* Receives messages from the client
-     * processes and determines which list they
-     * are moved onto and off of and who to
-     * reply to such that proper coordination
-     * is achieved 
-       waits for messages with RttReceive()
-       processes messages in the order they
-   */
+    int occupied;
+    RttThreadId sender;
+    int messageType;
+    RttThreadId *waiting;
+
+    occupied = 0;
+
+    for (;;) {
+        if (0 !=
+        RttReceive(&sender, &messageType, &size)) {
+            fprintf(stderr, "Error receiving message\n");
+        }
+
+        switch (messageType) {
+            case 0: /* ENTER */
+                printf("ENTER received\n");
+
+                /* if monitor is occupied add to entering queue */
+                if (occupied) {
+                    ListPrepend(enterq, &sender);
+                    printf("%d items in enterq\n", ListCount(enterq));
+                }
+                /* else set monitor to occupied and reply to sender */
+                else {
+                    occupied = 1;
+                    RttReply(sender, (void*)&SREPLY,
+                             size);
+                }
+                break;
+
+            case 1: /* LEAVE */
+                printf("LEAVE received\n");
+
+                /* if urgentq not empty, take item off urgentq, reply */
+                if (ListCount(urgentq) > 0) {
+                    waiting = (RttThreadId*)ListTrim(urgentq);
+                    RttReply(*waiting, (void*)&SREPLY,
+                             size);
+                }
+                /* else if enterq not empty, take item off enterq, reply */
+                else if (ListCount(enterq) > 0) {
+                    waiting = (RttThreadId*)ListTrim(enterq);
+                    RttReply(*waiting, (void*)&SREPLY,
+                             size);
+                }
+                /* else monBusy to false, reply to thread executing leave */
+                else {
+                    occupied = 0;
+                    RttReply(sender, (void*)&SREPLY,
+                             size);
+                }
+                break;
+
+            case 2: /* WAIT */
+                printf("WAIT received\n");
+
+                /* add to cv_waitinglist */
+                ListPrepend(conQueue[currentCV], &sender);
+                printf("%d items in conQueue[%d]\n",
+                        ListCount(conQueue[currentCV]), currentCV);
+
+                /* if urgentq not empty, take item off urgentq, reply */
+                if (ListCount(urgentq) > 0) {
+                    waiting = (RttThreadId*)ListTrim(urgentq);
+                    RttReply(*waiting, (void*)&SREPLY,
+                             size);
+                }
+                /* else if enterq not empty, take item off enterq, reply */
+                else if (ListCount(enterq) > 0) {
+                    waiting = (RttThreadId*)ListTrim(enterq);
+                    RttReply(*waiting, (void*)&SREPLY,
+                             size);
+                }
+                /* else set monBusy to false */
+                else {
+                    occupied = 0;
+                }
+                break;
+
+            case 3: /* SIGNAL */
+                printf("SIGNAL received\n");
+
+                /* if there is non-empty cvlist */
+                if (ListCount(conQueue[currentCV]) > 0) {
+                    /* take first item off the CV_waitinglist, reply */
+                    waiting = 
+                        (RttThreadId*)ListTrim(conQueue[currentCV]);
+                    RttReply(*waiting, (void*)&SREPLY,
+                             size);
+                    /* add current thread to the urgentq */
+                    ListPrepend(urgentq, &sender);
+                    printf("%d items in urgentq\n", ListCount(urgentq));
+                }
+                break;
+
+            default:
+                /* else reply to signaller */
+                RttReply(sender, (void*)&SREPLY,
+                         size);
+                break;
+        }
+    }
 }
 
-
-/* RttMonInit -- initializes the monitor
- * with the specified number of condition
- * variables */
+/* RttMonInit -- initializes the monitor with the 
+ * specified number of condition variables */
 int RttMonInit(int numConds) {
-    /* return 0 on success, -1 on failure */
     LIST *newConds;
     int cond;
-    int check;
+
     RttSchAttr attr;
     attr.startingtime = RTTZEROTIME;
     attr.priority = RTTNORM;
     attr.deadline = RTTNODEADLINE;   
+    
+    conds = numConds;
+
     for (cond = 0; cond < numConds; cond ++) {
         newConds = ListCreate();
         conQueue[cond] = newConds;
     }
+    
     enterq = ListCreate();
     urgentq = ListCreate();
-    check = RttCreate(&server, (void(*)()) MonServer, STKSIZE, "Server", 
-                NULL, attr, RTTUSR);
-    return check;
-}
-
-
-/* RttMonEnter -- signals to the server
- * that a process wishes to enter the
- * monitor */
-int RttMonEnter() {
-    /*messages sent:
-    // 0 = reader wants to enter
-    // 1 = writer wants to enter
-    // send message to enter monitor
-    // if caller is a reader:
-    // can enter if other readers in monitor
-    // added to enter queue if writer in monitor
-    // if caller is a writer:
-    // can enter if no threads in monitor
-    // added to enter queue otherwise
-    // all processes block in queue until
-    // signal to enter is received
-    */
-
-    /* return 0 on success, -1 on failure */
-    int result = RttSend(server, (int*)ENTER, (unsigned int)size, 
-                (int*)REPLY, (unsigned int *)&size);
     
-    return result;
-}
-
-
-/* RttMonLeave -- signals to the server
- * that a process wishes to leave the
- * monitor */
-int RttMonLeave() {
-/*
-    // messages sent:
-    // 0 = reader wants to exit
-    // 1 = writer wants to exit
-    // send message to leave monitor
-    // so that monitor can signal the
-    // next thread to enter
-
-     return 0 on success, -1 on failure */
-    int result = RttSend(server, (int*)ENTER, (unsigned int)size, 
-                (int*)REPLY, (unsigned int *)&size);
+    RttCreate(&server, MonServer, STKSIZE,
+              "Server", NULL, attr, RTTUSR);
     
-    return result;  
-}
-
-
-/* RttMonWait -- causes the calling
- * process to wait on some condition
- * variable (CV) */
-int RttMonWait(int CV) {
-    /* Calling process exits the monitor,
-     * is added to the associated CV queue,
-     * and waits until it is signalled by
-     * another process
-    // messages sent:
-    // 0 = reader wants to wait
-    // 1 = writer wants to wait
-    // if reader enters the monitor and
-    // there is no data to read, add
-    // it to the reader CV queue
-    // if writer enters the monitor and
-    // there is no spaces left to write
-    // data, add it to the writer queue
-*/
-    /* return 0 on success, -1 on failure */
-    RttThreadId curThread = RttMyThreadId();
-    RttSend(server, (int*)WAIT, (unsigned int)size, (int*)REPLY, 
-                    (unsigned int*)&size);
-    ListAppend(conQueue[CV], &curThread);    
     return 0;
 }
 
+/* RttMonEnter -- signals to the server that
+ * a process wishes to enter the monitor */
+int RttMonEnter() {
+    RttSend(server, (void*)&ENTER, size, 
+            &reply, &size);
+    return 0;
+}
+
+/* RttMonLeave -- signals to the server that
+ * a process wishes to leave the monitor */
+int RttMonLeave() {
+    RttSend(server, (void*)&LEAVE, size, 
+            &reply, &size); 
+    return 0;  
+}
+
+/* RttMonWait -- causes the calling process to
+ * wait on some condition variable (CV) */
+int RttMonWait(int CV) {
+    currentCV = CV;
+    RttSend(server, (void*)&WAIT, size, 
+            &reply, &size);    
+    return 0;
+}
 
 /* RttMonSignal -- signals the process at
  * the head of the CV queue to resume */
 int RttMonSignal(int CV) { 
-    /* Calling process must exit the monitor,
-     * is added to the urgent queue, and must
-     * wait until the other process leaves the
-     * monitor (ensures that only one process
-     * is running in the monitor at a time) 
-    // messages sent:
-    // 0 = reader wants to signal
-    // 1 = writer wants to signal
-    // when a writer finishes writing it
-    // calls this to allow a reader from the
-    // CV queue to read the data it just wrote
-    // (if there is any)
-    // when all readers finish reading this is
-    // called to allow a writer from the CV queue
-    // to write (if there is any)
-*/
-    /* return 0 on success, -1 on failure */
-    RttSend(server, (int*)SIGNAL, (unsigned int)size, (int*)REPLY, 
-                    (unsigned int*)&size);
-    ListTrim(conQueue[CV]);     
+    currentCV = CV;
+    RttSend(server, (void*)&SIGNAL, size,
+            &reply, &size);
     return 0;
 }
-
 
