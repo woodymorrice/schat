@@ -10,11 +10,11 @@ LIB1 = -L/student/cmpt332/rtt/lib/Linuxx86_64 -ltirpc
 LIB2 = -lRtt -lRttUtils -L. -llist liblist.a
 
 
-all: lab4
+all: reader-writer-test
 
-lab4: reader-writer-monitor.o monitor.o reader-writer.o liblist.a 
-	$(CC) $(LIB1) -o lab4 monitor.o reader-writer.o reader-writer-monitor.o \
-		$(LIB2)
+reader-writer-test: reader-writer-monitor.o monitor.o reader-writer.o liblist.a 
+	$(CC) $(LIB1) -o reader-writer-test \
+		monitor.o reader-writer.o reader-writer-monitor.o $(LIB2)
 
 reader-writer-monitor.o: reader-writer-monitor.c reader-writer-monitor.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) -c reader-writer-monitor.c \
@@ -31,5 +31,5 @@ monitor.o: monitor.h monitor.c
 .PHONY: clean all
 
 clean: 
-	rm -f *.o lab4
+	rm -f *.o reader-writer-test
 	

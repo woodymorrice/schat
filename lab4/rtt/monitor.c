@@ -12,26 +12,27 @@
 LIST *enterq;
 LIST *urgentq;
 LIST *conQueue[10];
+/* Allows up to 10 condition variables */
 
 const int STKSIZE = 65536;
 const int ENTER = 20;
 const int LEAVE = 21;
 const int SREPLY = 24;
 
-static RttThreadId server;
-static unsigned int size = 4;
-static int reply;
-static int conds;
+static RttThreadId server; /* so threads know where to send msgs */
+static unsigned int size = 4; /* message size */
+static int reply; /* holds replies (their contents never matter) */
+static int conds; /* # of condition variables */
 
 /* RttMonServer -- server PROCESS that handles
  * the coordination by putting processes on lists
  * according to the semantics of Monitors */
 RTTTHREAD MonServer() {
-    int occupied;
-    /* RttThreadId sender; */
+    int occupied; /* indicates when a proc is in the monitor */
     int messageType;
-    RttThreadId *waiting;
+    RttThreadId *waiting; /* ptr to thread being pulled off q */
 
+    /* Array to store PIDs from received messages */
     RttThreadId sendArr[100];
     int index;
 
@@ -45,8 +46,8 @@ RTTTHREAD MonServer() {
         }
 
         switch (messageType) {
-            case 0:
-            case 1:
+            case 0: /* Cases 0 through 9 are reserved for */
+            case 1: /* indexing the CV array with wait(CV) */
             case 2:
             case 3:
             case 4:
@@ -62,26 +63,26 @@ RTTTHREAD MonServer() {
                 /* add to cv_waitinglist */
                 ListPrepend(conQueue[messageType], &sendArr[index]);
 
-                /* if urgentq not empty, take item off urgentq, reply */
+                /* if urgentq not empty, take item off urgentq */
                 if (ListCount(urgentq) > 0) {
                     waiting = (RttThreadId*)ListTrim(urgentq);
                     RttReply(*waiting, (void*)&SREPLY,
                              size);
                 }
-                /* else if enterq not empty, take item off enterq, reply */
+                /* else if enterq not empty, take item off enterq */
                 else if (ListCount(enterq) > 0) {
                     waiting = (RttThreadId*)ListTrim(enterq);
                     RttReply(*waiting, (void*)&SREPLY,
                              size);
                 }
-                /* else set monBusy to false */
+                /* else set occupied to false */
                 else {
                     occupied = 0;
                 }
                 break;
 
-            case 10:
-            case 11:
+            case 10: /* Cases 10-19 are reserved for indexing */
+            case 11: /* the CV array with signal(CV)          */
             case 12:
             case 13:
             case 14:
@@ -97,7 +98,7 @@ RTTTHREAD MonServer() {
 
                 /* if there is non-empty cvlist */
                 if (ListCount(conQueue[messageType]) > 0) {
-                    /* take first item off the CV_waitinglist, reply */
+                    /* take first item off the CV_waitinglist */
                     waiting = 
                         (RttThreadId*)ListTrim(conQueue[messageType]);
                     RttReply(*waiting, (void*)&SREPLY,
@@ -128,23 +129,23 @@ RTTTHREAD MonServer() {
                 break;
 
             case 21: /* LEAVE */
-                /* printf("LEAVE received\n"); */
+                /* allow thread to leave */
                 RttReply(sendArr[index], (void*)&SREPLY,
                          size);
 
-                /* if urgentq not empty, take item off urgentq, reply */
+                /* if urgentq not empty, take item off urgentq */
                 if (ListCount(urgentq) > 0) {
                     waiting = (RttThreadId*)ListTrim(urgentq);
                     RttReply(*waiting, (void*)&SREPLY,
                              size);
                 }
-                /* else if enterq not empty, take item off enterq, reply */
+                /* else if enterq not empty, take item off enterq */
                 else if (ListCount(enterq) > 0) {
                     waiting = (RttThreadId*)ListTrim(enterq);
                     RttReply(*waiting, (void*)&SREPLY,
                              size);
                 }
-                /* else monBusy to false, reply to thread executing leave */
+                /* else set occupied to false */
                 else {
                     occupied = 0;
                 }    
@@ -217,7 +218,8 @@ int RttMonWait(int CV) {
 /* RttMonSignal -- signals the process at
  * the head of the CV queue to resume */
 int RttMonSignal(int CV) {
-    CV += 10;
+    CV += 10; /* msgs 0-9 are reserved for wait(), *
+               * so increment CV by 10             */ 
     RttSend(server, (void*)&CV, size,
             &reply, &size);
     return 0;
