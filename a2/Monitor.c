@@ -8,10 +8,29 @@
 #include <RttCommon.h>
 #include <list.h>
  
+LIST *enterq;
+LIST *urgentq;
+LIST *condq[10];
+RttSem *enterqSem; 
+RttSem *urgentqSem;
+RttSem *condqSem[10];
+RttSem *mutex;
  
 int MonInit (int numConds) {
+    LIST *newQueue;
+    int index;
     if (numConds < 1) return -1;
     printf("MonInit() reached, %d\n", numConds);
+    for (index = 0; index < numConds; index++) {
+        newQueue = ListCreate();
+        condq[index] = newQueue;
+        RttNewSem(condqSem[index], 0);
+    }
+    enterq = ListCreate();
+    urgentq = ListCreate(); 
+    RttNewSem(enterqSem, 0);
+    RttNewSem(urgentqSem, 0);
+    RttNewSem(mutex, 0);
     return 0;
 }
 

@@ -17,8 +17,8 @@ RTTINC = -I/student/cmpt332/rtt/include \
 		 -I/usr/include/tirpc
 RTTLIB1 = -L/student/cmpt332/rtt/lib/Linuxx86_64 \
 		 -ltirpc
-RTTLIB2 = -lRtt -lRttUtils -L. -llist \
-		  -lMonitor
+RTTLIB2 = -lRtt -lRttUtils -L. -lMonitor \
+		  -llist
 
 
 # Main Target
