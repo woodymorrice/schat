@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 INC = -I. -I/student/cmpt332/pthreads
-LIB1 = -L. -llist liblist.a
+LIB1 = -L. -llist
 LIB2 = -L/student/cmpt332/pthreads/lib/Linuxx86_64 -lpthreads
 
 all: lab5 
