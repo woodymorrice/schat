@@ -16,7 +16,9 @@
 #define BLOCK_CHANCE 3
 #define WORK_MAXIMUM 50
 
-LIST *procQueue;
+LIST *q0,*q1,*q2,*q3,*q4;
+
+int get_priority();
 
 void panic(const char *msg) {
     fprintf(stderr, "[PANIC] %s\n", msg);
@@ -51,10 +53,30 @@ struct proc *next_proc() {
     struct proc *p;
 
     /* TODO: reimplement as a priority scheduler */
-    for (p = ptable.procs; p < &ptable.procs[ptable.size]; p++) {
+    /*for (p = ptable.procs; p < &ptable.procs[ptable.size]; p++) {
         if (p->state != RUNNABLE) continue;
         return p;
-    }
+    }*/
+    if (ListCount(q0) > 0) {
+        //if (p->state != RUNNABLE) continue;
+        return ((struct proc*)(ListTrim(q0)));
+    }        
+    if (ListCount(q1) > 0) {
+        //if (p->state != RUNNABLE) continue;
+        return ((struct proc*)(ListTrim(q1)));
+    }   
+    if (ListCount(q2) > 0) {
+        //if (p->state != RUNNABLE) continue;
+        return ((struct proc*)(ListTrim(q2)));
+    }   
+    if (ListCount(q3) > 0) {
+        //if (p->state != RUNNABLE) continue;
+        return ((struct proc*)(ListTrim(q3)));
+    }   
+    if (ListCount(q4) > 0) {
+        //if (p->state != RUNNABLE) continue;
+        return ((struct proc*)(ListTrim(q4)));
+    }   
 
     return NULL;
 }
@@ -62,6 +84,11 @@ struct proc *next_proc() {
 /* Scheduler entrypoint */
 void scheduler(void *arg) {
     struct proc *p;
+    q0 = ListCreate();
+    q1 = ListCreate();
+    q2 = ListCreate();
+    q3 = ListCreate();
+    q4 = ListCreate();
 
     for (;;) {
         if (P(ptable.mutex)) panic("invalid ptable mutex");
@@ -84,6 +111,7 @@ void scheduler(void *arg) {
 void set_state(enum pstate state) {
     PID pid;
     struct proc *p;
+    int prio;
 
     pid = MyPid();
 
@@ -104,6 +132,24 @@ void set_state(enum pstate state) {
 
         if (state == RUNNABLE) {
             /* TODO: add to runnable queue */
+            prio = p->priority;
+            switch (prio) {
+                case 0:
+                    ListPrepend(q0, p);
+                    break;
+                case 1:
+                    ListPrepend(q1, p);
+                    break;
+                case 2:
+                    ListPrepend(q2, p);
+                    break;
+                case 3:
+                    ListPrepend(q3, p);
+                    break;
+                case 4:
+                    ListPrepend(q4, p);
+                    break;
+            }
         }
 
         p->state = state;

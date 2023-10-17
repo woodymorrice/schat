@@ -12,11 +12,11 @@ UBCINC = -I/student/cmpt332/pthreads/
 UBCLIB = -lpthreads \
 		 -L/student/cmpt332/pthreads/lib/Linuxx86_64
 
-sim: sim.o
-	$(CC) $(LIB) $(UBCLIB) -o sim sim.o
+sim: sim.o liblist.a
+	$(CC) $(UBCLIB) -o sim sim.o $(LIB)
 
 
-sim.o: sim.c
+sim.o: sim.c list.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) $(UBCINC) \
 		-o sim.o -c sim.c
 
