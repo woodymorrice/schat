@@ -50,31 +50,26 @@ static PID scheduler_pid;
 
 /* Returns the next process to run or NULL if there is nothing runnable */
 struct proc *next_proc() {
-    struct proc *p;
 
     /* TODO: reimplement as a priority scheduler */
-    /*for (p = ptable.procs; p < &ptable.procs[ptable.size]; p++) {
-        if (p->state != RUNNABLE) continue;
-        return p;
-    }*/
+
+    /*
+     * Checking through every queue based on the process's priority
+     * return the process address   
+    */
     if (ListCount(q0) > 0) {
-        //if (p->state != RUNNABLE) continue;
         return ((struct proc*)(ListTrim(q0)));
     }        
     if (ListCount(q1) > 0) {
-        //if (p->state != RUNNABLE) continue;
         return ((struct proc*)(ListTrim(q1)));
     }   
     if (ListCount(q2) > 0) {
-        //if (p->state != RUNNABLE) continue;
         return ((struct proc*)(ListTrim(q2)));
     }   
     if (ListCount(q3) > 0) {
-        //if (p->state != RUNNABLE) continue;
         return ((struct proc*)(ListTrim(q3)));
     }   
     if (ListCount(q4) > 0) {
-        //if (p->state != RUNNABLE) continue;
         return ((struct proc*)(ListTrim(q4)));
     }   
 
@@ -82,8 +77,11 @@ struct proc *next_proc() {
 }
 
 /* Scheduler entrypoint */
-void scheduler(void *arg) {
+void scheduler() {
     struct proc *p;
+    /*
+     * Initialize priority queues 
+    */
     q0 = ListCreate();
     q1 = ListCreate();
     q2 = ListCreate();
@@ -132,6 +130,9 @@ void set_state(enum pstate state) {
 
         if (state == RUNNABLE) {
             /* TODO: add to runnable queue */
+            /*
+            * Adding runnable process to queue based on its priority
+            */
             prio = p->priority;
             switch (prio) {
                 case 0:
