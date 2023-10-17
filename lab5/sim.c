@@ -8,11 +8,15 @@
 
 #include <os.h>
 
+#include <list.h>
+
 #define SCHEDULER_QUANTUM 25
 
 #define BLOCK_MAXIMUM 50
 #define BLOCK_CHANCE 3
 #define WORK_MAXIMUM 50
+
+LIST *procQueue;
 
 void panic(const char *msg) {
     fprintf(stderr, "[PANIC] %s\n", msg);

@@ -7,17 +7,17 @@ CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
 
 INC = -I.
-LIB = -L.
+LIB = -L. -llist
 UBCINC = -I/student/cmpt332/pthreads/
 UBCLIB = -lpthreads \
 		 -L/student/cmpt332/pthreads/lib/Linuxx86_64
 
 sim: sim.o
-	$(CC) $(UBCLIB) -o sim sim.o
+	$(CC) $(LIB) $(UBCLIB) -o sim sim.o
 
 
 sim.o: sim.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(UBCINC) \
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) $(UBCINC) \
 		-o sim.o -c sim.c
 
 .PHONY: clean
