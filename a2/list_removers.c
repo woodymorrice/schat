@@ -120,7 +120,9 @@ void *ListTrim(LIST *list) {
     oldTail = list->tailPointer;
     newTail = oldTail->prevNode;
     oldTail->prevNode = NULL;
-    newTail->nextNode = NULL;
+    if (newTail != NULL) {
+        newTail->nextNode = NULL;
+    }
     memoryNodeUsed -= sizeof(NODE);
     list->totalItem -= 1;
     list->tailPointer = newTail;
