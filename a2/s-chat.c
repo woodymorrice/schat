@@ -13,8 +13,8 @@
 #include <list.h>
 
 const int MAX_LEN = 255;
-const int STD_MSG = 0;
-const int STD_RPLY = 0;
+const char* STD_MSG = "0";
+const char* STD_RPLY = "0";
 
 void sServer();
 void sGetInput();
@@ -30,7 +30,7 @@ static PID sDisplayDataPID;
 
 int mainp() {
     if (PNUL == (sServerPID = Create(sServer, 65536,
-       "sServer", NULL, NORM, USR))) {
+       "sServer", NULL, HIGH, USR))) {
         printf("Error creating sServer thread\n");
     }
     if (PNUL == (sGetInputPID = Create(sGetInput, 65536,
@@ -63,8 +63,13 @@ void sGetInput() {
     fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
 
     for (;;) {
+        //buf[0] = '\0';
         msgLen = read(0, buf, MAX_LEN);
+        buf[msgLen+1] = '\0';
+        
         if (msgLen > 0) {
+
+            //msgLen++;
 
             if (strncmp("exit\n", buf, msgLen) == 0 ||
                 strncmp("quit\n", buf, msgLen) == 0) {
@@ -73,11 +78,12 @@ void sGetInput() {
             }
 
             /* for debugging (remove later) */
-            /* write(1, buf, msgLen); */
+            write(1, buf, msgLen);
 
             if (*(int*)Send(sServerPID, &buf, &msgLen)
                     == NOSUCHPROC) {
-                write(1, "Error in Send: invalid process ID\n", 35);
+                fprintf(stderr,
+                        "Error: sGetInput invalid send PID\n");
                 exit(0);
             }
         }
@@ -94,6 +100,7 @@ void sServer() {
     char* outArr[12];
     /* LIST* incoming;
     char* inArr[12]; */
+    char* message;
 
     int msgLen;
     int index;
@@ -101,17 +108,29 @@ void sServer() {
     outgoing = ListCreate();
     /* incoming = ListCreate(); */
 
-    msgLen = 0; /* dummy value */
     index = 0;
     printf("sServer() thread reached\n");
 
     for (;;) {
 
         /* get input */
+        message = (char*)Receive(&sGetInputPID, &msgLen);
+        outArr[index] = malloc(strlen(message)+1);
+        strcpy(message, outArr[index]);
+        if (msgLen > 0) {
+            //printf("%s", message);
+            //outArr[index] = malloc(sizeof(message));
+            printf("%s", outArr[index]);
+        }
+        /*printf("%s\n", (char*)Receive(&sGetInputPID, &msgLen));
+        */
+        /*msgLen = 0;
         outArr[index] = strndup((char*)
                 Receive(&sGetInputPID, &msgLen), msgLen);
-        printf("%s\n", outArr[index]);
-        ListPrepend(outgoing, &outArr[index]);
+        if (msgLen > 0) {
+            printf("%s\n", outArr[index]);
+        }
+        ListPrepend(outgoing, &outArr[index]); */
         Reply(sGetInputPID, (void*)&STD_RPLY, sizeof(STD_RPLY));
 
         /* send data */
@@ -151,10 +170,15 @@ void sSendData() {
     for (;;) {
         if (*(int*)Send(sServerPID, (void*)&STD_MSG, &msgLen)
                 == NOSUCHPROC) {
-            write(1, "Error in Send: invalid process ID\n", 35);
+            fprintf(stderr,
+                "Error: sSendData invalid send PID\n");
             exit(0);   
         }
         message = (char*)Receive(&sServerPID, &msgLen);
+        if (message != STD_RPLY) {
+            fprintf(stderr, 
+                    "Error: sSendData received erroneous reply\n");
+        }
         printf("%s\n", message);
     }
 }
@@ -169,10 +193,15 @@ void sGetData() {
     for (;;) {
         if (*(int*)Send(sServerPID, (void*)&STD_MSG, &msgLen)
                 == NOSUCHPROC) {
-            write(1, "Error in Send: invalid process ID\n", 35);
+            fprintf(stderr,
+                "Error: sGetData invalid send PID\n");
             exit(0);   
         }
         message = (char*)Receive(&sServerPID, &msgLen);
+        if (message != STD_RPLY) {
+            fprintf(stderr,
+                "Error: sGetData received erroneous reply\n");
+        }
 
     }
 }
@@ -187,10 +216,15 @@ void sDisplayData() {
     for (;;) {
         if (*(int*)Send(sServerPID, (void*)&STD_MSG, &msgLen)
                 == NOSUCHPROC) {
-            write(1, "Error in Send: invalid process ID\n", 35);
+            fprintf(stderr,
+                "Error: sDisplayData invalid send PID\n");
             exit(0);   
         }
         message = (char*)Receive(&sServerPID, &msgLen);
+        if (message != STD_RPLY) {
+            fprintf(stderr,
+                "Error: sDisplayData received erroneous reply\n");
+        }
 
     }
 }
