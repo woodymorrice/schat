@@ -25,7 +25,6 @@ int occupied;
 
 
 int MonEnter () {
-    printf("MonEnter() reached\n");
     /* if monitor is occupied add to entering queue */
     if (occupied) {
         ListPrepend(enterq, waiting);
@@ -42,7 +41,6 @@ int MonEnter () {
 
 
 int MonLeave () {
-    printf("MonLeave() reached\n");
     /* allow current thread to leave, before actually call another thread */
 
     /* if urgentq not empty, take item off */
@@ -130,19 +128,7 @@ int MonInit (int numConds) {
     RttNewSem(&enterqSem, 1);
     RttNewSem(&urgentqSem, 1);
     RttNewSem(&mutex, 1);
-    
-    for (;;) {
-        MonEnter();
-        returnVal = threads[index];
-        waiting = &returnVal;
-        /* Incoming thread will keep calling MonEnter() */
-        MonLeave();
-        if (index == 99) {
-            index = 0;  
-        }
-        else {
-            index++;
-        }
-    }
+    MonEnter();
+    MonLeave(); 
     return 0;
 }
