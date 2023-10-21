@@ -19,23 +19,23 @@ RttSem condqSem[10];
  * Mutex can only have value 0 / 1
 */
 RttSem mutex;
-
-RttThreadId *waiting;
 int occupied;
 
 
 int MonEnter () {
     /* if monitor is occupied add to entering queue */
-    if (occupied) {
-        ListPrepend(enterq, waiting);
+    RttThreadId waiting;
+    waiting = RttMyThreadId();
+    if (occupied == 0) {
+        ListPrepend(enterq, &waiting);
+        printf("%d items in enterq\n", ListCount(enterq));
         RttP(enterqSem);
     }
-    /* else set monitor to be occupied */
     else {
-        occupied = 1;
         RttP(mutex);
+        occupied = 1;
     }
-     
+    printf("Reach here!\n");
     return 0;
 }
 
@@ -45,16 +45,18 @@ int MonLeave () {
 
     /* if urgentq not empty, take item off */
     if (ListCount(urgentq) > 0) {
-        waiting = (RttThreadId*)ListTrim(urgentq);
+        ListTrim(urgentq);
+        printf("%d items in urgentq\n", ListCount(urgentq));
         RttV(urgentqSem);
     }
     /* else if enterq not empty, take item off */
     else if (ListCount(enterq) > 0){
-        waiting = (RttThreadId*)ListTrim(enterq);
+        ListTrim(enterq);
+        printf("%d itesms in enterq\n", ListCount(enterq));
         RttV(enterqSem);
     }
-    /* else set occupied to false */
     else {
+    /* releasing the lock */
         occupied = 0;
         RttV(mutex);
     }
@@ -63,61 +65,63 @@ int MonLeave () {
 
 
 int  MonWait (int CV) {
+    RttThreadId waiting;
+    waiting = RttMyThreadId();
     if (CV < 0) return -1;
-    printf("MonWait() reached, %d\n", CV);
 
     /* add to cv_waiting list */
-    ListPrepend(condq[CV], waiting);
-    RttP(condqSem[CV]);
+    ListPrepend(condq[CV], &waiting);
+    printf("%d items in the condq[%d]\n", ListCount(condq[CV]), CV);
  
     /* if urgentq not empty, take item off */
     if (ListCount(urgentq) > 0) {
-        waiting = (RttThreadId*)ListTrim(urgentq);
+        ListTrim(urgentq);
+        printf("%d items in urgentq\n", ListCount(urgentq));
         RttV(urgentqSem);
     }
     /* if enterq not empty, take item off */   
     else if (ListCount(enterq) > 0) {
-        waiting = (RttThreadId*)ListTrim(enterq);
+        ListTrim(enterq);
+        printf("%d items in enterq\n", ListCount(enterq));
         RttV(enterqSem);
     }
-    /* else set occupied to false */
     else {
-        occupied = 0;
+        occupied = 0; 
         RttV(mutex);
     }
+    RttP(condqSem[CV]);
     return 0;
 }
 
 
 int  MonSignal (int CV) {
+    RttThreadId waiting;
+    waiting = RttMyThreadId();
     if (CV < 0) return -1;
-    printf("MonSignal() reached, %d\n", CV);
     /* if there is a non-empty cv list */
     if (ListCount(condq[CV]) > 0) {
         /* take first item off the CV_waiting list
          * and unlock the current CV_waiting list 
         */
-        waiting = (RttThreadId*)ListTrim(condq[CV]);
+        ListTrim(condq[CV]);
+        printf("%d items in condq[%d]\n", ListCount(condq[CV]), CV);
         RttV(condqSem[CV]);
 
         /* add current thread to the urgentq */
-        ListPrepend(urgentq, waiting);
+        ListPrepend(urgentq, &waiting);
+        printf("%d items in urgentq\n", ListCount(urgentq));
         RttP(urgentqSem);
     }
     else {
-        printf("There is no thread waiting on condition: %d\n", CV);
+        printf("No thread waiting on condq[%d]\n", CV);
     }
     return 0; 
 }
  
 int MonInit (int numConds) {
     LIST *newQueue;
-    int index;
     int count;
-    RttThreadId threads[100];
-    RttThreadId returnVal;
     if (numConds < 1) return -1;
-    printf("MonInit() reached, %d\n", numConds);
     for (count = 0; count < numConds; count++) {
         newQueue = ListCreate();
         condq[count] = newQueue;
@@ -126,9 +130,7 @@ int MonInit (int numConds) {
     enterq = ListCreate();
     urgentq = ListCreate(); 
     RttNewSem(&enterqSem, 1);
-    RttNewSem(&urgentqSem, 1);
+    RttNewSem(&urgentqSem, 0);
     RttNewSem(&mutex, 1);
-    MonEnter();
-    MonLeave(); 
     return 0;
 }
