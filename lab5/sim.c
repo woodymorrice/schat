@@ -22,8 +22,6 @@
 
 LIST *q0,*q1,*q2,*q3,*q4;
 
-int get_priority();
-
 void panic(const char *msg) {
     fprintf(stderr, "[PANIC] %s\n", msg);
     exit(1);
@@ -57,10 +55,7 @@ struct proc *next_proc() {
 
     /* TODO: reimplement as a priority scheduler */
 
-    /*
-     * Checking through every queue based on the process's priority
-     * return the process address   
-    */
+    /* Checks each queue in order (highest priority first) */
     if (ListCount(q0) > 0) {
         return ((struct proc*)(ListTrim(q0)));
     }        
@@ -83,9 +78,8 @@ struct proc *next_proc() {
 /* Scheduler entrypoint */
 void scheduler() {
     struct proc *p;
-    /*
-     * Initialize priority queues 
-    */
+    /* Initialize queues - one for
+     * each priority level */
     q0 = ListCreate();
     q1 = ListCreate();
     q2 = ListCreate();
@@ -134,9 +128,9 @@ void set_state(enum pstate state) {
 
         if (state == RUNNABLE) {
             /* TODO: add to runnable queue */
-            /*
-            * Adding runnable process to queue based on its priority
-            */
+
+            /* Adds runnable processes to queue 
+            * based on their priority */
             prio = p->priority;
             switch (prio) {
                 case 0:

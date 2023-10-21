@@ -5,6 +5,7 @@
 CC = gcc
 CFLAGS = -g
 CPPFLAGS = -std=gnu90 -Wall -pedantic -Wextra
+NOEXEC = -z noexecstack
 
 INC = -I.
 LIB = -L. -llist
@@ -13,7 +14,7 @@ UBCLIB = -lpthreads \
 		 -L/student/cmpt332/pthreads/lib/Linuxx86_64
 
 sim: sim.o liblist.a
-	$(CC) $(UBCLIB) -o sim sim.o $(LIB)
+	$(CC) $(NOEXEC) $(UBCLIB) -o sim sim.o $(LIB)
 
 
 sim.o: sim.c list.h
