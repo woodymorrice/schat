@@ -28,14 +28,14 @@ int MonEnter () {
     waiting = RttMyThreadId();
     if (occupied == 0) {
         ListPrepend(enterq, &waiting);
-        printf("%d items in enterq\n", ListCount(enterq));
+        /*printf("%d items in enterq\n", ListCount(enterq));*/
         RttP(enterqSem);
     }
     else {
         RttP(mutex);
         occupied = 1;
     }
-    printf("Reach here!\n");
+    /*printf("Reach here!\n");*/
     return 0;
 }
 
@@ -46,13 +46,13 @@ int MonLeave () {
     /* if urgentq not empty, take item off */
     if (ListCount(urgentq) > 0) {
         ListTrim(urgentq);
-        printf("%d items in urgentq\n", ListCount(urgentq));
+        /*printf("%d items in urgentq\n", ListCount(urgentq));*/
         RttV(urgentqSem);
     }
     /* else if enterq not empty, take item off */
     else if (ListCount(enterq) > 0){
         ListTrim(enterq);
-        printf("%d itesms in enterq\n", ListCount(enterq));
+        /*printf("%d itesms in enterq\n", ListCount(enterq));*/
         RttV(enterqSem);
     }
     else {
@@ -71,18 +71,18 @@ int  MonWait (int CV) {
 
     /* add to cv_waiting list */
     ListPrepend(condq[CV], &waiting);
-    printf("%d items in the condq[%d]\n", ListCount(condq[CV]), CV);
+    /*printf("%d items in the condq[%d]\n", ListCount(condq[CV]), CV);*/
  
     /* if urgentq not empty, take item off */
     if (ListCount(urgentq) > 0) {
         ListTrim(urgentq);
-        printf("%d items in urgentq\n", ListCount(urgentq));
+        /*printf("%d items in urgentq\n", ListCount(urgentq));*/
         RttV(urgentqSem);
     }
     /* if enterq not empty, take item off */   
     else if (ListCount(enterq) > 0) {
         ListTrim(enterq);
-        printf("%d items in enterq\n", ListCount(enterq));
+        /*printf("%d items in enterq\n", ListCount(enterq));*/
         RttV(enterqSem);
     }
     else {
@@ -104,12 +104,12 @@ int  MonSignal (int CV) {
          * and unlock the current CV_waiting list 
         */
         ListTrim(condq[CV]);
-        printf("%d items in condq[%d]\n", ListCount(condq[CV]), CV);
+        /*printf("%d items in condq[%d]\n", ListCount(condq[CV]), CV);*/
         RttV(condqSem[CV]);
 
         /* add current thread to the urgentq */
         ListPrepend(urgentq, &waiting);
-        printf("%d items in urgentq\n", ListCount(urgentq));
+        /*printf("%d items in urgentq\n", ListCount(urgentq));*/
         RttP(urgentqSem);
     }
     else {
