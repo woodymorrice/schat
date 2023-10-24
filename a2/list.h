@@ -25,8 +25,8 @@ struct LIST {
 };
 
 
-#define LIST_POOL_SIZE 50
-#define NODE_POOL_SIZE 50
+#define LIST_POOL_SIZE 5000
+#define NODE_POOL_SIZE 5000
 /* Makes a new, empty list, and returns its reference on success.
  * Returns a NULL pointer on failure */
 

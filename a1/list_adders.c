@@ -153,7 +153,7 @@ int ListPrepend (LIST *list, void *item) {
     * If the current pointer is at the head of list,
     * item is added at the end.
     */
-    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
+    if (curFreeNode != NULL) {
         prevHead = list->headPointer;
         newItem = curFreeNode;
         newItem->dataType = item;
@@ -167,7 +167,12 @@ int ListPrepend (LIST *list, void *item) {
         }
         else {
             list->currentItem = list->headPointer;
-            curFreeNode = curFreeNode->nextNode;
+            if (curFreeNode->nextNode == NULL) {
+                curFreeNode = NULL;
+            }
+            else {
+                curFreeNode = curFreeNode->nextNode;
+            }
             list->headPointer = newItem;
             newItem->prevNode = NULL;
             newItem->nextNode = prevHead;

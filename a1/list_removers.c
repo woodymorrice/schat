@@ -117,12 +117,23 @@ void *ListTrim(LIST *list) {
     if (list->totalItem == 0) {
         return NULL;
     }
-    oldTail = list->tailPointer;
-    newTail = oldTail->prevNode;
-    oldTail->prevNode = NULL;
-    newTail->nextNode = NULL;
-    memoryNodeUsed -= sizeof(NODE);
-    list->totalItem -= 1;
-    list->tailPointer = newTail;
+    else if (list->totalItem == 1) {
+        oldTail = list->tailPointer;
+        memoryNodeUsed -= sizeof(NODE);
+        list->totalItem -= 1;
+        list->currentItem = NULL;
+        list->headPointer = NULL;
+        list->tailPointer = NULL; 
+    }
+    else {
+        oldTail = list->tailPointer;
+        newTail = oldTail->prevNode;
+        oldTail->prevNode = NULL;
+        newTail->nextNode = NULL;
+        memoryNodeUsed -= sizeof(NODE);
+        list->totalItem -= 1;
+        list->tailPointer = newTail;
+        list->currentItem = newTail;
+    }
     return oldTail->dataType;
 }

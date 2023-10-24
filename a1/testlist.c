@@ -21,7 +21,7 @@ int main() {
     LIST *testList3;
 
     int n0, n1, n2, n3, n4, n5, result;
-    char a, b, c, d;
+    char a, b, c;
     NODE *current;
     NODE *head;
     NODE *tail;
@@ -39,7 +39,6 @@ int main() {
     a = 'a';
     b = 'b';
     c = 'c';
-    d = 'd';
 
     testList = ListCreate();
     if (testList == NULL) {
