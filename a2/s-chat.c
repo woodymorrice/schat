@@ -83,21 +83,36 @@ int mainp(int argc, char* argv[]) {
  * takes input and packages it into a message to
  * send to the server upon newline */
 void sGetInput() {
+    char buf[256];
     int msgLength;
+
     int *reply;
     char* message;
 
     message = "test successful";
     msgLength = strlen(message);
 
+    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+
     for (;;) {
-        reply = (int*)Send(sServerPID, (void*)message, &msgLength);
-        if (*reply == NOSUCHPROC) {
-            printf("GetInput send failed\n");
+
+        msgLength = read(0, buf, MAX_LEN);
+            
+        if (msgLength > 0) {
+            buf[msgLength] = '\0';
+            
+            if (strncmp("exit\n", buf, msgLength) == 0 ||
+                strncmp("quit\n", buf, msgLength) == 0) {
+
+                fcntl(0, F_SETFL, fcntl(0, F_GETFL) | ~O_NONBLOCK);
+                exit(0);
+            }
+
+            reply = (int*)Send(sServerPID, (void*)&buf, &msgLength);
+            if (*reply == NOSUCHPROC) {
+                printf("GetInput send failed\n");
+            }
         }
-        /*else {
-            printf("GetInput received reply '%d'\n", *reply);
-        }*/
     }
 
 }
@@ -204,17 +219,17 @@ void sServer() {
 void sSendData() {
     int msgLength;
     void* reply;
-    /*char* message;*/
+    char* message;
 
     for (;;) {
         reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
         if (*(int*)reply == NOSUCHPROC) {
             printf("SendData send failed\n");
         }
-        /*else {
+        else {
             message = (char*)reply;
-            printf("SendData received reply '%s'\n", message);
-        }*/
+            printf("%s", message);
+        }
     }
  
 }
@@ -256,7 +271,7 @@ void sDisplayData() {
         else {
             message = (char*)reply;
             /*printf("DisplayData received reply '%s'\n", message);*/
-            printf("%s\n", message);
+            /*printf("%s\n", message); */
         }
     }
  
