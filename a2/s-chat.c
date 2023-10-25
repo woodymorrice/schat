@@ -116,7 +116,7 @@ void sServer() {
     /* received messages */
     void* received;
     char* message;
-    int* stdMsg;
+    /*int* stdMsg;*/
 
     char* reply;
 
@@ -131,6 +131,7 @@ void sServer() {
     for (;;) {
         received = Receive(&sender, &msgLength);
 
+        /* Sending messages */
         if (sender == sGetInputPID) {
             message = (char*)received;
             if (ListCount(outgoing) < 50) {
@@ -141,17 +142,14 @@ void sServer() {
                 printf("Server reply failed\n");
             }
 
-            if (sendWait == true) {
-                stdMsg = (int*)received;
-                if (ListCount(outgoing) > 0) {
-                    reply = ListTrim(outgoing);
-                }
+            if (sendWait == true && ListCount(outgoing) > 0) {
+                /*stdMsg = (int*)received;*/
+                reply = ListTrim(outgoing);
 
                 msgLength = strlen(reply);
                 if (0 != Reply(sSendDataPID, (void*)reply, msgLength)) {
                     printf("Server reply failed\n");
                 }
-
                 sendWait = false;
             }
         }
@@ -159,6 +157,7 @@ void sServer() {
         if (sender == sSendDataPID) {
             sendWait = true;
         }
+        /* Receiving messages */
         else
         if (sender == sGetDataPID) {
             message = (char*)received;
@@ -170,17 +169,15 @@ void sServer() {
                 printf("Server reply failed\n");
             }
             
-            if (dispWait == true) {
-                stdMsg = (int*)received;
-                if (ListCount(incoming) > 0) {
-                    reply = ListTrim(incoming);
-                }
+            if (dispWait == true && ListCount(incoming) > 0) {
+                /*stdMsg = (int*)received;*/
+                reply = ListTrim(incoming);
 
                 msgLength = strlen(reply);
                 if (0 != Reply(sDisplayDataPID, (void*)reply, msgLength)) {
                     printf("Server reply failed\n");
                 }
-            
+           
                 dispWait = false;
             }
         }
@@ -188,10 +185,14 @@ void sServer() {
         if (sender == sDisplayDataPID) {
             dispWait = true;
         }
+        /* Should never reach this point */
         else {
-            if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
+            fprintf(stderr, "Server Error: unknown sender\n"); 
+            exit(-1);
+
+            /*if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
                 printf("Server reply failed\n");
-            }
+            }*/
         }
     }
 
@@ -203,7 +204,7 @@ void sServer() {
 void sSendData() {
     int msgLength;
     void* reply;
-    char* message;
+    /*char* message;*/
 
     for (;;) {
         reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
