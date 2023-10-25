@@ -1,325 +1,345 @@
 /*
-CMPT332 - Group 14
-Phong Thanh Nguyen (David) - wdz468 - 11310824
-Woody Morrice - wam553 - 11071060
-*/
+ * Joseph Medernach, imy309, 11313955
+ * John Miller, knp254, 11323966
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include <list.h>
- 
-/*
-Amount of memory used for LIST / NODE
-*/
-size_t  memoryListUsed;
-size_t  memoryNodeUsed;
+#include <string.h>
+
+/* keeping track of it the user has created any lists yet */
+int inited = 0;
+
+/* the statically allocated node arrays */
+NODE node_array[MAX_NODES];
+NODE *free_node;
+int num_nodes;
+
+/* the statically allocated list arrays */
+LIST list_array[MAX_LISTS];
+LIST *free_list;
+int num_lists;
 
 /*
-Each block in the allocation
-*/
-int listBlock;
-int nodeBlock;
+ * The ListCreate procedure creates a new LIST and returns a pointer to it
+ *
+ * return: a new, empty, LIST, or NULL if creating a new list failed
+ * postcond: an empty list is allocated
+ *
+ * This function may fail, if the maximum number of LISTs has been reached
+ */
+LIST *ListCreate() {
+    LIST *new_list;
 
-/*
-LIST POOL
-NODE POOL
-*/
-
-LIST memoryList[LIST_POOL_SIZE];
-NODE memoryNode[NODE_POOL_SIZE];
-bool isInited = false;
-
-/*
-Point to the current free list / free node
-*/
-LIST *curFreeList;
-NODE *curFreeNode;
-
-
-
-
-LIST *ListCreate () {
-    LIST *emptyList; 
-
-    if (!isInited) {
-    /*
-    * initialize nodes
-    */
-        int node;
-        int list;                                                                    
-                                                                                
-        memoryNode[0].prevNode= NULL;                                               
-        memoryNode[0].dataType = NULL;                                             
-        memoryNode[0].nextNode = &memoryNode[1];                                   
-                                                                                
-        for(node = 1; node < NODE_POOL_SIZE - 1; node++){                                  
-            memoryNode[node].prevNode = &memoryNode[node - 1];                         
-            memoryNode[node].dataType = NULL;                                       
-            memoryNode[node].nextNode = &memoryNode[node + 1];                         
-        }                                                                           
-                                                                                
-        memoryNode[NODE_POOL_SIZE-1].prevNode = &memoryNode[node - 1];                  
-        memoryNode[NODE_POOL_SIZE-1].dataType = NULL;                    
-        memoryNode[NODE_POOL_SIZE-1].nextNode = NULL;          
-   
-    /*
-    * initialize lists
-    */   
-        memoryList[0].headPointer = NULL;                                              
-        memoryList[0].tailPointer  = NULL;                                             
-        memoryList[0].currentItem = NULL;
-        memoryList[0].totalItem = 0;
-        memoryList[0].nextLP = &memoryList[1];
-        memoryList[0].prevLP = NULL;                                   
-                                                                                
-        for(list = 1; list < LIST_POOL_SIZE - 1; list++){                             
-            memoryList[list].headPointer = NULL;                       
-            memoryList[list].tailPointer = NULL;                                      
-            memoryList[list].currentItem = NULL;
-            memoryList[list].totalItem = 0;
-            memoryList[list].prevLP = &memoryList[list - 1];
-            memoryList[list].nextLP = &memoryList[list + 1];                        
-        }                                                                           
-                                                                                
-        memoryList[LIST_POOL_SIZE - 1].headPointer = NULL;                  
-        memoryList[LIST_POOL_SIZE - 1].tailPointer = NULL;                              
-        memoryList[LIST_POOL_SIZE - 1].currentItem = NULL;
-        memoryList[LIST_POOL_SIZE - 1].totalItem = 0;
-        memoryList[LIST_POOL_SIZE - 1].prevLP = &memoryList[list - 1];
-        memoryList[LIST_POOL_SIZE - 1].nextLP = NULL;
-                       
-        curFreeList = &memoryList[listBlock];
-        curFreeNode = &memoryNode[nodeBlock];
-        isInited = true;
+    /* init the nodes and lists if not yet done for the first time */
+    if (!inited) {
+        memset(&node_array, 0, MAX_NODES*sizeof(NODE));
+        memset(&list_array, 0, MAX_LISTS*sizeof(LIST));
+        free_node = node_array;
+        free_list = list_array;
+        num_nodes = 0;
+        num_lists = 0;
+        inited = 1;
     }
-
-
-    if (memoryListUsed > sizeof(LIST) * LIST_POOL_SIZE) {
-        printf("Error ListCreated(): memory list used exceed the limit\n");
+    /* if there are no lists remaining */
+    if (free_list == NULL) {
         return NULL;
     }
-    emptyList = curFreeList;
-    memoryListUsed += sizeof(LIST);
-    if (curFreeList->nextLP == NULL) {
-        curFreeList->nextLP = curFreeList;
+    new_list = free_list;
+    num_lists++;
+    /* advance the free_list* to the next free list if it exists */
+    if (num_lists == MAX_LISTS) {
+        free_list = NULL;
+    } else if (free_list->next_list == NULL) {
+        free_list++;
+    } else {
+        free_list = free_list->next_list;
     }
-    curFreeList = curFreeList->nextLP;
-    return emptyList;
-}
-    
-int ListCount (LIST *list) {
-    return list->totalItem;    
-}
 
-int ListAppend (LIST *list, void *item) {
-    NODE *prevTail;
-    NODE *newItem;
-
-    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
-        prevTail = list->tailPointer;
-        list->currentItem = list->tailPointer;
-        newItem = curFreeNode;
-        newItem->dataType = item;
-         
-        if (list->totalItem == 0) {
-            curFreeNode = curFreeNode->nextNode;
-            list->headPointer = newItem;
-            list->tailPointer = newItem;
-            newItem->prevNode = NULL;
-            newItem->nextNode = NULL;
-        }
-        else {
-            curFreeNode = curFreeNode->nextNode;
-            list->tailPointer = newItem;
-            prevTail->nextNode = newItem;
-            newItem->prevNode = prevTail;
-            newItem->nextNode = NULL;
-            list->currentItem = list->tailPointer;
-        }
-        list->totalItem += 1;
-        memoryNodeUsed += sizeof(NODE);
-        return 0;
-    }
-    printf("Error ListAppend(): memory NODE used exceed the limit\n");
-    return -1;
-}
-    
-
-int ListPrepend (LIST *list, void *item) {
-    NODE *prevHead;
-    NODE *newItem;
-    /*
-    * If the current pointer is at the head of list,
-    * item is added at the end.
-    */
-    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
-        prevHead = list->headPointer;
-        newItem = curFreeNode;
-        newItem->dataType = item;
-
-        if (list->totalItem == 0) {
-            list->headPointer = newItem;
-            list->tailPointer = newItem;
-            curFreeNode = curFreeNode->nextNode;
-            newItem->prevNode = NULL;
-            newItem->nextNode = NULL;
-        }
-        else {
-            list->currentItem = list->headPointer;
-            curFreeNode = curFreeNode->nextNode;
-            list->headPointer = newItem;
-            newItem->prevNode = NULL;
-            newItem->nextNode = prevHead;
-            prevHead->prevNode = newItem;
-        }
-        list->currentItem = newItem;
-        list->totalItem += 1;
-        memoryNodeUsed += sizeof(NODE);
-        return 0;
-    }
-    printf("Error ListPrepend(): memory NODE used exceed the limit\n");
-    return -1;
+    /* ensure that the list is fresh */
+    new_list->head = NULL;
+    new_list->tail = NULL;
+    new_list->curr = NULL;
+    new_list->count = 0;
+    new_list->next_list = NULL;
+    return new_list;
 }
 
+
+/*
+ * The ListAdd procedure adds a new item to the list immediately after the
+ * current item and makes the new item the current item
+ *
+ * precond: the list param is not NULL
+ * param: list - the list to add the item to
+ * param: item - the item to add to the list
+ * return: 0 if the item was successfully added to the list, -1 if not
+ * postcond: an item is added to the list, the current item is changed
+ *
+ * This procedure may fail, if the maximum number of items has be reached
+ */
 int ListAdd(LIST *list, void *item) {
-    NODE *curItem;
-    NODE *curNext;
-    NODE *newItem;
+    NODE *new_node;
 
-    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {
-        newItem = curFreeNode;
-        newItem->dataType = item;
-        /*
-        * if the current list has no item
-        */
-        if (list->totalItem == 0) {
-            list->headPointer = newItem;
-            list->tailPointer = newItem;
-            curFreeNode = curFreeNode->nextNode; 
-            newItem->prevNode = NULL;
-            newItem->nextNode = NULL;
-            list->currentItem = list->headPointer;
-        } 
-        else { 
-            if (list->currentItem == list->tailPointer) {
-                /*
-                * current item is at tail
-                */
-                curItem = list->currentItem;
-                curItem->nextNode = newItem;
-                curFreeNode = curFreeNode->nextNode; 
-                newItem->nextNode = NULL;
-                newItem->prevNode = curItem;
-                list->tailPointer = newItem;
-                list->currentItem = list->tailPointer;
-            }
-            else {
-                /*
-                * current item is at other positions
-                */
-                curItem = list->currentItem;
-                curNext = curItem->nextNode;
-                curFreeNode = curFreeNode->nextNode; 
-                curItem->nextNode = newItem;
-                curNext->prevNode = newItem;
-                newItem->nextNode = curNext;
-                newItem->prevNode = curItem;
-            
-                list->currentItem = newItem;
-            }
-        }
-        memoryNodeUsed += sizeof(NODE);
-        list->totalItem += 1;
-        return 0;
+    /* if there are no more nodes available */
+    /* if a NULL list was passed */
+    if (list == NULL || num_nodes == MAX_NODES) {
+        return -1;
     }
-    printf("Error ListAdd(): memory NODE used exceed the limit\n");
-    return -1;
+
+    new_node = free_node;
+    num_nodes++;
+
+    /* advance the free_node* to the next free node if one exists */
+    if (num_nodes == MAX_NODES) {
+        free_node = NULL;
+    } else if (free_node->next == NULL) {
+        free_node++;
+    } else {
+        free_node = free_node->next;
+        new_node->next = NULL;
+    }
+
+    new_node->item = item;
+    list->count++;
+
+    /* link the new node */
+    if (list->head == NULL) {
+        new_node->prev = NULL;
+        new_node->next = NULL;
+        list->head = new_node;
+        list->tail = new_node;
+
+    } else {
+        /* if there is already a node after the current node */
+        if ((list->curr)->next != NULL) {
+            ((list->curr)->next)->prev = new_node;
+            new_node->next = (list->curr)->next;
+        } else { /* if not we are inserting at the end */
+            list->tail = new_node;
+        }
+        new_node->prev = list->curr;
+        (list->curr)->next = new_node;
+    }
+    list->curr = new_node;
+
+    return 0;
 }
 
+
+/*
+ * The ListInsert procedure adds a new item to the list immediately before the
+ * current item and makes the new item the current item
+ *
+ * precond: the list param is not NULL
+ * param: list - the list to add the item to
+ * param: item - the item to add to the list
+ * return: 0 if the item was successfully added to the list, -1 if not
+ * postcond: an item is added to the list and the current item is changed
+ *
+ * This procedure may fail, if the maximum number of items has be reached
+ */
 int ListInsert(LIST *list, void *item) {
-    NODE *curItem;
-    NODE *curPrev;
-    NODE *newItem;
-    if (memoryNodeUsed < sizeof(NODE) * NODE_POOL_SIZE) {       
-        curItem = list->currentItem;
-        newItem = curFreeNode;
-        newItem->dataType = item;
-        
-        if (curFreeNode->nextNode == NULL) {
-            curFreeNode->nextNode = curFreeNode;
-        }
-        else {
-            curFreeNode = curFreeNode->nextNode;
-        } 
-        
-        if (list->totalItem == 0) {
-            list->headPointer = newItem;
-            list->tailPointer = newItem;
-            newItem->prevNode = NULL;
-            newItem->nextNode = NULL;
-            list->currentItem = list->headPointer;
-        }
-        else {
-            /*
-            * if current item is at head
-            */
-            if (list->currentItem == list->headPointer) {
-                list->headPointer = newItem;
-                curItem->prevNode = newItem;
-                newItem->nextNode = curItem;
-                newItem->prevNode = NULL;
-                list->currentItem = newItem;
-            }
-            else {
-            /*
-            * if current item is at middle position
-            */
-                curPrev = curItem->prevNode;
-                curItem->prevNode = newItem;
-                curPrev->nextNode = newItem;
-                newItem->prevNode = curPrev;
-                newItem->nextNode = curItem;
-                list->currentItem = newItem;
-            }
-        }
-        list->totalItem += 1;
-        memoryNodeUsed += sizeof(NODE);
-        return 0;
+    NODE *new_node;
+
+    /* if there are no more nodes available */
+    /* if a NULL list was passed */
+    if (list == NULL || num_nodes == MAX_NODES) {
+        return -1;
     }
-    return -1;
+
+    new_node = free_node;
+    num_nodes++;
+
+    /* advance the free_node* to the next free node if one exists */
+    if (num_nodes == MAX_NODES) {
+        free_node = NULL;
+    } else if (free_node->next == NULL) {
+        free_node++;
+    } else {
+        free_node = free_node->next;
+        new_node->next = NULL;
+    }
+
+    new_node->item = item;
+    list->count++;
+
+    /* link the new node */
+    if (list->head == NULL) {
+        new_node->prev = NULL;
+        new_node->next = NULL;
+        list->head = new_node;
+        list->tail = new_node;
+
+    } else {
+        /* if there is already a node before the current node */
+        if ((list->curr)->prev != NULL) {
+            ((list->curr)->prev)->next = new_node;
+            new_node->prev = (list->curr)->prev;
+        } else { /* if not we are inserting at the start */
+            list->head = new_node;
+        }
+        new_node->next = list->curr;
+        (list->curr)->prev = new_node;
+    }
+    list->curr = new_node;
+
+    return 0;
 }
 
-void ListConcat(LIST *list1, LIST *list2) {
-    NODE *list1Tail;
-    NODE *list2Head;
-    NODE *list2Tail;
-    if (list1 == NULL) {
+
+/*
+ * The ListAppend procedure adds a new item to the end of the list and makes
+ * the new item the current item
+ *
+ * precond: the list param is not NULL
+ * param: list - the list to add the item to
+ * param: item - the item to add to the list
+ * return: 0 if the item was successfully added to the list, -1 if not
+ * postcond: an item is added to the list and the current item is changed
+ *
+ * This procedure may fail, if the maximum number of items has be reached
+ */
+int ListAppend(LIST *list, void *item) {
+    NODE *new_node;
+
+    /* if the maximum number of nodes has already been created */
+    /* if a NULL list was passed */
+    if (list == NULL || num_nodes == MAX_NODES) {
+        return -1;
+    }
+
+    new_node = free_node;
+    num_nodes++;
+
+    /* advance the free_node* to the next free node if one exists */
+    if (num_nodes == MAX_NODES) {
+        free_node = NULL;
+    } else if (free_node->next == NULL) {
+        free_node++;
+    } else {
+        free_node = free_node->next;
+        new_node->next = NULL;
+    }
+
+    new_node->item = item;
+    list->count++;
+
+    /* link the node */
+    /* if the list has no items */
+    if (list->head == NULL) {
+        new_node->prev = NULL;
+        list->head = new_node;
+    /* if the list has at least one item */
+    } else {
+        new_node->prev = list->tail;
+        list->tail->next = new_node;
+    }
+    list->tail = new_node;
+    new_node->next = NULL;
+    list->curr = new_node;
+
+    return 0;
+}
+
+
+/*
+ * The ListInsert procedure adds a new item to the start of the list and makes
+ * the new item the current item
+ * 
+ * precond: the list param is not NULL
+ * param: list - the list to add the item to
+ * param: item - the item to add to the list
+ * return: 0 if the item was successfully added to the list, -1 if not
+ * postcond: an item is added to the list and the current item is changed
+ *
+ * This procedure may fail, if the maximum number of items has be reached
+ */
+int ListPrepend(LIST *list, void *item) {
+    NODE *new_node;
+
+    /* if the maximum number of nodes has already been created */
+    /* if a NULL list was passed */
+    if (list == NULL || num_nodes == MAX_NODES) {
+        return -1;
+    }
+
+    new_node = free_node;
+    num_nodes++;
+
+    /* advance the free_node* to the next free node if one exists */
+    if (num_nodes == MAX_NODES) {
+        free_node = NULL;
+    } else if (free_node->next == NULL) {
+        free_node++;
+    } else {
+        free_node = free_node->next;
+        new_node->next = NULL;
+    }
+
+    new_node->item = item;
+    list->count++;
+
+    /* link the node */
+    /* if the list has no items */
+    if (list->tail == NULL) {
+        new_node->next = NULL;
+        list->tail = new_node;
+    /* if the list has at least one item */
+    } else {
+        new_node->next = list->head;
+        list->head->prev = new_node;
+    }
+    list->head = new_node;
+    new_node->prev = NULL;
+    list->curr = new_node;
+
+    return 0;
+}
+
+
+/*
+ * The ListConcat procedure adds the contents of one list to the end of
+ * another list and deletes the now empty list
+ *
+ * precond: the first param is not NULL
+ * precond: the second param is not NULL
+ * precond: both list params are not the same
+ * param: first - the list which will have the second's contents appended
+ *                to it
+ * param: second - the list whose contents will be appended to first, and will
+ *                 be deleted
+ * postcond: the second list is deleted, the first list has the second's
+ *           content appended to it
+ *
+ * if the first list is empty, the current item is set to the new first item
+ * in the first list
+ */
+void ListConcat(LIST *first, LIST *second) {
+    /* if a NULL list was passed or params are the same */
+    if (first == NULL || second == NULL || first == second) {
         return;
-    } else if (list2 == NULL) {
-        return;
     }
-    list1Tail = list1->tailPointer;
-    list2Head = list2->headPointer;
-    list2Tail = list2->tailPointer;
-    list1Tail->nextNode = list2->headPointer;
-    list2Head->prevNode = list1Tail;
-    list1->tailPointer = list2Tail;
-    list1->totalItem += list2->totalItem;
-  
-    /*
-    * Deleting list2
-    */
-    list2->headPointer = NULL;
-    list2->tailPointer = NULL;
-    list2->currentItem = NULL;
-    list2->totalItem = 0;
-    if (curFreeList->nextLP == NULL) {
-        curFreeList = list2;
+
+    /* if second is not empty, add it to the end of first */
+    if (second->head != NULL) {
+        /* if first is empty */
+        if (first->head == NULL) {
+            first->head = second->head;
+            first->curr = first->head;
+        } else { /* else first is not empty */
+            first->tail->next = second->head;
+            second->head->prev = first->tail;
+        }
+        first->tail = second->tail;
+        first->count += second->count;
     }
-    else {
-        curFreeList->nextLP = curFreeList;
-        curFreeList = list2;
-    }
-    memoryListUsed -= sizeof(LIST);
+
+    /* delete second */
+    second->head = NULL;
+    second->tail = NULL;
+    second->curr = NULL;
+    second->count = 0;
+    second->next_list = free_list;
+    free_list = second;
+    num_lists--;
 }

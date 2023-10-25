@@ -1,74 +1,172 @@
 /*
-CMPT332 - Group 14
-Phong Thanh Nguyen (David) - wdz468 - 11310824
-Woody Morrice - wam553 - 11071060
-*/
+ * Joseph Medernach, imy309, 11313955
+ * John Miller, knp254, 11323966
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <list.h>
+#include <stddef.h>
+
+/*
+ * The ListCount procedure returns the number of items in a list
+ *
+ * precond: list is not NULL
+ * param: list - the list to determine the number of items
+ * return: the number of items in the list, -1 if the list is NULL
+ */
+int ListCount(LIST *list) {
+    /* if a NULL list was passed */
+    if (list == NULL) {
+        return -1;
+    }
+    return list->count;
+}
 
 
+/*
+ * The ListFirst procedure makes the current item of the list the first item
+ *
+ * precond: list is not NULL
+ * param: list - the list in question
+ * return: the first item in the list, or NULL if the list is empty
+ * postcond: the current item of the list is changed
+ *
+ * if the list is empty, nothing is done and NULL is returned
+ */
 void *ListFirst(LIST *list) {
-    list->currentItem = list->headPointer;
-    return list->currentItem;
+    /* if the list is empty or if a NULL list was passed */
+    if (list == NULL || list->head == NULL) {
+        return NULL;
+    }
+
+    list->curr = list->head;
+    return list->curr->item;
 }
 
+
+/*
+ * The ListLast procedure makes the current item of the list the last item
+ *
+ * precond: list is not NULL
+ * param: list - the list in question
+ * return: the last item in the list, or NULL if the list is empty
+ * postcond: the current item of the list is changed
+ *
+ * if the list is empty, nothing is done and NULL is returned
+ */
 void *ListLast(LIST *list) {
-    return list->currentItem = list->tailPointer;
+    /* if the list is empty or if a NULL list was passed */
+    if (list == NULL || list->head == NULL) {
+        return NULL;
+    }
+
+    list->curr = list->tail;
+    return list->curr->item;
 }
 
-void *ListCurr(LIST *list) {
-    return list->currentItem;
-}
 
+/*
+ * The ListNext procedure makes the current item of the list the item after
+ * the current item
+ *
+ * precond: list is not NULL
+ * param: list - the list in question
+ * return: the new current item of the list, or NULL if the list is empty or
+ *         this operation would attempt to move the current item beyond
+ *         the end of the list
+ * postcond: the current item of the list is changed
+ *
+ * if the list is empty, nothing is done and NULL is returned
+ * if this operation would move the current item beyond the end of the list
+ * nothing is done and NULL is returned
+ */
 void *ListNext(LIST *list) {
-    NODE *nextItem;
-    NODE *curItem;
-    /*
-    * if the current item is at the tail of list
-    * return NULL  
-    */
-    if (list->currentItem == list->tailPointer) {
+    /* if a NULL list was passed or if the list is empty or */
+    /* if this pushes the current item past the end of the list */
+    if (list == NULL || list->head == NULL || list->curr->next == NULL) {
         return NULL;
     }
-    curItem = list->currentItem;
-    nextItem = curItem->nextNode;
-    list->currentItem = nextItem;
-    return list->currentItem;
+
+    list->curr = list->curr->next;
+    return list->curr->item;
 }
 
 
+/*
+ * The ListPrev procedure makes the current item of the list the item before
+ * the current item
+ *
+ * precond: list is not NULL
+ * param: list - the list in question
+ * return: the new current item of the list, or NULL if the list is empty or
+ *         this operation would attempt to move the current item beyond
+ *         the start of the list
+ * postcond: the current item of the list is changed
+ *
+ * if the list is empty, nothing is done and NULL is returned
+ * if this operation would move the current item beyond the start of the list
+ * nothing is done and NULL is returned
+ */
 void *ListPrev(LIST *list) {
-    struct NODE *prev;
-    struct NODE *curItem;
-    
-    curItem = list->currentItem;
-    /*
-    * if the current item is at head of list
-    * return NULL 
-    */
-    if (list->currentItem == list->headPointer) {
+    /* if a NULL list was passed or if the list is empty */
+    /* if this pushes the current item before the start of the list */
+    if (list == NULL || list->head == NULL || list->curr->prev == NULL) {
         return NULL;
     }
-    prev = curItem->prevNode;
-    list->currentItem = prev;
-    return list->currentItem;
+
+    list->curr = list->curr->prev;
+    return list->curr->item;
 }
 
-void *ListSearch(LIST* list, int (*comparator)(void *item1, void *item2),
-                void *comparisonArg) {
-    struct NODE *curNode;
-    curNode = list->currentItem;
-    if (list == NULL || comparator == NULL || comparisonArg == NULL) {
+
+/*
+ * The ListCurr procedure returns the current item of the list
+ *
+ * precond: list is not NULL
+ * param: list - the list in question
+ * return: the current item of the list, or NULL if the list is empty
+ */
+void *ListCurr(LIST *list) {
+    /* if a NULL list was passed */
+    if (list == NULL || list->head == NULL) {
         return NULL;
     }
-    while (comparator(comparisonArg, curNode->dataType) != 1) {
-        if (curNode == list->tailPointer) {
-            return NULL;
-        }
-        curNode = curNode->nextNode;
+
+    return list->curr->item;
+}
+
+
+/*
+ * The ListSearch procedure searches the list for a target item starting from
+ * the current item
+ *
+ * precond: the list param is not NULL
+ * precond: the comp param is not NULL
+ * param: list - the list to search
+ * param: comp - the function used to compare items
+ * param: item - the item to search for
+ * return: the item found in the list, or NULL if the list is empty or no item
+ *         was found
+ * postcond: the current item is set to be the item found, or the last item
+ *           in the list if no item was found
+ *
+ * if the list is empty then nothing is done and NULL is returned
+ */
+void *ListSearch(LIST *list, comparator comp, void *item) {
+    if (list == NULL || comp == NULL) {
+        return NULL;
     }
-    return curNode->dataType;
-    
+
+    /* while there is a current item, check if it is the one we want */
+    /* if not, look at the next item */
+    while (list->curr != NULL) {
+        if ((*comp)(list->curr->item, item)) {
+            return list->curr->item;
+        }
+        list->curr = list->curr->next;
+    }
+
+    /* if the item was not found then the current item should be the last */
+    /* item */
+    list->curr = list->tail;
+    return NULL;
 }

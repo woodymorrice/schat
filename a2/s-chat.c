@@ -1,6 +1,11 @@
 /* CMPT332 - Group 14
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
+
+/* List Library provided with consent by
+ * Joseph Medernach, imy309, 11313955
+ * John Miller, knp254, 11323966 */
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
