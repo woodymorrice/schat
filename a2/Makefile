@@ -84,11 +84,11 @@ s-chat-arm.o: s-chat.c
 
 # Other
 # liblist.a for x86_64
-liblist.a: list_adders.o list_movers.o \
+#liblist.a: list_adders.o list_movers.o \
 	list_removers.o
-	ar -rs liblist.a list_adders.o \
-		list_movers.o list_removers.o
-	ranlib liblist.a
+#	ar -rs liblist.a list_adders.o \
+#		list_movers.o list_removers.o
+#	ranlib liblist.a
 
 list_adders.o: list_adders.c list.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
@@ -144,6 +144,6 @@ list_removers_arm.o: list_removers.c list.h
 .PHONY: clean all s-chat
 
 clean:
-	rm -f *.o *.a s-chat-x86_64 s-chat-ppc \
+	rm -f *.o libMonitor.a s-chat-x86_64 s-chat-ppc \
 		  s-chat-arm reader_writer_test 
 

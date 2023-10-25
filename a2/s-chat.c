@@ -13,8 +13,8 @@
 #include <list.h>
 
 const int MAX_LEN = 255;
-const char* STD_MSG = "0";
-const char* STD_RPLY = "0";
+const int STD_MSG = 0;
+const int STD_RPLY = 0;
 
 void sServer();
 void sGetInput();
@@ -28,7 +28,31 @@ static PID sSendDataPID;
 static PID sGetDataPID;
 static PID sDisplayDataPID;
 
-int mainp() {
+static int   hostPort;
+static char* destName[5];
+static int   destPort[5];
+
+
+int mainp(int argc, char* argv[]) {
+    int i;
+    int j;
+
+    if (argc < 4 || argc > 12) {
+        printf("s-chat usage: s-chat localport " 
+               "destname destport dest2name dest2port...\n");
+        exit(-1);
+    }
+    else {
+        hostPort = atoi(argv[1]);
+        for (i=2; i < argc; i++) {
+            j = 0;
+            destName[j] = argv[i];
+            i++;
+            destPort[j] = atoi(argv[i]);
+            j++;
+        }
+    }
+
     if (PNUL == (sServerPID = Create(sServer, 65536,
        "sServer", NULL, HIGH, USR))) {
         printf("Error creating sServer thread\n");
@@ -49,6 +73,7 @@ int mainp() {
        "sDisplayData", NULL, NORM, USR))) {
         printf("Error creating sDisplayData thread\n");
     }
+
     return 0;
 }
 
@@ -57,103 +82,101 @@ int mainp() {
  * takes input and packages it into a message to
  * send to the server upon newline */
 void sGetInput() {
-    char buf[256];
-    int msgLen;
+    int msgLength;
+    int *reply;
+    char* message;
 
-    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+    message = "test successful";
+    msgLength = strlen(message);
 
     for (;;) {
-        //buf[0] = '\0';
-        msgLen = read(0, buf, MAX_LEN);
-        buf[msgLen+1] = '\0';
-        
-        if (msgLen > 0) {
-
-            //msgLen++;
-
-            if (strncmp("exit\n", buf, msgLen) == 0 ||
-                strncmp("quit\n", buf, msgLen) == 0) {
-                fcntl(0, F_SETFL, fcntl(0, F_GETFL) | ~O_NONBLOCK);
-                exit(0);
-            }
-
-            /* for debugging (remove later) */
-            write(1, buf, msgLen);
-
-            if (*(int*)Send(sServerPID, &buf, &msgLen)
-                    == NOSUCHPROC) {
-                fprintf(stderr,
-                        "Error: sGetInput invalid send PID\n");
-                exit(0);
-            }
+        reply = (int*)Send(sServerPID, (void*)message, &msgLength);
+        if (*reply == NOSUCHPROC) {
+            printf("GetInput send failed\n");
+        }
+        else {
+            printf("GetInput received reply '%d'\n", *reply);
         }
     }
 
-    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | ~O_NONBLOCK);
 }
 
 /* sServer -- coordinates the sending of messages
  * by managing a list of messages from sGetInput()
  * and serving those messages to sSendData() */
 void sServer() {
+    PID sender;
+    int msgLength;
     LIST* outgoing;
-    char* outArr[12];
-    /* LIST* incoming;
-    char* inArr[12]; */
-    char* message;
+    LIST* incoming;
 
-    int msgLen;
-    int index;
+    /* received messages */
+    void* received;
+    char* message;
+    int* stdMsg;
+
+    char* reply;
+
+    reply = "goodbye";
 
     outgoing = ListCreate();
-    /* incoming = ListCreate(); */
-
-    index = 0;
-    printf("sServer() thread reached\n");
+    incoming = ListCreate();
 
     for (;;) {
-
-        /* get input */
-        message = (char*)Receive(&sGetInputPID, &msgLen);
-        outArr[index] = malloc(strlen(message)+1);
-        strcpy(message, outArr[index]);
-        if (msgLen > 0) {
-            //printf("%s", message);
-            //outArr[index] = malloc(sizeof(message));
-            printf("%s", outArr[index]);
+        received = Receive(&sender, &msgLength);
+        
+        if (sender == sGetInputPID) {
+            message = (char*) received;
+            if (ListCount(outgoing) < 50) {
+                ListPrepend(outgoing, message);
+            }
+                
+            printf("Server received '%s' from %ld\n",
+                   message, sender);
+        
+            if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
+                printf("Server reply failed\n");
+            }
         }
-        /*printf("%s\n", (char*)Receive(&sGetInputPID, &msgLen));
-        */
-        /*msgLen = 0;
-        outArr[index] = strndup((char*)
-                Receive(&sGetInputPID, &msgLen), msgLen);
-        if (msgLen > 0) {
-            printf("%s\n", outArr[index]);
+        else
+        if (sender == sSendDataPID) {
+            stdMsg = (int*) received;
+            printf("Server received '%d' from %ld\n",
+                   *stdMsg, sender);
+
+            if (ListCount(outgoing) > 0) {
+                reply = ListTrim(outgoing);
+            }
+            msgLength = strlen(reply);
+            if (0 != Reply(sender, (void*)reply, msgLength)) {
+                printf("Server reply failed\n");
+            }
         }
-        ListPrepend(outgoing, &outArr[index]); */
-        Reply(sGetInputPID, (void*)&STD_RPLY, sizeof(STD_RPLY));
-
-        /* send data */
-        /* Receive(&sSendDataPID, &msgLen);
-        Reply(sSendDataPID, ListTrim(outgoing),
-                sizeof(void*)); */
-
-        /* get data */
-        /* Receive(&sGetDataPID, &msgLen);
-        Reply(sGetDataPID, (void*)&STD_RPLY,
-                sizeof(void*)); */
-
-        /* display data */
-        /* Receive(&sDisplayDataPID, &msgLen);
-        Reply(sDisplayDataPID, (void*)&STD_RPLY,
-                sizeof(void*)); */
-
-
-        if (index < 11) {
-            index++;
+        else
+        if (sender == sGetDataPID) {
+            message = (char*) received;
+            printf("Server received '%s' from %ld\n",
+                   message, sender);
+            
+            if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
+                printf("Server reply failed\n");
+            }
+        }
+        else
+        if (sender == sDisplayDataPID) {
+            stdMsg = (int*) received;
+            printf("Server received '%d' from %ld\n",
+                   *stdMsg, sender);
+            
+            msgLength = strlen(reply);
+            if (0 != Reply(sender, (void*)reply, msgLength)) {
+                printf("Server reply failed\n");
+            }
         }
         else {
-            index = 0;
+            if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
+                printf("Server reply failed\n");
+            }
         }
     }
 
@@ -163,69 +186,62 @@ void sServer() {
  * and sends them to remote UNIX processes using
  * UDP protocol */
 void sSendData() {
+    int msgLength;
+    void* reply;
     char* message;
-    int msgLen;
-    printf("sSendData() thread reached\n");
 
     for (;;) {
-        if (*(int*)Send(sServerPID, (void*)&STD_MSG, &msgLen)
-                == NOSUCHPROC) {
-            fprintf(stderr,
-                "Error: sSendData invalid send PID\n");
-            exit(0);   
+        reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
+        if (*(int*)reply == NOSUCHPROC) {
+            printf("SendData send failed\n");
         }
-        message = (char*)Receive(&sServerPID, &msgLen);
-        if (message != STD_RPLY) {
-            fprintf(stderr, 
-                    "Error: sSendData received erroneous reply\n");
+        else {
+            message = (char*)reply;
+            printf("SendData received reply '%s'\n", message);
         }
-        printf("%s\n", message);
     }
+ 
 }
 
 /* sGetData -- listens on the specified port for
  * UDP data packets and retrieves them */
 void sGetData() {
+    int msgLength;
+    int *reply;
     char* message;
-    int msgLen;
-    printf("sGetData() thread reached\n");
+
+    message = "hello";
+    msgLength = strlen(message);
 
     for (;;) {
-        if (*(int*)Send(sServerPID, (void*)&STD_MSG, &msgLen)
-                == NOSUCHPROC) {
-            fprintf(stderr,
-                "Error: sGetData invalid send PID\n");
-            exit(0);   
+        reply = (int*)Send(sServerPID, (void*)message, &msgLength);
+        if (*reply == NOSUCHPROC) {
+            printf("GetInput send failed\n");
         }
-        message = (char*)Receive(&sServerPID, &msgLen);
-        if (message != STD_RPLY) {
-            fprintf(stderr,
-                "Error: sGetData received erroneous reply\n");
+        else {
+            printf("GetData received reply '%d'\n", *reply);
         }
-
     }
+
 }
 
 /* sDisplayData -- prints messages received from
  * the network to the local terminal */
 void sDisplayData() {
+    int msgLength;
+    void* reply;
     char* message;
-    int msgLen;
-    printf("sDisplayData() thread reached\n");
-    
-    for (;;) {
-        if (*(int*)Send(sServerPID, (void*)&STD_MSG, &msgLen)
-                == NOSUCHPROC) {
-            fprintf(stderr,
-                "Error: sDisplayData invalid send PID\n");
-            exit(0);   
-        }
-        message = (char*)Receive(&sServerPID, &msgLen);
-        if (message != STD_RPLY) {
-            fprintf(stderr,
-                "Error: sDisplayData received erroneous reply\n");
-        }
 
+    for (;;) {
+        reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
+        if (*(int*)reply == NOSUCHPROC) {
+            printf("DisplayData send failed\n");
+        }
+        else {
+            message = (char*)reply;
+            printf("DisplayData received reply '%s'\n", message);
+        }
     }
+ 
 }
 
