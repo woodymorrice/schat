@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include <standards.h>
 #include <os.h>
@@ -94,9 +95,9 @@ void sGetInput() {
         if (*reply == NOSUCHPROC) {
             printf("GetInput send failed\n");
         }
-        else {
+        /*else {
             printf("GetInput received reply '%d'\n", *reply);
-        }
+        }*/
     }
 
 }
@@ -108,7 +109,9 @@ void sServer() {
     PID sender;
     int msgLength;
     LIST* outgoing;
+    bool  sendWait;
     LIST* incoming;
+    bool  dispWait;
 
     /* received messages */
     void* received;
@@ -120,58 +123,70 @@ void sServer() {
     reply = "goodbye";
 
     outgoing = ListCreate();
+    sendWait = false;
+    
     incoming = ListCreate();
+    dispWait = false;
 
     for (;;) {
         received = Receive(&sender, &msgLength);
-        
+
         if (sender == sGetInputPID) {
-            message = (char*) received;
+            message = (char*)received;
             if (ListCount(outgoing) < 50) {
                 ListPrepend(outgoing, message);
             }
                 
-            printf("Server received '%s' from %ld\n",
-                   message, sender);
-        
             if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
                 printf("Server reply failed\n");
+            }
+
+            if (sendWait == true) {
+                stdMsg = (int*)received;
+                if (ListCount(outgoing) > 0) {
+                    reply = ListTrim(outgoing);
+                }
+
+                msgLength = strlen(reply);
+                if (0 != Reply(sSendDataPID, (void*)reply, msgLength)) {
+                    printf("Server reply failed\n");
+                }
+
+                sendWait = false;
             }
         }
         else
         if (sender == sSendDataPID) {
-            stdMsg = (int*) received;
-            printf("Server received '%d' from %ld\n",
-                   *stdMsg, sender);
-
-            if (ListCount(outgoing) > 0) {
-                reply = ListTrim(outgoing);
-            }
-            msgLength = strlen(reply);
-            if (0 != Reply(sender, (void*)reply, msgLength)) {
-                printf("Server reply failed\n");
-            }
+            sendWait = true;
         }
         else
         if (sender == sGetDataPID) {
-            message = (char*) received;
-            printf("Server received '%s' from %ld\n",
-                   message, sender);
+            message = (char*)received;
+            if (ListCount(incoming) < 50) {
+                ListPrepend(incoming, message);
+            }
             
             if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
                 printf("Server reply failed\n");
             }
+            
+            if (dispWait == true) {
+                stdMsg = (int*)received;
+                if (ListCount(incoming) > 0) {
+                    reply = ListTrim(incoming);
+                }
+
+                msgLength = strlen(reply);
+                if (0 != Reply(sDisplayDataPID, (void*)reply, msgLength)) {
+                    printf("Server reply failed\n");
+                }
+            
+                dispWait = false;
+            }
         }
         else
         if (sender == sDisplayDataPID) {
-            stdMsg = (int*) received;
-            printf("Server received '%d' from %ld\n",
-                   *stdMsg, sender);
-            
-            msgLength = strlen(reply);
-            if (0 != Reply(sender, (void*)reply, msgLength)) {
-                printf("Server reply failed\n");
-            }
+            dispWait = true;
         }
         else {
             if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
@@ -195,10 +210,10 @@ void sSendData() {
         if (*(int*)reply == NOSUCHPROC) {
             printf("SendData send failed\n");
         }
-        else {
+        /*else {
             message = (char*)reply;
             printf("SendData received reply '%s'\n", message);
-        }
+        }*/
     }
  
 }
@@ -218,9 +233,9 @@ void sGetData() {
         if (*reply == NOSUCHPROC) {
             printf("GetInput send failed\n");
         }
-        else {
+        /*else {
             printf("GetData received reply '%d'\n", *reply);
-        }
+        }*/
     }
 
 }
@@ -239,7 +254,8 @@ void sDisplayData() {
         }
         else {
             message = (char*)reply;
-            printf("DisplayData received reply '%s'\n", message);
+            /*printf("DisplayData received reply '%s'\n", message);*/
+            printf("%s\n", message);
         }
     }
  
