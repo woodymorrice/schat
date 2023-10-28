@@ -139,11 +139,23 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_pingpong\
+	$U/_uthread\
 	$U/_trace
+	# CMPT 332 GROUP 14 CHANGE, FALL 2023
+	# a2: part a
+ 
+$U/uthread_switch.o: $U/uthread_switch.S 
+	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S
+
+$U/_uthread: $U/uthread.o $U/uthread_switch.o $(ULIB)
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_uthread $U/uthread.o $U/uthread_switch.o $(ULIB)
+	$(OBJDUMP) -S $U/_uthread > $U/uthread.asm
+
 	# Begin CMPT 332 group14 change Fall 2023
 	# Phong Thanh Nguyen (David) - wdz468 - 11310824
 	# Woody Morrice - wam553 - 11071060
 	# End CMPT 332 group14 change Fall 2023
+
 
 fs.img: mkfs/mkfs README $(UEXTRA) $(UPROGS)
 	mkfs/mkfs fs.img README $(UEXTRA) $(UPROGS)
