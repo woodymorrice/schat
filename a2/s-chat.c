@@ -7,25 +7,37 @@
  * John Miller, knp254, 11323966 */
 
 #include <unistd.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/poll.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 
 #include <standards.h>
 #include <os.h>
 
 #include <list.h>
 
+#define BACKLOG 10
+
 const int MAX_LEN = 255;
 const int STD_MSG = 0;
 const int STD_RPLY = 0;
+const int NFDS = 1;
+const int TIMEOUT = 0;
 
 void sServer();
 void sGetInput();
 void sSendData();
 void sGetData();
 void sDisplayData();
+int  prepSocket();
 
 static PID sServerPID;
 static PID sGetInputPID;
@@ -33,10 +45,10 @@ static PID sSendDataPID;
 static PID sGetDataPID;
 static PID sDisplayDataPID;
 
-static int   hostPort;
+static unsigned short int hostPort;
 static char* destName[5];
-static int   destPort[5];
-
+static unsigned short int destPort[5];
+static int sockfd;
 
 int mainp(int argc, char* argv[]) {
     int i;
@@ -48,12 +60,12 @@ int mainp(int argc, char* argv[]) {
         exit(-1);
     }
     else {
-        hostPort = atoi(argv[1]);
+        hostPort = (unsigned short int)atoi(argv[1]);
         for (i=2; i < argc; i++) {
             j = 0;
             destName[j] = argv[i];
             i++;
-            destPort[j] = atoi(argv[i]);
+            destPort[j] = (unsigned short int)atoi(argv[i]);
             j++;
         }
     }
@@ -138,6 +150,8 @@ void sServer() {
     incoming = ListCreate();
     dispWait = false;
 
+    sockfd = prepSocket();
+
     for (;;) {
         received = Receive(&sender, &msgLength);
 
@@ -210,9 +224,64 @@ void sServer() {
  * and sends them to remote UNIX processes using
  * UDP protocol */
 void sSendData() {
+    //char* destName[5];
+    //unsigned short int destPort[5];
+
+    struct hostent *result;
+    char buffer[256];
+    int bufflen;
+    int h_errnop;
+
+    struct in_addr **addrs;
+    int i;
+    char ip_add[INET_ADDRSTRLEN];
+
+    struct sockaddr_in *destPc;
+
     int msgLength;
     void* reply;
     char* message;
+    
+    struct pollfd *canSend[1];
+    int npoll;
+
+    /* struct sockaddr_in *to;
+    unsigned int tolen; */
+
+    printf("'%s' %u\n", destName[0], destPort[0]);
+    
+    /* getting the network host entry information */
+    result = malloc(sizeof(struct hostent));
+    bufflen = 256;
+    h_errnop = 0;
+    if (0 != gethostbyname_r(destName[0], result, &buffer[0], bufflen,
+                &result, &h_errnop)) {
+        fprintf(stderr, "error: could not get network host entry\n");
+        exit(-1);
+    }
+    
+    /* prints the list of IP addresses for debugging */
+    memset(ip_add, 0, INET_ADDRSTRLEN);
+    addrs = (struct in_addr **)result->h_addr_list;
+    for (i = 0; addrs[i] != NULL; i++) {
+        inet_ntop(AF_INET, &addrs[i], ip_add, INET_ADDRSTRLEN);
+        printf("'%s'\n", ip_add);
+    }
+
+    /* preparing my artisan sockaddr_in struct */
+    destPc = malloc(sizeof(struct sockaddr_in));
+    
+    destPc->sin_family = AF_INET;
+    destPc->sin_port = htons(destPort[0]);
+    destPc->sin_addr = *addrs[0];
+    
+    canSend[0] = malloc(sizeof(struct pollfd));
+
+    canSend[0]->fd = sockfd;
+    canSend[0]->events = POLLOUT;
+
+    /* to = malloc(sizeof(struct sockaddr_in)); */
+    
 
     for (;;) {
         reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
@@ -222,10 +291,26 @@ void sSendData() {
         }
         else {
             message = (char*)reply;
-            printf("%s", message);
+            /* printf("%s", message); */
+            npoll = poll(canSend[0], NFDS, TIMEOUT);
+            if (npoll == -1) {
+                fprintf(stderr, "error %d: send poll failed\n", errno);
+                exit(-1);
+            }
+            else
+            if (npoll ==  1) {
+                if (-1 == sendto(sockfd, (void*)message, sizeof(message),
+                            0, (struct sockaddr *)destPc, sizeof(*destPc))) {
+                    fprintf(stderr, "error %d: sendto failed\n", errno);
+                    exit(-1);
+                }
+            }
+            /*else {
+                printf("send poll timed out\n");    
+            }*/
         }
     }
- 
+
 }
 
 /* sGetData -- listens on the specified port for
@@ -234,16 +319,51 @@ void sGetData() {
     int msgLength;
     int *reply;
     char* message;
+    char msg[256];
 
-    message = "hello";
-    msgLength = strlen(message);
+    struct pollfd *msgWaiting[1];
+    int npoll;
+
+    
+
+    struct sockaddr_in *from;
+    unsigned int fromlen;
+
+
+    msgWaiting[0] = malloc(sizeof(struct pollfd));
+
+    msgWaiting[0]->fd = sockfd;
+    msgWaiting[0]->events = POLLIN;
+
+    from = malloc(sizeof(struct sockaddr_in));
+    fromlen = sizeof(struct sockaddr_in);
+
+    //message = "hello";
+    //msgLength = strlen(message);
 
     for (;;) {
-        reply = (int*)Send(sServerPID, (void*)message, &msgLength);
-        if (*reply == NOSUCHPROC) {
-            printf("GetInput send failed\n");
+        npoll = poll(msgWaiting[0], NFDS, TIMEOUT);
+        if (npoll == -1) {
+            fprintf(stderr, "error %d: recv poll failed\n", errno);
             exit(-1);
         }
+        else 
+        if (npoll ==  1) {
+            if (-1 == recvfrom(sockfd, (void*)msg, sizeof(msg),
+                               0, (struct sockaddr *)from, &fromlen)) {
+                fprintf(stderr, "error %d: recvfrom failed\n", errno);
+                exit(-1);
+            }
+            msgLength = sizeof(msg);
+            reply = (int*)Send(sServerPID, (void*)msg, &msgLength);
+            if (*reply == NOSUCHPROC) {
+                printf("GetInput send failed\n");
+                exit(-1);
+            }
+        }
+        /*else {
+            printf("send poll timed out\n");
+        }*/
     }
 
 }
@@ -253,7 +373,7 @@ void sGetData() {
 void sDisplayData() {
     int msgLength;
     void* reply;
-    /*char* message;*/
+    char* message;
 
     for (;;) {
         reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
@@ -262,11 +382,83 @@ void sDisplayData() {
             exit(-1);
         }
         else {
-            /*message = (char*)reply;*/
+            message = (char*)reply;
             /*printf("DisplayData received reply '%s'\n", message);*/
-            /*printf("%s\n", message); */
+            printf("%s\n", message);
         }
     }
  
+}
+
+/* prepSocket -- prepares and returns local network socket */
+int prepSocket() {
+    char hostname[32]; /* for getting the hostname */
+
+    struct hostent *result; /* for grabbing the network host entry */
+    char buffer[256];
+    int  bufflen;
+    int  h_errnop;
+
+    struct in_addr **addrs; /* to print the IP for debugging */
+    int i;
+    char ip_add[INET_ADDRSTRLEN];
+
+    struct sockaddr_in *hostPc; /* handcrafted internet socket  */
+                               /*  address struct              */
+    int sock; /* socket file descriptor */
+
+    /* getting the hostname */
+    if (0 != gethostname(hostname, sizeof(hostname))) {
+        fprintf(stderr, "error %d: could not get host name\n", errno);
+        exit(-1);
+    }
+    printf("'%s' %u\n", hostname, hostPort); /* DEBUG */
+
+    /* getting the network host entry information */
+    result = malloc(sizeof(struct hostent));
+    bufflen = 256;
+    h_errnop = 0;
+    if (0 != gethostbyname_r(&hostname[0], result, &buffer[0], bufflen,
+                &result, &h_errnop)) {
+        fprintf(stderr, "error: could not get network host entry\n");
+        exit(-1);
+    }
+    
+    /* prints the list of IP addresses for debugging */
+    memset(ip_add, 0, INET_ADDRSTRLEN);
+    addrs = (struct in_addr **)result->h_addr_list;
+    for (i = 0; addrs[i] != NULL; i++) {
+        inet_ntop(AF_INET, &addrs[i], ip_add, INET_ADDRSTRLEN);
+        printf("'%s'\n", ip_add);
+    }
+
+    /* preparing my artisan sockaddr_in struct */
+    hostPc = malloc(sizeof(struct sockaddr_in));
+    
+    hostPc->sin_family = AF_INET;
+    hostPc->sin_port = htons(hostPort);
+    hostPc->sin_addr = *addrs[0];
+    memset(hostPc->sin_zero, '\0', sizeof(hostPc->sin_zero));
+
+    /* getting the socket file descriptor */
+    if (-1 == (sock = socket(PF_INET, SOCK_DGRAM, 0))) {
+        fprintf(stderr, "error: could not get socket\n");
+        exit(-1);
+    }
+    
+    /* binding the socket to the chosen port */
+    if (-1 == bind(sock, (struct sockaddr *)hostPc, sizeof(*hostPc))) {
+        fprintf(stderr, "error: could not bind socket\n");
+        exit(-1);
+    }
+    
+    /* set the socket to non-blocking */
+    if (-1 == fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK)) {
+        fprintf(stderr, "error %d: could not set socket to nonblocking\n",
+                errno);
+        exit(-1);
+    }
+
+    return sock;
 }
 
