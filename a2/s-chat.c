@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/poll.h>
+#include <sys/time.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 
@@ -25,6 +26,11 @@
 #include <list.h>
 
 #define BACKLOG 10
+
+struct sDgram {
+    char message[256];
+    struct timeval time;
+};
 
 const int MAX_LEN = 255;
 const int STD_MSG = 0;
@@ -38,6 +44,7 @@ void sSendData();
 void sGetData();
 void sDisplayData();
 int  prepSocket();
+struct sDgram* packDgram(char* msg);
 
 static PID sServerPID;
 static PID sGetInputPID;
@@ -102,13 +109,16 @@ void sGetInput() {
     char buf[256];
     int msgLength;
     int *reply;
-
-    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+    
+    if (-1 == fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK)) {
+        fprintf(stderr, "error %d: couldn't set stdin to non-blocking",
+                errno);
+        exit(-1);
+    }
 
     for (;;) {
 
-        msgLength = read(0, buf, MAX_LEN);
-            
+        msgLength = read(0, buf, MAX_LEN);        
         if (msgLength > 0) {
             buf[msgLength] = '\0';
             
@@ -139,7 +149,7 @@ void sServer() {
     LIST *outgoing, *incoming;
     bool  sendWait,  dispWait;
 
-    void *received;
+    void *received, *dReply;
     char *message, *reply;
 
     reply = "goodbye";
@@ -185,9 +195,8 @@ void sServer() {
         /* Receiving messages */
         else
         if (sender == sGetDataPID) {
-            message = (char*)received;
             if (ListCount(incoming) < 50) {
-                ListPrepend(incoming, message);
+                ListPrepend(incoming, received);
             }
             
             if (0 != Reply(sender, (void*)&STD_RPLY, msgLength)) {
@@ -196,10 +205,10 @@ void sServer() {
             }
             
             if (dispWait == true && ListCount(incoming) > 0) {
-                reply = ListTrim(incoming);
+                dReply = ListTrim(incoming);
 
                 msgLength = strlen(reply);
-                if (0 != Reply(sDisplayDataPID, (void*)reply, msgLength)) {
+                if (0 != Reply(sDisplayDataPID, dReply, msgLength)) {
                     printf("Server reply failed\n");
                     exit(-1);
                 }
@@ -224,8 +233,8 @@ void sServer() {
  * and sends them to remote UNIX processes using
  * UDP protocol */
 void sSendData() {
-    //char* destName[5];
-    //unsigned short int destPort[5];
+    /*char* destName[5];
+    unsigned short int destPort[5];*/
 
     struct hostent *result;
     char buffer[256];
@@ -241,6 +250,7 @@ void sSendData() {
     int msgLength;
     void* reply;
     char* message;
+    struct sDgram* dataPkg;
     
     struct pollfd *canSend[1];
     int npoll;
@@ -291,7 +301,7 @@ void sSendData() {
         }
         else {
             message = (char*)reply;
-            /* printf("%s", message); */
+            dataPkg = packDgram(message);
             npoll = poll(canSend[0], NFDS, TIMEOUT);
             if (npoll == -1) {
                 fprintf(stderr, "error %d: send poll failed\n", errno);
@@ -299,12 +309,19 @@ void sSendData() {
             }
             else
             if (npoll ==  1) {
-                if (-1 == sendto(sockfd, (void*)message, sizeof(message),
-                            0, (struct sockaddr *)destPc, sizeof(*destPc))) {
+                if (-1 == sendto(sockfd, (void*)dataPkg,
+                                 sizeof(struct sDgram), 0,
+                                 (struct sockaddr *)destPc, sizeof(*destPc))) {
                     fprintf(stderr, "error %d: sendto failed\n", errno);
                     exit(-1);
                 }
+                /*if (-1 == sendto(sockfd, (void*)message, strlen(message)+1,
+                            0, (struct sockaddr *)destPc, sizeof(*destPc))) {
+                    fprintf(stderr, "error %d: sendto failed\n", errno);
+                    exit(-1);
+                }*/
             }
+            free(dataPkg);
             /*else {
                 printf("send poll timed out\n");    
             }*/
@@ -317,14 +334,16 @@ void sSendData() {
  * UDP data packets and retrieves them */
 void sGetData() {
     int msgLength;
-    int *reply;
-    char* message;
+    void *reply;
+    /*char* message;*/
     char msg[256];
+
+    struct sDgram* dataPkg;
 
     struct pollfd *msgWaiting[1];
     int npoll;
 
-    
+    int bytes;
 
     struct sockaddr_in *from;
     unsigned int fromlen;
@@ -338,8 +357,8 @@ void sGetData() {
     from = malloc(sizeof(struct sockaddr_in));
     fromlen = sizeof(struct sockaddr_in);
 
-    //message = "hello";
-    //msgLength = strlen(message);
+    /*message = "hello";
+    msgLength = strlen(message);*/
 
     for (;;) {
         npoll = poll(msgWaiting[0], NFDS, TIMEOUT);
@@ -349,17 +368,26 @@ void sGetData() {
         }
         else 
         if (npoll ==  1) {
-            if (-1 == recvfrom(sockfd, (void*)msg, sizeof(msg),
-                               0, (struct sockaddr *)from, &fromlen)) {
+            dataPkg = malloc(sizeof(struct sDgram));
+            bytes = recvfrom(sockfd, (void*)dataPkg, sizeof(struct sDgram),
+                               0, (struct sockaddr *)from, &fromlen); 
+            if (bytes == -1) {
                 fprintf(stderr, "error %d: recvfrom failed\n", errno);
                 exit(-1);
             }
-            msgLength = sizeof(msg);
-            reply = (int*)Send(sServerPID, (void*)msg, &msgLength);
-            if (*reply == NOSUCHPROC) {
+            /*msg[bytes] = '\0';*/
+            msgLength = sizeof(struct sDgram);
+            /*printf("%s\n", dataPkg->message);*/
+            reply = Send(sServerPID, (void*)dataPkg, &msgLength);
+            if (*(int*)reply == NOSUCHPROC) {
                 printf("GetInput send failed\n");
                 exit(-1);
             }
+            /*reply = (int*)Send(sServerPID, (void*)msg, &msgLength);
+            if (*reply == NOSUCHPROC) {
+                printf("GetInput send failed\n");
+                exit(-1);
+            }*/
         }
         /*else {
             printf("send poll timed out\n");
@@ -373,7 +401,8 @@ void sGetData() {
 void sDisplayData() {
     int msgLength;
     void* reply;
-    char* message;
+    /*char* message;*/
+    struct sDgram* dataPkg;
 
     for (;;) {
         reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
@@ -382,10 +411,10 @@ void sDisplayData() {
             exit(-1);
         }
         else {
-            message = (char*)reply;
-            /*printf("DisplayData received reply '%s'\n", message);*/
-            printf("%s\n", message);
+            dataPkg = (struct sDgram *)reply;
+            printf("%s", &dataPkg->message[0]);
         }
+        free(dataPkg);
     }
  
 }
@@ -462,3 +491,16 @@ int prepSocket() {
     return sock;
 }
 
+struct sDgram* packDgram(char* msg) {
+    struct sDgram* dgram;
+    struct timeval curTime;
+
+    gettimeofday(&curTime, NULL);
+
+    dgram = malloc(sizeof(struct sDgram));
+    memcpy(dgram->message, msg, strlen(msg)+1);
+    dgram->message[strlen(msg)] = '\0';
+    dgram->time = curTime;
+
+    return dgram;
+}
