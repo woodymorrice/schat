@@ -46,7 +46,7 @@ void sGetData();
 void sDisplayData();
 int  prepSocket();
 struct sDgram* packDgram(char* msg);
-void printTime(long int tv);
+void printTime(long int t);
 
 static PID sServerPID;
 static PID sGetInputPID;
@@ -54,9 +54,11 @@ static PID sSendDataPID;
 static PID sGetDataPID;
 static PID sDisplayDataPID;
 
+static char hostName[32];
 static unsigned short int hostPort;
 static char* destName[5];
 static unsigned short int destPort[5];
+static int destinations;
 static int sockfd;
 
 int mainp(int argc, char* argv[]) {
@@ -64,16 +66,16 @@ int mainp(int argc, char* argv[]) {
     int j;
 
     /* get ports and names */
-    if (argc < 4 || argc > 12 ||
-        argc % 2 != 0) {
+    if (argc < 4 || argc > 12 || argc % 2 != 0) {
         printf("s-chat usage: s-chat localport " 
                "destname destport dest2name dest2port...\n");
         exit(-1);
     }
     else {
+        destinations = (argc - 2) / 2;
         hostPort = (unsigned short int)atoi(argv[1]);
+        j = 0;
         for (i=2; i < argc; i++) {
-            j = 0;
             destName[j] = argv[i];
             i++;
             destPort[j] = (unsigned short int)atoi(argv[i]);
@@ -132,7 +134,8 @@ void sGetInput() {
                 strncmp("quit\n", buf, msgLength) == 0) {
 
                 fcntl(0, F_SETFL, fcntl(0, F_GETFL) | ~O_NONBLOCK);
-                fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | ~O_NONBLOCK);
+                fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL)
+                                       | ~O_NONBLOCK);
                 exit(0);
             }
             
@@ -238,9 +241,6 @@ void sServer() {
 /* sSendData -- takes data packages from the server and   *
  * sends them to remote UNIX processes using UDP protocol */
 void sSendData() {
-    /*char* destName[5];
-    unsigned short int destPort[5];*/
-
     struct hostent *result;
     char buffer[256];
     int bufflen;
@@ -248,9 +248,10 @@ void sSendData() {
 
     struct in_addr **addrs;
     int i;
+    int j;
     char ip_add[INET_ADDRSTRLEN];
 
-    struct sockaddr_in *destPc;
+    struct sockaddr_in *destPc[5];
 
     int msgLength;
     void* reply;
@@ -259,35 +260,46 @@ void sSendData() {
     
     struct pollfd *canSend[1];
     int npoll;
-
-
-    printf("'%s' %u\n", destName[0], destPort[0]);
     
-    /* getting the network host entry information */
     result = malloc(sizeof(struct hostent));
-    bufflen = 256;
-    h_errnop = 0;
-    if (0 != gethostbyname_r(destName[0], result, &buffer[0], bufflen,
-                &result, &h_errnop)) {
-        fprintf(stderr, "error: could not get network host entry\n");
-        exit(-1);
-    }
-    
-    /* prints the list of IP addresses for debugging */
-    memset(ip_add, 0, INET_ADDRSTRLEN);
-    addrs = (struct in_addr **)result->h_addr_list;
-    for (i = 0; addrs[i] != NULL; i++) {
-        inet_ntop(AF_INET, &addrs[i], ip_add, INET_ADDRSTRLEN);
-        printf("'%s'\n", ip_add);
-    }
 
-    /* preparing my artisan sockaddr_in struct */
-    destPc = malloc(sizeof(struct sockaddr_in));
+    for (i = 0; i < destinations; i++) {
+
+        printf("'%s' %u\n", destName[i], destPort[i]);
     
-    destPc->sin_family = AF_INET;
-    destPc->sin_port = htons(destPort[0]);
-    destPc->sin_addr = *addrs[0];
+        /*result = malloc(sizeof(struct hostent));*/
+
+        /*memset(buffer, '\0', 256);*/
     
+        /* getting the network host entry information */
+        bufflen = 256;
+        h_errnop = 0;
+        if (0 != gethostbyname_r(destName[i], result,
+                                 buffer, bufflen,
+                                 &result, &h_errnop)) {
+            fprintf(stderr, "error: couldnt get network host entry\n");
+            exit(-1);
+        }
+    
+        /* prints the list of IP addresses for debugging */
+        memset(ip_add, 0, INET_ADDRSTRLEN);
+        addrs = (struct in_addr **)result->h_addr_list;
+        for (j = 0; addrs[j] != NULL; j++) {
+            inet_ntop(AF_INET, &addrs[j], ip_add, INET_ADDRSTRLEN);
+            printf("'%s'\n", ip_add);
+        }
+
+        /* preparing my artisan sockaddr_in struct */
+        destPc[i] = malloc(sizeof(struct sockaddr_in));
+    
+        destPc[i]->sin_family = AF_INET;
+        destPc[i]->sin_port = htons(destPort[i]);
+        destPc[i]->sin_addr = *addrs[0];
+
+        /*free(result);*/
+    }
+    
+    free(result);
     canSend[0] = malloc(sizeof(struct pollfd));
 
     canSend[0]->fd = sockfd;
@@ -302,6 +314,7 @@ void sSendData() {
         else {
             message = (char*)reply;
             dataPkg = packDgram(message);
+
             npoll = poll(canSend[0], NFDS, TIMEOUT);
             if (npoll == -1) {
                 fprintf(stderr, "error %d: send poll failed\n", errno);
@@ -309,11 +322,15 @@ void sSendData() {
             }
             else
             if (npoll ==  1) {
-                if (-1 == sendto(sockfd, (void*)dataPkg,
-                                 sizeof(struct sDgram), 0,
-                                 (struct sockaddr *)destPc, sizeof(*destPc))) {
-                    fprintf(stderr, "error %d: sendto failed\n", errno);
-                    exit(-1);
+                for (i = 0; i < destinations; i++) {
+                    if (-1 == sendto(sockfd, (void*)dataPkg,
+                                     sizeof(struct sDgram), 0,
+                                     (struct sockaddr *)destPc[i],
+                                     sizeof(struct sockaddr_in))) {
+                        fprintf(stderr, "error %d: sendto failed\n",
+                                errno);
+                        exit(-1);
+                    }
                 }
             }
             free(dataPkg);
@@ -356,8 +373,9 @@ void sGetData() {
         else 
         if (npoll ==  1) {
             dataPkg = malloc(sizeof(struct sDgram));
-            bytes = recvfrom(sockfd, (void*)dataPkg, sizeof(struct sDgram),
-                               0, (struct sockaddr *)from, &fromlen); 
+            bytes = recvfrom(sockfd, (void*)dataPkg,
+                             sizeof(struct sDgram),
+                             0, (struct sockaddr *)from, &fromlen); 
             if (bytes == -1) {
                 fprintf(stderr, "error %d: recvfrom failed\n", errno);
                 exit(-1);
@@ -396,7 +414,7 @@ void sDisplayData() {
 
 /* prepSocket -- prepares and returns local network socket */
 int prepSocket() {
-    char hostname[32]; /* for getting the hostname */
+    /*static char hostname[32];*/ /* for getting the hostname */
 
     struct hostent *result; /* for grabbing the network host entry */
     char buffer[256];
@@ -411,17 +429,17 @@ int prepSocket() {
     int sock; /* socket file descriptor */
 
     /* getting the hostname */
-    if (0 != gethostname(hostname, sizeof(hostname))) {
+    if (0 != gethostname(hostName, sizeof(hostName))) {
         fprintf(stderr, "error %d: could not get host name\n", errno);
         exit(-1);
     }
-    printf("'%s' %u\n", hostname, hostPort); /* DEBUG */
+    printf("'%s' %u\n", hostName, hostPort); /* DEBUG */
 
     /* getting the network host entry information */
     result = malloc(sizeof(struct hostent));
     bufflen = 256;
     h_errnop = 0;
-    if (0 != gethostbyname_r(&hostname[0], result, &buffer[0], bufflen,
+    if (0 != gethostbyname_r(&hostName[0], result, &buffer[0], bufflen,
                 &result, &h_errnop)) {
         fprintf(stderr, "error: could not get network host entry\n");
         exit(-1);
@@ -457,7 +475,7 @@ int prepSocket() {
     
     /* set the socket to non-blocking */
     if (-1 == fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK)) {
-        fprintf(stderr, "error %d: could not set socket to nonblocking\n",
+        fprintf(stderr, "error %d: couldnt set socket to nonblocking\n",
                 errno);
         exit(-1);
     }
@@ -474,7 +492,9 @@ struct sDgram* packDgram(char* msg) {
     gettimeofday(&curTime, NULL);
 
     dgram = malloc(sizeof(struct sDgram));
+    
     memcpy(dgram->message, msg, strlen(msg)+1);
+    
     dgram->message[strlen(msg)] = '\0';
     dgram->time = htonl(curTime.tv_sec);
 
@@ -490,7 +510,7 @@ void printTime(long int t) {
 
     secs = ntohl(t);
     timeptr = *localtime(&secs);
-    strftime(str, sizeof(str), "%X, %d %B %Y", &timeptr);
+    strftime(str, sizeof(str), "%X %x", &timeptr);
 
     printf("%s", str);
 }
