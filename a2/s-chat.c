@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <sys/poll.h>
 #include <sys/time.h>
+#include <time.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 
@@ -29,7 +30,7 @@
 
 struct sDgram {
     char message[256];
-    struct timeval time;
+    long int time;
 };
 
 const int MAX_LEN = 255;
@@ -45,6 +46,7 @@ void sGetData();
 void sDisplayData();
 int  prepSocket();
 struct sDgram* packDgram(char* msg);
+void printTime(long int tv);
 
 static PID sServerPID;
 static PID sGetInputPID;
@@ -61,7 +63,9 @@ int mainp(int argc, char* argv[]) {
     int i;
     int j;
 
-    if (argc < 4 || argc > 12) {
+    /* get ports and names */
+    if (argc < 4 || argc > 12 ||
+        argc % 2 != 0) {
         printf("s-chat usage: s-chat localport " 
                "destname destport dest2name dest2port...\n");
         exit(-1);
@@ -77,6 +81,7 @@ int mainp(int argc, char* argv[]) {
         }
     }
 
+    /* make threads */
     if (PNUL == (sServerPID = Create(sServer, 65536,
        "sServer", NULL, HIGH, USR))) {
         printf("Error creating sServer thread\n");
@@ -101,15 +106,15 @@ int mainp(int argc, char* argv[]) {
     return 0;
 }
 
-
-/* sGetInput -- waits on input from the keyboard,
- * takes input and packages it into a message to
- * send to the server upon newline */
+/* sGetInput -- waits on input from the keyboard, *
+ * takes input and packages it into a message to  *
+ * send to the server upon newline                */
 void sGetInput() {
     char buf[256];
     int msgLength;
     int *reply;
     
+    /* unblock stdin */
     if (-1 == fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK)) {
         fprintf(stderr, "error %d: couldn't set stdin to non-blocking",
                 errno);
@@ -117,18 +122,21 @@ void sGetInput() {
     }
 
     for (;;) {
-
+        /* get input */
         msgLength = read(0, buf, MAX_LEN);        
         if (msgLength > 0) {
             buf[msgLength] = '\0';
             
+            /* exit commands */
             if (strncmp("exit\n", buf, msgLength) == 0 ||
                 strncmp("quit\n", buf, msgLength) == 0) {
 
                 fcntl(0, F_SETFL, fcntl(0, F_GETFL) | ~O_NONBLOCK);
+                fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | ~O_NONBLOCK);
                 exit(0);
             }
-
+            
+            /* send input to server */
             reply = (int*)Send(sServerPID, (void*)&buf, &msgLength);
             if (*reply == NOSUCHPROC) {
                 printf("GetInput send failed\n");
@@ -136,12 +144,11 @@ void sGetInput() {
             }
         }
     }
-
 }
 
-/* sServer -- coordinates the sending of messages
- * by managing a list of messages from sGetInput()
- * and serving those messages to sSendData() */
+/* sServer -- coordinates the sending of messages  *
+ * by managing a list of messages from sGetInput() *
+ * and serving those messages to sSendData()       */
 void sServer() {
     PID sender;
     int msgLength;
@@ -226,12 +233,10 @@ void sServer() {
             exit(-1);
         }
     }
-
 }
 
-/* sSendData -- takes data packages from the server
- * and sends them to remote UNIX processes using
- * UDP protocol */
+/* sSendData -- takes data packages from the server and   *
+ * sends them to remote UNIX processes using UDP protocol */
 void sSendData() {
     /*char* destName[5];
     unsigned short int destPort[5];*/
@@ -255,8 +260,6 @@ void sSendData() {
     struct pollfd *canSend[1];
     int npoll;
 
-    /* struct sockaddr_in *to;
-    unsigned int tolen; */
 
     printf("'%s' %u\n", destName[0], destPort[0]);
     
@@ -290,9 +293,6 @@ void sSendData() {
     canSend[0]->fd = sockfd;
     canSend[0]->events = POLLOUT;
 
-    /* to = malloc(sizeof(struct sockaddr_in)); */
-    
-
     for (;;) {
         reply = Send(sServerPID, (void*)&STD_MSG, &msgLength);
         if (*(int*)reply == NOSUCHPROC) {
@@ -315,28 +315,18 @@ void sSendData() {
                     fprintf(stderr, "error %d: sendto failed\n", errno);
                     exit(-1);
                 }
-                /*if (-1 == sendto(sockfd, (void*)message, strlen(message)+1,
-                            0, (struct sockaddr *)destPc, sizeof(*destPc))) {
-                    fprintf(stderr, "error %d: sendto failed\n", errno);
-                    exit(-1);
-                }*/
             }
             free(dataPkg);
-            /*else {
-                printf("send poll timed out\n");    
-            }*/
         }
     }
 
 }
 
-/* sGetData -- listens on the specified port for
- * UDP data packets and retrieves them */
+/* sGetData -- listens on the specified port *
+ * for UDP data packets and retrieves them   */
 void sGetData() {
     int msgLength;
     void *reply;
-    /*char* message;*/
-    char msg[256];
 
     struct sDgram* dataPkg;
 
@@ -357,9 +347,6 @@ void sGetData() {
     from = malloc(sizeof(struct sockaddr_in));
     fromlen = sizeof(struct sockaddr_in);
 
-    /*message = "hello";
-    msgLength = strlen(message);*/
-
     for (;;) {
         npoll = poll(msgWaiting[0], NFDS, TIMEOUT);
         if (npoll == -1) {
@@ -375,33 +362,21 @@ void sGetData() {
                 fprintf(stderr, "error %d: recvfrom failed\n", errno);
                 exit(-1);
             }
-            /*msg[bytes] = '\0';*/
             msgLength = sizeof(struct sDgram);
-            /*printf("%s\n", dataPkg->message);*/
             reply = Send(sServerPID, (void*)dataPkg, &msgLength);
             if (*(int*)reply == NOSUCHPROC) {
                 printf("GetInput send failed\n");
                 exit(-1);
             }
-            /*reply = (int*)Send(sServerPID, (void*)msg, &msgLength);
-            if (*reply == NOSUCHPROC) {
-                printf("GetInput send failed\n");
-                exit(-1);
-            }*/
         }
-        /*else {
-            printf("send poll timed out\n");
-        }*/
     }
-
 }
 
-/* sDisplayData -- prints messages received from
- * the network to the local terminal */
+/* sDisplayData -- prints messages received *
+ * from the network to the local terminal   */
 void sDisplayData() {
     int msgLength;
     void* reply;
-    /*char* message;*/
     struct sDgram* dataPkg;
 
     for (;;) {
@@ -412,11 +387,11 @@ void sDisplayData() {
         }
         else {
             dataPkg = (struct sDgram *)reply;
-            printf("%s", &dataPkg->message[0]);
+            printTime(dataPkg->time);
+            printf(": %s", &dataPkg->message[0]);
         }
         free(dataPkg);
     }
- 
 }
 
 /* prepSocket -- prepares and returns local network socket */
@@ -432,8 +407,7 @@ int prepSocket() {
     int i;
     char ip_add[INET_ADDRSTRLEN];
 
-    struct sockaddr_in *hostPc; /* handcrafted internet socket  */
-                               /*  address struct              */
+    struct sockaddr_in *hostPc; /* handcrafted */
     int sock; /* socket file descriptor */
 
     /* getting the hostname */
@@ -491,6 +465,8 @@ int prepSocket() {
     return sock;
 }
 
+/* packDgram -- takes a string and packs it *
+ * into a datagram with time information    */
 struct sDgram* packDgram(char* msg) {
     struct sDgram* dgram;
     struct timeval curTime;
@@ -500,7 +476,22 @@ struct sDgram* packDgram(char* msg) {
     dgram = malloc(sizeof(struct sDgram));
     memcpy(dgram->message, msg, strlen(msg)+1);
     dgram->message[strlen(msg)] = '\0';
-    dgram->time = curTime;
+    dgram->time = htonl(curTime.tv_sec);
 
     return dgram;
 }
+
+/* printTime -- takes a long int representing the time *
+ * since epoch and prints the date in a nice format    */
+void printTime(long int t) {
+    time_t secs;
+    char str[64];
+    struct tm timeptr;
+
+    secs = ntohl(t);
+    timeptr = *localtime(&secs);
+    strftime(str, sizeof(str), "%X, %d %B %Y", &timeptr);
+
+    printf("%s", str);
+}
+
