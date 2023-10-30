@@ -16,4 +16,11 @@ struct context {
     uint64 s9;
     uint64 s10;
     uint64 s11;    
-}context;
+};
+
+struct spinlock {
+    uint lockedState;
+    struct thread *thread; /* to know which thread is holding the lock */
+    int lockID;
+};
+

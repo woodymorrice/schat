@@ -17,10 +17,18 @@ struct thread {
   int        state;             /* FREE, RUNNING, RUNNABLE */
 /* CMPT332 GROUP 14 Change, Fall 2023 */
   uint64  reg;
+  struct context context;
 };
 struct thread all_thread[MAX_THREAD];
 struct thread *current_thread;
 extern void thread_switch(uint64, uint64);
+
+/*CMPT332 GROUP 14 Change, Fall 2023*/
+int mtx_create(int locked);
+int mtx_lock(int lock_id);
+int mtx_unlock(int lock_id);
+
+struct spinlock lock;
               
 void 
 thread_init(void)
@@ -80,7 +88,8 @@ thread_create(void (*func)())
   }
   t->state = RUNNABLE;
   // YOUR CODE HERE
-  malloc(sizeof(struct thread)); 
+  malloc(sizeof(struct thread));
+  fork(); 
 }
 
 void 
@@ -151,6 +160,42 @@ thread_c(void)
 
   current_thread->state = FREE;
   thread_schedule();
+}
+
+/* CMPT332 GROUP 14 Change, 2023 */
+
+/* creates a mutex lock and returns an opaque ID 
+ * lock starts out in the "locked" state (binary true or false)
+*/
+int mtx_create (int locked) {
+    int pid;
+    pid = 0;
+    lock.lockedState = locked;
+    lock.thread = current_thread;
+    lock.lockID = pid;
+    return 0;
+}
+
+/*
+ * block until the lock has been acquired 
+*/
+int mtx_lock (int lock_id) {
+    for (;;) {
+       if (lock.lockedState == 0) {
+            lock.lockedState = 1;
+            break; 
+       }
+        
+    }
+    return 0;
+}
+
+/* 
+ * release the lock, potentially unblocking a waiting thread 
+*/
+
+int mtx_unlock (int lock_id) {
+    return 0;
 }
 
 int 

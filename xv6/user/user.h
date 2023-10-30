@@ -31,6 +31,12 @@ int trace(int);
 
 /* End CMPT 332 group14 change Fall 2023 */
 
+/*CMPT332 GROUP 14 Change, Fall 2023*/
+int mtx_create(int locked);
+int mtx_lock(int lock_id);
+int mtx_unlock(int lock_id);
+void thread_create(void (*func)());
+
 /* ulib.c */
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
