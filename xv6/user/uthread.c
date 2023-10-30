@@ -13,15 +13,16 @@
 
 
 struct thread {
-  char       stack[STACK_SIZE]; /* the thread's stack */
+ /* char       stack[STACK_SIZE]; the thread's stack */
   int        state;             /* FREE, RUNNING, RUNNABLE */
 /* CMPT332 GROUP 14 Change, Fall 2023 */
-  uint64  reg;
   struct context context;
+  char* stack;
 };
 struct thread all_thread[MAX_THREAD];
 struct thread *current_thread;
-extern void thread_switch(uint64, uint64);
+/* CMPT332 GROUP 14 Change, Fall 2023*/
+extern void thread_switch(struct context*, struct context*);
 
 /*CMPT332 GROUP 14 Change, Fall 2023*/
 int mtx_create(int locked);
@@ -73,7 +74,7 @@ thread_schedule(void)
      * Invoke thread_switch to switch from t to next_thread:
      * thread_switch(??, ??);
      */
-    thread_switch(t->reg, next_thread->reg);
+    thread_switch(&t->context, &next_thread->context);
   } else
     next_thread = 0;
 }
@@ -81,15 +82,15 @@ thread_schedule(void)
 void 
 thread_create(void (*func)())
 {
-  struct thread *t;
-
+  struct thread *t; 
   for (t = all_thread; t < all_thread + MAX_THREAD; t++) {
     if (t->state == FREE) break;
   }
   t->state = RUNNABLE;
   // YOUR CODE HERE
-  malloc(sizeof(struct thread));
-  fork(); 
+  t->stack = (char*)malloc(STACK_SIZE * sizeof(char));
+  t->context.ra = (uint64)func;
+  t->context.sp = (uint64)t->stack;
 }
 
 void 
