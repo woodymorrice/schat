@@ -74,11 +74,21 @@ int mainp(int argc, char* argv[]) {
     else {
         destinations = (argc - 2) / 2;
         hostPort = (unsigned short int)atoi(argv[1]);
+        if (hostPort < 30001 || hostPort > 40000) {
+            fprintf(stderr, "User error: invalid port number, "
+                    "must be within the range 30001-40000\n");
+            exit(-1);
+        }
         j = 0;
         for (i=2; i < argc; i++) {
             destName[j] = argv[i];
             i++;
             destPort[j] = (unsigned short int)atoi(argv[i]);
+            if (destPort[j] < 30001 || destPort[j] > 40000) {
+                fprintf(stderr, "User error: invalid port number, "
+                        "must be within the range 30001-40000\n");
+                exit(-1);
+            }
             j++;
         }
     }
@@ -278,6 +288,12 @@ void sSendData() {
                                  buffer, bufflen,
                                  &result, &h_errnop)) {
             fprintf(stderr, "error: couldnt get network host entry\n");
+            exit(-1);
+        }
+
+        if (result == NULL) {
+            fprintf(stderr, "User error: no host by the name \"%s\"\n",
+                    destName[i]);
             exit(-1);
         }
     

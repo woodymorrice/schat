@@ -1,0 +1,100 @@
+* CMPT332 - Group 14
+* Phong Thanh Nguyen (David) - wdz468 - 11310824
+* Woody Morrice - wam553 - 11071060
+
+** Test Plan **
+White box testing will mostly revolve around testing all the
+possible ways that a user can enter the wrong arguments from
+the command line. I'll test the program's behaviour when I
+enter too few, too many, or incomplete arguments (a host name
+but no port, for example), host names that don't exist, ports
+out of the acceptable range (which will be limited to 30000-40000
+for this assignment), a port where a server name should be and 
+vice versa.
+
+Other than ensuring proper input, there really is only one path
+through the code the way its designed. There could potentially
+be some different paths depending on which threads send to the
+server first, but because of the nature of concurrent threads I
+couldn't really test those cases specifically without
+deconstructing the program.
+
+I will also test that program works with the maximum number of
+chatters (6 for my implementation) and show that messages are
+received properly under reasonable use circumstances.
+
+Test 1: no arguments
+Expected Output:
+Exit and indicate to the user the proper usage
+
+Test 2: 1 argument
+Expected Output:
+Exit and indicate to the user the proper usage (requires at least
+3 arguments: host port destination name, destination port)
+
+Test 3: 3 valid arguments
+Expected Output:
+Begin taking and transmitting user input
+
+Test 4: 4 valid arguments
+Expected Output:
+Exit and indicate the proper usage, there should be one argument
+for the local port, then pairs of arguments. Even numbers of
+command line arguments are not allowed. Note that in the code, its
+actually odd numbers of arguments that are not allowed, since the
+first argument in argv[] is always the name of the program.
+
+Test 5: 11 valid arguments
+Expected Output:
+This is the maximum allowed chatters, so the program should run
+properly.
+
+Test 6: 12 valid arguments
+Expected Output:
+Exit and indicate to the user the proper usage.
+
+Test 7: 3 arguments, invalid host
+Expected Output:
+Exit and indicate that the hostname is invalid
+
+Test 8: 11 arguments, invalid host as the second to last argument
+Expected Output:
+Same result as the previous, but showing that all the host names
+in the array are checking
+
+Test 9: invalid local port
+Expected Output:
+
+Test 10: invalid destination port
+Expected Output:
+
+Test 11: port name and server name mixed up
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
+Test :
+Expected Output:
+
