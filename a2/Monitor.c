@@ -32,14 +32,12 @@ int MonEnter () {
     waiting = RttMyThreadId();
     if (occupied == 0) {
         ListPrepend(enterq, &waiting);
-        /*printf("Enter: %d items in enterq\n", ListCount(enterq));*/
         RttP(enterqSem);
     }
     else {
         RttP(mutex);
         occupied = 1;
     }
-    /*printf("Reach here!\n");*/
     return 0;
 }
 
@@ -50,13 +48,11 @@ int MonLeave () {
     /* if urgentq not empty, take item off */
     if (ListCount(urgentq) > 0) {
         ListTrim(urgentq);
-        /*printf("Leave: %d items in urgentq\n", ListCount(urgentq));*/
         RttV(urgentqSem);
     }
     /* else if enterq not empty, take item off */
     else if (ListCount(enterq) > 0){
         ListTrim(enterq);
-        /*printf("Leave: %d itesms in enterq\n", ListCount(enterq));*/
         RttV(enterqSem);
     }
     else {
@@ -75,18 +71,15 @@ int  MonWait (int CV) {
 
     /* add to cv_waiting list */
     ListPrepend(condq[CV], &waiting);
-    printf("Prepend: %d items in the condq[%d]\n", ListCount(condq[CV]), CV);
  
     /* if urgentq not empty, take item off */
     if (ListCount(urgentq) > 0) {
         ListTrim(urgentq);
-        printf("Wait: %d items in urgentq\n", ListCount(urgentq));
         RttV(urgentqSem);
     }
     /* if enterq not empty, take item off */   
     else if (ListCount(enterq) > 0) {
         ListTrim(enterq);
-        printf("Wait: %d items in enterq\n", ListCount(enterq));
         RttV(enterqSem);
     }
     else {
@@ -108,16 +101,11 @@ int  MonSignal (int CV) {
          * and unlock the current CV_waiting list 
         */
         ListTrim(condq[CV]);
-        /*printf("Signal: %d items in condq[%d]\n", ListCount(condq[CV]), CV);*/
         RttV(condqSem[CV]);
 
         /* add current thread to the urgentq*/ 
         ListPrepend(urgentq, &waiting);
-        /*printf("Signal: %d items in urgentq\n", ListCount(urgentq));*/
         RttP(urgentqSem);
-    }
-    else {
-        printf("No thread waiting on condq[%d]\n", CV);
     }
     return 0; 
 }

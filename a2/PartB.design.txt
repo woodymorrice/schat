@@ -36,7 +36,10 @@ Updated new list library from Joseph Medernach (imy309) and John Miler (knp254)
 
 Updated functions description & pseudocode
 
-Assume all the created thread will be at user-level threads. 
+Assume all the created thread will be at user-level threads.
+
+Testing will be done by readers_writers.c, the output of the testing will be
+in PartB.design.txt
 
 ** Pseudocode **
 
