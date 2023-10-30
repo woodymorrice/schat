@@ -7,128 +7,162 @@
 **********
 
 ** Design Details **
-Our solution will consist of 6 functions as outlined in the
-assignment specification. The mainp() function will initialize
-the five necessary threads. ALL thread functions run on an
-infinite loop.
+Our solution consists of 6 thread functions as outlined in the
+assignment specification, and some additional helper functions to
+improve code readability. Threads implement ubc pthreads IPC to
+communicate. Each call to Send(), Receive() and Reply() is checked
+for errors to ensure proper communication. The unix networking API
+is used for network communication, and the program includes rigorous
+error checking for each function called (which made debugging a
+breeze).
 
-The first thread will run the function sGetInput(), which waits
-for user input and scans user input into a string buffer, limiting
-the user to 126 characters, leaving room for a newline character
-and a tombstone. Then it sends a message to the server containing
-the string held in the buffer and waits for a reply. If the server
-returns a failure message, sGetInput should emit a message
-indicating that the list is full.
+The mainp() function initializes the
+necessary threads and stores command line arguments (host names,
+port numbers) in a global variables so they can be accessed by any
+thread or function that needs them. Thread PIDs are recorded in
+global variables so MyPid() never needs to be called and the server
+will always know what thread it is communicating with.
 
-The second thread runs sServer(), which receives messages, acts on
-those messages, and sends replies to the other threads. When it
-receives a message from sGetInput there are three possibilites:
-The message is an exit command, in which case the server should
-kill all the other threads and exit. The incoming list is full,
-in which case the server should reply with a failure message.
-Otherwise, it should reply with a success message.
-When it receives a messages from sSendData() it should either
-reply with a failure message if the outgoing list is empty, or
-reply with the first string in the outgoing list.
-When it receives a message from sGetData() it should reply with
-a failure message if the list is full, otherwise it should add
-the received string to the list of incoming messages.
-When it receives a messages from sDisplayData() it should send
-a failure message if the outgoing list is empty, otherwise it
-should send the first string in the outgoing list.
+The first thread runs the function sGetInput(), which sets stdin to
+non blocking and reads console input in a loop. Messages are recorded
+(up to 255 bytes) into a bounded buffer, a tombstone is appended,
+and the message is sent using the ubc pthreads IPC function to the
+server. If the user enters "exit" or "quit", necessary file descriptors
+are set back to blocking and the program exits.
 
-The third thread runs sSendData() which send a message to the
-server indicating that it is waiting for a string to send,
-and upon receiving a reply, it either re-commences its loop
-on a failure reply, or takes the string from the received
-message, encodes it to a universal format, and sends it via
-UDP to the remote UNIX processes that were specified by IP
-and port at runtime.
+The second thread runs sServer(). The server receives messages and
+sends replies, manages lists of incoming and outgoing messages, and
+initializes the network socket. The reason the server initializes
+the socket is because it is the first thread that is created,
+ensuring that the socket is available when other threads need to
+use it. After calling the prepSocket() function and initializing the
+two lists, the server enters its loop. The server receives a message,
+and checks the sender.
 
-The fourth thread runs sGetData(), which listens on the specified
-port for UDP packets, and retrieves them. It then 
-decodes the content of the message into the appropriate format for
-the local machine, and sends a message containing the resulting
-string to sServer() to add to the list of incoming messages. If
-the server replies with a failure messages, the incoming list is
-full, and sGetData() should emit an error message indicating as
-such.
+If the sender is sGetInput() the server takes
+the message it received and adds it to the list of outgoing messages
+(if the list is not full) and gives a standard reply. Then a boolean
+indicating whether sSendData() is waiting is checked, and if it is
+(and the list of outgoing messages is not empty) it sends the message
+that has been waiting on the the list of outgoing messages the longest
+in its reply to sSendData(), and sets the boolean to false.
+
+If the sender is sSendData(), it sets its waiting boolean to true
+and does not reply. The logic behind this is that each time the 
+server receives a new outgoing message, it checks whether sSendData()
+is waiting, and gives it a message if it is. So there should never be
+a situation where the server receives a new message and sSendData()
+is left waiting.
+
+For the other two possible senders, the server works exactly the
+same way. If the sender is sGetData(), the server does all the same
+steps as it would with sGetInput() (but with a list of incoming
+messages instead), except in this case it checks if
+sDisplayData() is waiting instead.
+
+The third thread runs sSendData() which gathers the necessary data
+about the other members of the chat, packs datagrams and send them
+off. First it populates an array of sockaddr_in by gathering all the
+necessary information about the other chat participants (specified
+in the command line arguments). Then it commmences its loop where
+it notifies the server that it is waiting for a message to send,
+and upon receiving a reply, it takes the string and calls packDgram()
+to package it up with the current date/time information. It then
+polls the socket to see if it can send, and sends the datagram off
+to each other member of the chat using sendto() from the unix 
+networking library. 
+
+The fourth thread runs sGetData(), which receives datagrams and
+sends them to the server. In a loop it polls the socket for incoming
+datagrams, and when a packet is available it allocates space in a
+buffer and loads it in. Then it sends a pointer to the datagram to
+the server.
 
 The fifth thread runs sDisplayData(), which sends a message to 
-the server indicating that it is waiting, and upon reply,
-either prints the message to the local console, or does nothing
-if the server indicates that the incoming list is empty.
+the server indicating that it is waiting, and upon reply, it uses
+the function printTime() to display the time information contained
+in the datagram in a nice format, then prints the string contained
+in the datagram. After the message has been displayed, sDisplayData()
+free()'s the pointer.
+
+The function packDgram() allocates space for a datagram before it
+packs it, so sSendData() must free that space after the datagram is
+sent. packDgram() also converts the time data to network byte order
+
+The actual time information that is sent over the network is just
+the tv_sec field of the timeval struct. The microseconds don't
+change the time displayed in any meaningful way so that field is not
+necessary. The printTime() function takes the information stored in
+the tv_sec field, converts it to host byte order, and packs it into
+a tm struct using localtime() which allows the date and time to be 
+easily displayed in any format I like with strftime(). The
+tm struct created by localtime() is statically allocated so it does
+not need to be freed, and according to the man page the function reuses
+that space each time its called (it's memory environmentally friendly).
 
 
 ** Pseudocode **
 
 mainp()
+    store command line arguments
     initialize threads
 
 sGetInput()
-    get server pid
+    unblock stdin
     infinite loop:
     wait for input from keyboard
-        if input
-            read input into buffer until newline
+        if input is exit command
+            block necessary file descriptors
+            exit
+        else
+            add tombstone
             send message to server with buffer contents
-            if reply = failure
-                emit list full message
 
 sServer()
-    get pids for the other threads
+    initialize lists
+    prepare network socket
     infinite loop:
     wait for messages
         if message received from sGetInput()
-            if string is exit command
-                kill all threads
-            if outgoing list is full
-                reply that the list is full(failure)
-            else
-                add string to list
-                reply success
+            if outgoing list is not full
+                add message to outgoing list
+            if sSendData() is waiting
+                reply with oldest message on outgoing list
+                set sendWaiting boolean to false
 
-        if message received from sSendData()
-            if outgoing list is empty
-                reply list is empty
-            else
-                send first string in list
+       if message received from sSendData()
+            set sendWaiting boolean to true
 
-        if message received from sGetData()
-            if incoming list is full
-                reply that the list is full(failure)
-            else
-                add string to list
-                reply success
-        
-        if message received from sDisplayData()
-            if outgoing list is empty
-                reply list is empty
-            else
-                send first string in list
+       if message received from sGetData()
+            if incoming list is not full
+                add message to incoming list
+            if sDisplayData is waiting
+                reply with oldest message on incoming list
+                set dispWaiting to false
 
 sSendData()
-    get server pid
+    get destination(s) network info
     infinite loop:
     send waiting message to server
-        if reply not list empty
-            convert message data to universal type
-            transmit data over UDP
+        when reply received
+        poll socket
+        when can send
+            pack datagram
+            send datagram to all recipients
+            free datagram
 
 sGetData()
-    get server pid
     infinite loop:
-    listen on port for datagram
-        if datagram received
-            convert data(string) to local type
-            send message server containing string
-            if reply = failure
-                emit list full message
+    poll socket for incoming datagram
+        when datagram available
+        receive it
+        send it to server
 
 sDisplayData()
-    get server pid
     infinite loop:
     send waiting message to server
-        if reply not list empty
-            display message string on local console
+        when reply received
+        display time from datagram
+        display message from datagram
+        free datagram
 
