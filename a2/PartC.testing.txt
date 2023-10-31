@@ -8,33 +8,36 @@ possible ways that a user can enter the wrong arguments from
 the command line. I'll test the program's behaviour when I
 enter too few, too many, or incomplete arguments (a host name
 but no port, for example), host names that don't exist, ports
-out of the acceptable range (which will be limited to 30000-40000
+out of the acceptable range (which will be limited to 30001-40000
 for this assignment), a port where a server name should be and 
-vice versa.
+vice versa, and ill show that the program works with the maximum
+number of chatters.
 
-Other than ensuring proper input, there really is only one path
-through the code the way its designed. There could potentially
-be some different paths depending on which threads send to the
-server first, but because of the nature of concurrent threads I
-couldn't really test those cases specifically without
-deconstructing the program.
-
-I will also test that program works with the maximum number of
-chatters (6 for my implementation) and show that messages are
-received properly under reasonable use circumstances.
 
 Test 1: no arguments
 Expected Output:
 Exit and indicate to the user the proper usage
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64
+s-chat usage: s-chat localport destname destport dest2name dest2port...
 
 Test 2: 1 argument
 Expected Output:
 Exit and indicate to the user the proper usage (requires at least
 3 arguments: host port destination name, destination port)
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+s-chat usage: s-chat localport destname destport dest2name dest2port...
 
 Test 3: 3 valid arguments
 Expected Output:
 Begin taking and transmitting user input
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+cmpt332-arm 35353
+this is my user input
+# received by cmpt332-arm:
+10/30/23 18:30:38.187447: this is my user input
 
 Test 4: 4 valid arguments
 Expected Output:
@@ -43,58 +46,64 @@ for the local port, then pairs of arguments. Even numbers of
 command line arguments are not allowed. Note that in the code, its
 actually odd numbers of arguments that are not allowed, since the
 first argument in argv[] is always the name of the program.
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+cmpt332-arm 35353 cmpt332-ppc
+s-chat usage: s-chat localport destname destport dest2name dest2port...
 
-Test 5: 11 valid arguments
+Test 5: 5 valid arguments
 Expected Output:
 This is the maximum allowed chatters, so the program should run
 properly.
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+cmpt332-arm 35353 cmpt332-ppc 36363
+hey there fellas
+# received by cmpt332-arm:
+10/30/23 18:37:32.47432: hey there fellas
+# received by cmpt332-ppc:
+10/30/23 18:37:32.47432: hey there fellas
 
-Test 6: 12 valid arguments
+Test 6: 6 valid arguments
 Expected Output:
 Exit and indicate to the user the proper usage.
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+cmpt332-arm 35353 cmpt332-ppc 36363 tux6
+s-chat usage: s-chat localport destname destport dest2name dest2port...
 
 Test 7: 3 arguments, invalid host
 Expected Output:
 Exit and indicate that the hostname is invalid
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+cmpt333-arm 35353
+User error: no host by the name "cmpt333-arm"
 
 Test 8: 11 arguments, invalid host as the second to last argument
 Expected Output:
 Same result as the previous, but showing that all the host names
 in the array are checking
+Result:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+cmpt332-arm 35353 cmpt332-bbc 36363
+User error: no host by the name "cmpt332-bbc"
 
 Test 9: invalid local port
 Expected Output:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 100
+cmpt332-arm 35353 cmpt332-bbc 36363
+User error: invalid port number, must be within the range 30001-40000
 
 Test 10: invalid destination port
 Expected Output:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 34343
+cmpt332-arm 35353 cmpt332-bbc 42
+User error: invalid port number, must be within the range 30001-40000
 
 Test 11: port name and server name mixed up
 Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
-
-Test :
-Expected Output:
+wam553@cmpt332-amd64:~/332/cmpt332-g14/a2> ./s-chat-x86_64 cmpt332-amd64
+34343 cmpt332-arm
+User error: invalid port number, must be within the range 30001-40000
 

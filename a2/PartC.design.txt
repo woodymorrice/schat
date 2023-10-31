@@ -21,7 +21,11 @@ necessary threads and stores command line arguments (host names,
 port numbers) in a global variables so they can be accessed by any
 thread or function that needs them. Thread PIDs are recorded in
 global variables so MyPid() never needs to be called and the server
-will always know what thread it is communicating with.
+will always know what thread it is communicating with. The number of
+destinations is limited to 2 because there are only 3 virtual machines
+to test on, but 3 is still sufficient to show that it works with more
+than just two machines. Thread stack sizes are initialized to 65536
+bytes which is small but sufficient enough for what they are doing.
 
 The first thread runs the function sGetInput(), which sets stdin to
 non blocking and reads console input in a loop. Messages are recorded
@@ -87,15 +91,13 @@ free()'s the pointer.
 
 The function packDgram() allocates space for a datagram before it
 packs it, so sSendData() must free that space after the datagram is
-sent. packDgram() also converts the time data to network byte order
+sent. packDgram() also converts the time data to network byte order.
 
 The actual time information that is sent over the network is just
-the tv_sec field of the timeval struct. The microseconds don't
-change the time displayed in any meaningful way so that field is not
-necessary. The printTime() function takes the information stored in
-the tv_sec field, converts it to host byte order, and packs it into
-a tm struct using localtime() which allows the date and time to be 
-easily displayed in any format I like with strftime(). The
+the fields of the timeval struct. The printTime() function takes the 
+information stored in the tv_sec field, converts it to host byte order,
+and packs it into a tm struct using localtime() which allows the date
+and time to be easily displayed in any format I like with strftime().The
 tm struct created by localtime() is statically allocated so it does
 not need to be freed, and according to the man page the function reuses
 that space each time its called (it's memory environmentally friendly).
