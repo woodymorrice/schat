@@ -10,24 +10,36 @@ int itemCons;
 
 itemProd = 0;
 itemCons = 0;
-void item_1(void) {
-    prinf("item 1\n");
-    
-}
 void producer () {
-    int item[5] = {0, 1, 2, 3, 4};
-    while (itemProd < 5) {
-        
+    int i;
+    int item[5] = {0, 1, 2, 3, 4}; 
     printf("Producing items in BUFFER\n");
-    itemProd ++;
+    for (i = 0,  i < 5, i++) {
+        buffer[i] = item[i];
+        thread_yield();
     }
+    thread_schedule();
 }
 
+
 void consumer () {
-    while (itemCon < itemProd) {
+    int i;
     printf("Consuming BUFFER\n");
-    itemCon ++;
+    for (i = 0, i < 5, i++) {
+        thread_yield();
     }
+    thread_schedule();
 }
 int main(int argc, char *argv[]) {
+    int lock;
+    lock = mtx_create(0);
+    while (1) {
+        mutex_lock(lock);
+        thread_create(producer);
+        mutex_unlock(lock);
+    }
+    while (1) {
+        mutex_
+    }
+
 }
