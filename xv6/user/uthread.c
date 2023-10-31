@@ -21,16 +21,16 @@ struct thread {
 };
 struct thread all_thread[MAX_THREAD];
 struct thread *current_thread;
-/* CMPT332 GROUP 14 Change, Fall 2023*/
+
 extern void thread_switch(struct context*, struct context*);
 
-/*CMPT332 GROUP 14 Change, Fall 2023*/
 int mtx_create(int locked);
 int mtx_lock(int lock_id);
 int mtx_unlock(int lock_id);
-
-struct spinlock lock;
-              
+struct spinlock lockArr [STACK_SIZE];
+int initialized; 
+initialized = 0;
+/*End of CMPT 332 GROUP 14 Change, Fall 2023*/              
 void 
 thread_init(void)
 {
@@ -169,12 +169,22 @@ thread_c(void)
  * lock starts out in the "locked" state (binary true or false)
 */
 int mtx_create (int locked) {
-    int pid;
-    pid = 0;
-    lock.lockedState = locked;
-    lock.thread = current_thread;
-    lock.lockID = pid;
-    return 0;
+    int lockId;
+    struct spinlock lock;
+    lockId = 0; 
+    if (initialized == 0) {
+        lock.lockedState = locked;
+        lock.thread = current_thread;
+        lockArr[lockId] = lock;
+        initialized = 1;
+    }
+    else {
+        lockId ++;
+        lock.lockedState = locked;
+        lock.thread = current_thread;
+        lockArr[lockId] = lock;
+    }
+    return lockId;
 }
 
 /*
@@ -182,11 +192,10 @@ int mtx_create (int locked) {
 */
 int mtx_lock (int lock_id) {
     for (;;) {
-       if (lock.lockedState == 0) {
-            lock.lockedState = 1;
+       if (lockArr[lock_id].lockedState == 0) {
+            lockArr[lock_id].lockedState = 1;
             break; 
        }
-        
     }
     return 0;
 }
@@ -196,6 +205,7 @@ int mtx_lock (int lock_id) {
 */
 
 int mtx_unlock (int lock_id) {
+    lockArr[lock_id].lockedState = 0;
     return 0;
 }
 

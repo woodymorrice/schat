@@ -1,4 +1,5 @@
 /*CMPT332 GROUP 14 Change, Fall 2023*/
+struct thread;
 
 struct context {
     uint64 ra;
@@ -21,6 +22,5 @@ struct context {
 struct spinlock {
     uint lockedState;
     struct thread *thread; /* to know which thread is holding the lock */
-    int lockID;
 };
 
