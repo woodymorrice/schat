@@ -1,15 +1,15 @@
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"
-#include "user/uthead.h"
+#include "user/uthread.h"
 
 #define STKSIZE 2000
 int buffer[STKSIZE];
 int itemProd;
 int itemCons;
 
-itemProd = 0;
-itemCons = 0;
+int itemProd = 0;
+int itemCons = 0;
 void item_1(void) {
     prinf("item 1\n");
     
@@ -29,5 +29,6 @@ void consumer () {
     itemCon ++;
     }
 }
-int main(int argc, char *argv[]) {
+int tmain(int argc, char *argv[]) {
+    return 0;
 }
