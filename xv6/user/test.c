@@ -38,6 +38,9 @@ int tmain(int argc, char *argv[]) {
         mtx_unlock(lock);
     }
     while (1) {
+        mtx_lock(lock);
+        thread_create(consumer);
+        mtx_unlock(lock);
     }
 
     exit(0);
