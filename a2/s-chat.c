@@ -26,18 +26,24 @@
 
 #include <list.h>
 
-#define BACKLOG 10
+#define BUF_SIZE 256
+#define NFDS 1
+#define TIMEOUT 0
+#define MAX_DEST 2
 
 struct sDgram {
-    char message[256];
-    long int time;
+    char message[256]; /* same as BUF_SIZE */
+    uint32_t s;
+    uint32_t ms;
+    /*int32_t s_hi;
+    int32_t s_lo;
+    int32_t ms_hi;
+    int32_t ms_lo;*/
 };
 
-const int MAX_LEN = 255;
+/* const ints so they can be pointed to */
 const int STD_MSG = 0;
 const int STD_RPLY = 0;
-const int NFDS = 1;
-const int TIMEOUT = 0;
 
 void sServer();
 void sGetInput();
@@ -45,8 +51,8 @@ void sSendData();
 void sGetData();
 void sDisplayData();
 int  prepSocket();
-struct sDgram* packDgram(char* msg);
-void printTime(long int t);
+struct sDgram* packDgram(char*);
+void printTime(struct sDgram*);
 
 static PID sServerPID;
 static PID sGetInputPID;
@@ -56,8 +62,8 @@ static PID sDisplayDataPID;
 
 static char hostName[32];
 static unsigned short int hostPort;
-static char* destName[5];
-static unsigned short int destPort[5];
+static char* destName[MAX_DEST];
+static unsigned short int destPort[MAX_DEST];
 static int destinations;
 static int sockfd;
 
@@ -122,7 +128,7 @@ int mainp(int argc, char* argv[]) {
  * takes input and packages it into a message to  *
  * send to the server upon newline                */
 void sGetInput() {
-    char buf[256];
+    char buf[BUF_SIZE];
     int msgLength;
     int *reply;
     
@@ -135,7 +141,7 @@ void sGetInput() {
 
     for (;;) {
         /* get input */
-        msgLength = read(0, buf, MAX_LEN);        
+        msgLength = read(0, buf, BUF_SIZE-1);        
         if (msgLength > 0) {
             buf[msgLength] = '\0';
             
@@ -172,7 +178,7 @@ void sServer() {
     void *received, *dReply;
     char *message, *reply;
 
-    reply = "goodbye";
+    /* reply = "goodbye"; */
 
     outgoing = ListCreate();
     sendWait = false;
@@ -210,7 +216,18 @@ void sServer() {
         }
         else
         if (sender == sSendDataPID) {
-            sendWait = true;
+            if (ListCount(outgoing) > 0) {
+                reply = ListTrim(outgoing);
+
+                msgLength = strlen(reply);
+                if (0 != Reply(sSendDataPID, (void*)reply, msgLength)) {
+                    printf("Server reply failed\n");
+                    exit(-1);
+                } 
+            }
+            else {
+                sendWait = true;
+            }
         }
         /* Receiving messages */
         else
@@ -227,7 +244,7 @@ void sServer() {
             if (dispWait == true && ListCount(incoming) > 0) {
                 dReply = ListTrim(incoming);
 
-                msgLength = strlen(reply);
+                msgLength = strlen((char*)dReply);
                 if (0 != Reply(sDisplayDataPID, dReply, msgLength)) {
                     printf("Server reply failed\n");
                     exit(-1);
@@ -238,7 +255,18 @@ void sServer() {
         }
         else
         if (sender == sDisplayDataPID) {
-            dispWait = true;
+            if (ListCount(incoming) > 0) {
+                dReply = ListTrim(incoming);
+
+                msgLength = strlen((char*)dReply);
+                if (0 != Reply(sDisplayDataPID, dReply, msgLength)) {
+                    printf("Server reply failed\n");
+                    exit(-1);
+                } 
+            }
+            else {
+                dispWait = true;
+            }
         }
         /* Should never reach this point */
         else {
@@ -261,7 +289,7 @@ void sSendData() {
     int j;
     char ip_add[INET_ADDRSTRLEN];
 
-    struct sockaddr_in *destPc[5];
+    struct sockaddr_in *destPc[MAX_DEST];
 
     int msgLength;
     void* reply;
@@ -275,7 +303,7 @@ void sSendData() {
 
     for (i = 0; i < destinations; i++) {
 
-        printf("'%s' %u\n", destName[i], destPort[i]);
+        /* printf("'%s' %u\n", destName[i], destPort[i]); */
     
         /*result = malloc(sizeof(struct hostent));*/
 
@@ -298,12 +326,12 @@ void sSendData() {
         }
     
         /* prints the list of IP addresses for debugging */
-        memset(ip_add, 0, INET_ADDRSTRLEN);
+        /* memset(ip_add, 0, INET_ADDRSTRLEN); */
         addrs = (struct in_addr **)result->h_addr_list;
-        for (j = 0; addrs[j] != NULL; j++) {
+        /* for (j = 0; addrs[j] != NULL; j++) {
             inet_ntop(AF_INET, &addrs[j], ip_add, INET_ADDRSTRLEN);
             printf("'%s'\n", ip_add);
-        }
+        } */
 
         /* preparing my artisan sockaddr_in struct */
         destPc[i] = malloc(sizeof(struct sockaddr_in));
@@ -421,7 +449,7 @@ void sDisplayData() {
         }
         else {
             dataPkg = (struct sDgram *)reply;
-            printTime(dataPkg->time);
+            printTime(dataPkg);
             printf(": %s", &dataPkg->message[0]);
         }
         free(dataPkg);
@@ -449,7 +477,7 @@ int prepSocket() {
         fprintf(stderr, "error %d: could not get host name\n", errno);
         exit(-1);
     }
-    printf("'%s' %u\n", hostName, hostPort); /* DEBUG */
+    /* printf("'%s' %u\n", hostName, hostPort); */
 
     /* getting the network host entry information */
     result = malloc(sizeof(struct hostent));
@@ -462,12 +490,12 @@ int prepSocket() {
     }
     
     /* prints the list of IP addresses for debugging */
-    memset(ip_add, 0, INET_ADDRSTRLEN);
+    /* memset(ip_add, 0, INET_ADDRSTRLEN); */
     addrs = (struct in_addr **)result->h_addr_list;
-    for (i = 0; addrs[i] != NULL; i++) {
+    /* for (i = 0; addrs[i] != NULL; i++) {
         inet_ntop(AF_INET, &addrs[i], ip_add, INET_ADDRSTRLEN);
         printf("'%s'\n", ip_add);
-    }
+    } */
 
     /* preparing my artisan sockaddr_in struct */
     hostPc = malloc(sizeof(struct sockaddr_in));
@@ -505,29 +533,54 @@ struct sDgram* packDgram(char* msg) {
     struct sDgram* dgram;
     struct timeval curTime;
 
+    /*int32_t s_hi;
+    int32_t s_lo;
+    int32_t ms_hi;
+    int32_t ms_lo;*/
+
     gettimeofday(&curTime, NULL);
 
     dgram = malloc(sizeof(struct sDgram));
     
-    memcpy(dgram->message, msg, strlen(msg)+1);
-    
+    memcpy(dgram->message, msg, strlen(msg)+1); 
     dgram->message[strlen(msg)] = '\0';
-    dgram->time = htonl(curTime.tv_sec);
+
+    /*dgram->secs = (int64_t)htonl(curTime.tv_sec);*/
+    /*dgram->ms = (int64_t)htonl(curTime.tv_usec);*/
+
+    /*s_hi = (int32_t)(curTime.tv_sec  >> 32);
+    s_lo = (int32_t)(curTime.tv_sec & 0xffffffff);
+    ms_hi = (int32_t)((int64_t)curTime.tv_usec >> 32);
+    ms_lo = (int32_t)(curTime.tv_usec & 0xffffffff);*/
+
+    dgram->s = htonl(curTime.tv_sec);
+    /*dgram->s_hi = htonl(s_hi);
+    dgram->s_lo = htonl(s_lo);
+    dgram->ms_hi = htonl(ms_hi);
+    dgram->ms_lo = htonl(ms_lo);*/
+    dgram->ms = htonl((uint32_t)curTime.tv_usec);
 
     return dgram;
 }
 
-/* printTime -- takes a long int representing the time *
- * since epoch and prints the date in a nice format    */
-void printTime(long int t) {
-    time_t secs;
+/* printTime -- prints the date in a nice format */
+void printTime(struct sDgram* time) {
+    long int s;
+
+    /*time_t secs;*/
+    uint32_t ms;
     char str[64];
     struct tm timeptr;
 
-    secs = ntohl(t);
-    timeptr = *localtime(&secs);
-    strftime(str, sizeof(str), "%X %x", &timeptr);
+    s = (signed long)ntohl(time->s);
+    ms = ntohl(time->ms);
+    /*ms = ntohll(time->ms);*/
+    /*s = (((int64_t)ntohl(time->s_hi)) << 32) + ntohl(time->s_lo);*/
+    /*ms = (((int64_t)ntohl(time->ms_hi)) << 32) | ntohl(time->ms_lo);*/
 
-    printf("%s", str);
+    timeptr = *localtime(&s);
+    strftime(str, sizeof(str), "%x %X", &timeptr);
+
+    printf("%s.%d", str, ms);
 }
 
