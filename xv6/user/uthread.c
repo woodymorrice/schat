@@ -3,6 +3,7 @@
 #include "user/user.h"
 /*CMPT332 GROUP 14 Change, Fall 2023*/
 #include "user/uthread.h"
+#include <stddef.h>
 /* Possible states of a thread: */
 #define FREE        0x0
 #define RUNNING     0x1
@@ -29,7 +30,6 @@ int mtx_lock(int lock_id);
 int mtx_unlock(int lock_id);
 struct spinlock lockArr [STACK_SIZE];
 int initialized; 
-initialized = 0;
 /*End of CMPT 332 GROUP 14 Change, Fall 2023*/              
 void 
 thread_init(void)
@@ -172,6 +172,7 @@ int mtx_create (int locked) {
     int lockId;
     struct spinlock lock;
     lockId = 0; 
+    initialized = 0;
     if (initialized == 0) {
         lock.lockedState = locked;
         lock.thread = current_thread;
