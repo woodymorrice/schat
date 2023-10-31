@@ -36,6 +36,10 @@ int mtx_create(int locked);
 int mtx_lock(int lock_id);
 int mtx_unlock(int lock_id);
 void thread_create(void (*func)());
+void thread_schedule(void);
+void thread_yield(void);
+
+
 
 /* ulib.c */
 int stat(const char*, struct stat*);
