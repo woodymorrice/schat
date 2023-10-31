@@ -153,10 +153,12 @@ $U/_uthread: $U/uthread.o $U/uthread_switch.o $(ULIB)
 		$U/uthread_switch.o $(ULIB)
 	$(OBJDUMP) -S $U/_uthread > $U/uthread.asm
 
+$U/test.o: $U/test.c
+	$(CC) $(CFLAGS) -c -o $U/test.o $U/test.c
+
 $U/_test: $U/test.o $U/uthread.o $U/uthread_switch.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e tmain -Ttext 0 -o $U/_uthread $U/uthread.o \
-		$U/uthread_switch.o $(ULIB)
-	$(OBJDUMP) -S $U/_uthread > $U/uthread.asm
+	$(LD) $(LDFLAGS) -N -e tmain -Ttext 0 -o $U/_test $U/uthread.o \
+		$U/uthread_switch.o $U/test.o $(ULIB)
 	# Begin CMPT 332 group14 change Fall 2023
 	# Phong Thanh Nguyen (David) - wdz468 - 11310824
 	# Woody Morrice - wam553 - 11071060

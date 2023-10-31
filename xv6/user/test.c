@@ -30,7 +30,10 @@ void consumer () {
 }
 
 int tmain(int argc, char *argv[]) {
-    int lock;
+    /* We could not finish this in time. The uthread executable
+     * works though! */
+
+    /*int lock;
     lock = mtx_create(0);
     while (1) {
         mtx_lock(lock);
@@ -38,7 +41,7 @@ int tmain(int argc, char *argv[]) {
         mtx_unlock(lock);
     }
     while (1) {
-    }
+    }*/
 
     exit(0);
 
