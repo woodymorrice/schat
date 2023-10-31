@@ -175,6 +175,7 @@ int mtx_create (int locked) {
     if (initialized == 0) {
         lock.lockedState = locked;
         lock.thread = current_thread;
+        lock.id = lockId;
         lockArr[lockId] = lock;
         initialized = 1;
     }
@@ -182,6 +183,7 @@ int mtx_create (int locked) {
         lockId ++;
         lock.lockedState = locked;
         lock.thread = current_thread;
+        lock.id = lockId;
         lockArr[lockId] = lock;
     }
     return lockId;
@@ -206,6 +208,7 @@ int mtx_lock (int lock_id) {
 
 int mtx_unlock (int lock_id) {
     lockArr[lock_id].lockedState = 0;
+    lockArr[lock_id].thread = NULL;
     return 0;
 }
 
