@@ -38,6 +38,7 @@ int mtx_unlock(int lock_id);
 void thread_create(void (*func)());
 void thread_schedule(void);
 void thread_yield(void);
+void thread_init(void);
 
 
 
