@@ -14,8 +14,8 @@ allow to enter. Function will return an integer value, 0 for success entering,
 otherwise return -1 for failure.  
 
 MonLeave() - will responsible for releasing the mutex lock on the monitor, 
-checking whether if there are any other waiting threads in urgent queue, and 
-wake it up. If there is no thread waiting on urgent queue, simply do nothing. 
+checking whether if there are any other waiting threads in urgent queue or 
+enter queue and wake it up. Else if everything is empty, release the lock. 
 Return 0 for success leaving, and -1 otherwise. 
 
 MonWait(int CV) - making the current thread to wait on the condition queue.
@@ -24,21 +24,32 @@ condition queue will have no effect on the monitor, until another new thread
 enters and wakes it up.
 
 MonSignal(int CV) - waking up the waiting thread of that condition variable
-in the condition queue. If there is no thread waiting on that condition, the 
-function simply does nothing. Else, put the current thread that is calling 
-the function in the urgent queue. Now the monitor is only released when the 
-thread in urgent enter the monitor again using MonEnter()  and  leave the 
-monitor by calling MonLeave(). Enforce the idea when the last person leave
-Saskatoon, turn off the light.  
+in the condition queue. If there is thread waiting on that condition, the  
+thread will be taken off the condition queue and put in the urgent queue. 
+Now the monitor is only released when the thread in urgent queue leave the
+monitor. Enforce the idea when the last person leave Saskatoon, turn off the 
+light.  
 
-Assume all the created thread will be at user-level threads. 
+** Changes make for the final phase **
+
+Updated new list library from Joseph Medernach (imy309) and John Miler (knp254)
+
+Updated functions description & pseudocode
+
+Assume all the created thread will be at user-level threads.
+
+Testing will be done by readers_writers.c, the output of the testing will be
+in PartB.design.txt
 
 ** Pseudocode **
 
 int MonInit(int numConds) {
     create the condition queue based on the parameter
     for every condition queue
+        create list storage for each condition queue
         create new semaphore by using RttNewSem()
+    create list storage for enter queue
+    create list storage for urgen queue
     create enter queue semaphore
     create urgent queue semaphore
     create a semaphore for mutex
@@ -48,31 +59,46 @@ int MonInit(int numConds) {
 int MonEnter() {
     check if the mutex lock is released
     if (mutex is released) { 
-        new thread enter the monitor
+        new thread is added to the enterq 
+        update value of enterq semaphore
     } 
     else {
-        making the new thread wait in the entering queue
-        return -1
+        let the new thread enter the monitor
+        set the status of monitor to be occupied
     }
-    lock the monitor to prevent other threads to enter
-    return 0 (success)
+    return 0 (success) / -1 (on failure)
 }
     
 int MonLeave() {
-    check if there are waiting thread in the urgent queue
-    if (there are no waiting thread) {
-        do nothing
+    if (urgent queue is not empty) {
+        take the waiting thread off 
+        update value of urgentq semaphore
+    }
+    else if (enter queue is not empty){
+        take the waiting thread off 
+        update value of enterq semaphore
     }
     else {
-       signal to wake up the waiting threads
+        release the lock
+        update the mutex semaphore
     }
-    release mutex lock 
     return 0 (leave success) / -1 (leave failure)
 }
 
 int MonWait(int CV) {
-    make current thread wait on the CV
-    release mutex lock
+    make current thread wait on the CV 
+    if (urgent queue is not empty) {
+        take the waiting thread off the queue
+        update value of condition queue semaphore
+    }
+    else if (enter queue is not empty) {
+        take the waiting thread off 
+        update the value of enter queue semaphore
+    }
+    else {
+        release the lock 
+    }
+    update the value of the correspond condition queue
     return 0 (if the passed argument is valid) / -1 (otherwise) 
 }
 
@@ -82,7 +108,9 @@ int  MonSignal(int CV) {
     }
     else {
         wake up the waiting thread of that CV
-        put the current thread into the urgen queue 
+        update the value of CV queue semaphore
+        put the current thread into the urgen queue
+        update the value of urgent queue semaphore 
     }
     return 0 (if the passed in argument is valid) / -1 (otherwise)
 }
