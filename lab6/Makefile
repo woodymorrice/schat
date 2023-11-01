@@ -13,7 +13,8 @@ LIB2 = -lRtt -lRttUtils -L. -llist liblist.a
 all: best-fit
 
 best-fit: monitor.o best-fit.o best-fit-monitor.o liblist.a 
-	$(CC) $(LIB1) -o best-fit best-fit-monitor.o best-fit.o monitor.o $(LIB2)
+	$(CC) $(LIB1) -z noexecstack -o best-fit \
+		best-fit-monitor.o best-fit.o monitor.o $(LIB2)
  
 best-fit.o: BestFit.c BestFitMonitor.h list.h	
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) -c BestFit.c -o best-fit.o

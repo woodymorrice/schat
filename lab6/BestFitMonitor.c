@@ -5,12 +5,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <rtthreads.h>
+#include <RttCommon.h>
+
 #include <monitor.h>
 #include <list.h>
 #include <BestFitMonitor.h>
 
-#define TRUE 1
-#define FALSE 0
+/* #define TRUE 1
+#define FALSE 0 */
 #define TOTAL_MEM 32768
 #define SUCCESS 0
 #define FAILURE 1
@@ -41,6 +44,10 @@ memBlock* BFAllocate(int size) {
     memBlock* iterator;
     memBlock* bestFit;
     memBlock* newBlock;
+
+    RttMonEnter();
+
+    printf("Allocating..\n");
 
     if (ListCount(memory) < 1) {
         fprintf(stderr, "no initial memory block\n");
@@ -81,7 +88,7 @@ memBlock* BFAllocate(int size) {
         iterator = ListCurr(memory);
     }
 
-    /* place it at the old blocks start address */
+    /* place new block  at the old blocks start address */
     newBlock->startAddr = bestFit->startAddr;
     /* new start address for old block is right after
     * the new block ends */
@@ -90,7 +97,10 @@ memBlock* BFAllocate(int size) {
     /* insert the new block just before the old block */
     ListInsert(memory, newBlock);
 
+    memPrinter();
+
     RttMonLeave();
+
     return newBlock;
 }
 
@@ -99,13 +109,18 @@ int Free(int address) {
     memBlock* iterator;
     memBlock* before;
     memBlock* after;
-    
+
     RttMonEnter();
+
+    printf("Freeing..\n");    
 
     if (ListCount(memory) < 1) {
         fprintf(stderr, "no initial memory block\n");
         exit(FAILURE);
     }
+
+    before = NULL;
+    after = NULL;
 
     ListFirst(memory);
     do {
@@ -124,23 +139,36 @@ int Free(int address) {
                     ListRemove(memory);
                     free(before);
                 }
+                else {
+                    ListNext(memory);
+                }
             }
 
             /* if the block after it is free */
             after = ListNext(memory);
             if (after != NULL) {
+                if (after == iterator) {
+                    after = ListNext(memory);
+                }
                 if (after->isFree == TRUE) {
                     iterator->size += after->size;
                     ListRemove(memory);
                     free(after);
                 }
             }
+
+            memPrinter();
+
             RttMonSignal(0);
+            
             RttMonLeave();
+
             return SUCCESS;
         }
 
     } while (ListNext(memory) != NULL);
+
+    RttMonLeave();
 
     return FAILURE;
 }
