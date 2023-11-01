@@ -10,11 +10,12 @@
 
 #include <BestFitMonitor.h>
 
-#define SLEEP 20
+#define MAX_SLEEP 20
 #define STKSIZE 65536
-#define FREEPROB 60 
+#define FREE_PROB 50
 #define PERCENT 100
-#define BLKMAX 8192
+#define TOTAL_MEM 32768
+#define MAX_ALLOC 8192
 #define MAX_THRDS 8
 #define NUM_ITERS 8
 
@@ -34,25 +35,21 @@ RTTTHREAD threadCreate(void* arg) {
 
     blocks = ListCreate();
 
-    for(j = 0; j < NUM_ITERS; j++) {
-        RttSleep((int) (rand() % SLEEP));
-        
-        size = rand() % BLKMAX + 1; 
-        probability = (rand() % PERCENT) + 1;
-        if (probability > FREEPROB) {
+    for(j = 0; j < NUM_ITERS; j++) { 
+        size = (int) ((rand() % MAX_ALLOC) + 1); 
+        probability = (int) ((rand() % PERCENT) + 1);
+        if (ListCount(blocks) == 0 || probability > FREE_PROB) {
             printf("%ld start allocate\n", myId);
-            if(size != 0) {
-                block = BFAllocate(size);
-                if (block != NULL) {
-                    ListPrepend(blocks, block);
-                }
+            block = BFAllocate(size);
+            if (block != NULL) {
+                ListPrepend(blocks, block);
             }
         }
         else {
             if (ListCount(blocks) > 0) {
-                randFree = rand() % ListCount(blocks)+1;
+                randFree = (int) (rand() % ListCount(blocks));
                 ListFirst(blocks);
-                for (i = 1; i < randFree; i++) {
+                for (i = 0; i < randFree; i++) {
                     block = ListNext(blocks);
                 }
                 printf("%ld start free\n", myId);
@@ -61,6 +58,7 @@ RTTTHREAD threadCreate(void* arg) {
                 }
             }
         }
+        RttSleep((int) (rand() % MAX_SLEEP));
     }
 }
 
@@ -74,38 +72,57 @@ int mainp() {
     attr.priority = RTTNORM;
     attr.deadline = RTTNODEADLINE;
 
-    /*setbuff(stdout,0);*/
+    setbuf(stdout,0);
 
     srand(71);
     
     BestFitInit();
+
+
+    printf("Total size: %d\n", TOTAL_MEM);
+    memPrinter();
+
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)1, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
 
+    RttSleep((int) (rand() % MAX_SLEEP/2));
+
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)2, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
+    
+    RttSleep((int) (rand() % MAX_SLEEP/2));
 
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)3, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
+    
+    RttSleep((int) (rand() % MAX_SLEEP/2));
 
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)4, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
+    
+    RttSleep((int) (rand() % MAX_SLEEP/2));
 
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)5, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
+    
+    RttSleep((int) (rand() % MAX_SLEEP/2));
 
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)6, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
+    
+    RttSleep((int) (rand() % MAX_SLEEP/2));
 
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)7, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
+    
+    RttSleep((int) (rand() % MAX_SLEEP/2));
 
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)8, attr, RTTUSR);

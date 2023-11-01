@@ -5,19 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <rtthreads.h>
-#include <RttCommon.h>
-
 #include <monitor.h>
 #include <list.h>
 #include <BestFitMonitor.h>
 
-/* #define TRUE 1
-#define FALSE 0 */
+#define TRUE 1
+#define FALSE 0
 #define TOTAL_MEM 32768
 #define SUCCESS 0
 #define FAILURE 1
 #define CONDS 1 /* number of conditions variables */
+#define MEM_AVAIL 0
 
 static LIST* memory;
 
@@ -47,7 +45,7 @@ memBlock* BFAllocate(int size) {
 
     RttMonEnter();
 
-    printf("Allocating..\n");
+    printf("Allocating a block of size %d\n", size);
 
     if (ListCount(memory) < 1) {
         fprintf(stderr, "no initial memory block\n");
@@ -70,7 +68,7 @@ memBlock* BFAllocate(int size) {
             }
         } while (ListNext(memory) != NULL);
         if (bestFit == NULL) {
-            RttMonWait(0);
+            RttMonWait(MEM_AVAIL);
         }
     }
     
@@ -112,7 +110,7 @@ int Free(int address) {
 
     RttMonEnter();
 
-    printf("Freeing..\n");    
+    printf("Freeing address %d\n", address);    
 
     if (ListCount(memory) < 1) {
         fprintf(stderr, "no initial memory block\n");
@@ -159,7 +157,7 @@ int Free(int address) {
 
             memPrinter();
 
-            RttMonSignal(0);
+            RttMonSignal(MEM_AVAIL);
             
             RttMonLeave();
 
@@ -173,6 +171,7 @@ int Free(int address) {
     return FAILURE;
 }
 
+/* memPrinter -- show the current state of the memory block */
 void memPrinter() {
     memBlock* iterator;
  
@@ -180,8 +179,6 @@ void memPrinter() {
         fprintf(stderr, "no initial memory block\n");
         exit(FAILURE);
     }
-    
-    printf("Total size: %d\n", TOTAL_MEM); 
 
     ListFirst(memory);
     do {
