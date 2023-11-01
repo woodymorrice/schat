@@ -6,65 +6,87 @@
 #include <rtthreads.h>
 #include <RttCommon.h>
 
+#include <list.h>
+
 #include <BestFitMonitor.h>
 
 #define SLEEP 20
 #define STKSIZE 65536
 #define FREEPROB 50 
 #define PERCENT 100
+#define BLKMAX 16384
+#define MAX_THRDS 4
 
-struct memBlock *block;
 
-RTTHREAD threadCreate(void *arg) {
+RTTTHREAD threadCreate(void *arg) {
     long myId;
     int size;
     int probability;
+    LIST* blocks;
+    memBlock* block;
+    int randFree;
+    int i;
+
+
     myId = (long) arg;
 
+    blocks = ListCreate();
+
     for(;;) {
-        size = rand(); 
-        probability = rand() % PERCENT;
-        if ((rand() % PERCENT) > FREEPROB) {
+        size = rand() % BLKMAX; 
+        probability = (rand() % PERCENT) + 1;
+        if (probability > FREEPROB) {
             printf("%ld start allocate\n", myId);
             if(size != 0) {
                 printf("Allocating\n");
-                Allocate(size);
+                block = BFAllocate(size);
+                if (block != NULL) {
+                    ListPrepend(blocks, block);
+                }
             }
         }
         else {
-            printf("%ld start free\n", myId);
-            if (block->startAddress != NULL && block->isFree == 1) {
-                prinf("Freeing\n");
-                Free(block->startAddress);
+            if (ListCount(blocks) > 0) {
+                randFree = rand() % ListCount(blocks)+1;
+                ListFirst(blocks);
+                for (i = 1; i < randFree; i++) {
+                    block = ListNext(blocks);
+                }
+                printf("%ld start free\n", myId);
+                printf("Freeing\n");
+                Free(block->startAddr);
             }
-            
         }
+        memPrinter();
         RttSleep((int) (rand() % SLEEP));
     }
 }
 
 
 int mainp() {
-
-    int temp;
+    int thread;
     RttSchAttr attr;
-    RttThreadId threads;
+    RttThreadId id;
+    int i;
 
     attr.startingtime = RTTZEROTIME;
     attr.priority = RTTNORM;
     attr.deadline = RTTNODEADLINE;
 
-    setbuff(stdout,0);
+    /*setbuff(stdout,0);*/
 
-    srand(71);
+    /*srand(71);*/
     
-    BestInit();
-    
-    temp = RttCreate(&threads, (void(*)()) threadCreate, STKSIZE, "THR",
-                    (void*) 1000 attr, RTTUSR);
-    if (temp == RTTFAILED) perror("RttCreate");
+    BestFitInit();
+    for (i = 0; i < MAX_THRDS; i++) {
+        thread = RttCreate(&id, threadCreate, STKSIZE,
+                           "simProc", NULL, attr, RTTUSR);
+        if (thread == RTTFAILED) {
+            perror("RttCreate");
+        }
+    }
 
-    printf("Threads created\n");
+    /*printf("Threads created\n");*/
 
     return(0);
 
