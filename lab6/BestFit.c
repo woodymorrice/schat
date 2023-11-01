@@ -54,7 +54,9 @@ RTTTHREAD threadCreate(void *arg) {
                 }
                 printf("%ld start free\n", myId);
                 printf("Freeing\n");
-                Free(block->startAddr);
+                if (0 == Free(block->startAddr)) {
+                    ListRemove(blocks);
+                }
             }
         }
         memPrinter();

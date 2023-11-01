@@ -74,7 +74,7 @@ memBlock* BFAllocate(int size) {
     newBlock->size = size;
     bestFit->size -= size;
         
-    /* this needs some checks */
+    /* find the old blocks spot in the list */
     iterator = ListFirst(memory);
     while (iterator->startAddr != bestFit->startAddr) {
         ListNext(memory);
@@ -87,7 +87,9 @@ memBlock* BFAllocate(int size) {
     * the new block ends */
     bestFit->startAddr += size;
       
+    /* insert the new block just before the old block */
     ListInsert(memory, newBlock);
+
     RttMonLeave();
     return newBlock;
 }
@@ -108,11 +110,13 @@ int Free(int address) {
     ListFirst(memory);
     do {
         iterator = ListCurr(memory);
+        /* if the block to free has been found */
         if (iterator->startAddr == address) {
+            /* set it to free */
             iterator->isFree = TRUE;
             
+            /* if the block before it is free */
             before = ListPrev(memory);
-
             if (before != NULL) {
                 if (before->isFree == TRUE) {
                     iterator->startAddr = before->startAddr;
@@ -122,8 +126,8 @@ int Free(int address) {
                 }
             }
 
+            /* if the block after it is free */
             after = ListNext(memory);
-            
             if (after != NULL) {
                 if (after->isFree == TRUE) {
                     iterator->size += after->size;
