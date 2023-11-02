@@ -20,7 +20,7 @@
 #define NUM_ITERS 8
 
 
-RTTTHREAD threadCreate(void* arg) {
+RTTTHREAD simProc(void* arg) {
     long myId;
     int size;
     int probability;
@@ -82,29 +82,27 @@ int mainp() {
     printf("Total size: %d\n", TOTAL_MEM);
     memPrinter();
 
-    thread = RttCreate(&id, threadCreate, STKSIZE,
+    thread = RttCreate(&id, simProc, STKSIZE,
                        "simProc", (void*)1, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
 
     RttSleep((int) (rand() % MAX_SLEEP/2));
 
-    thread = RttCreate(&id, threadCreate, STKSIZE,
+    thread = RttCreate(&id, simProc, STKSIZE,
                        "simProc", (void*)2, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
     
     RttSleep((int) (rand() % MAX_SLEEP/2));
 
-    thread = RttCreate(&id, threadCreate, STKSIZE,
+    thread = RttCreate(&id, simProc, STKSIZE,
                        "simProc", (void*)3, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
     
     RttSleep((int) (rand() % MAX_SLEEP/2));
 
-    thread = RttCreate(&id, threadCreate, STKSIZE,
+    thread = RttCreate(&id, simProc, STKSIZE,
                        "simProc", (void*)4, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
-
-    /*printf("Threads created\n");*/
 
     return(0);
 
