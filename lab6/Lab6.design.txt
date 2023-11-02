@@ -1,0 +1,155 @@
+* CMPT332 - Group 14
+* Phong Thanh Nguyen (David) - wdz468 - 11310824
+* Woody Morrice - wam553 - 11071060
+
+
+
+BestFitMonitor.h
+
+    A structure memBlock which contains 
+
+    Function prototypes:
+    
+        int BestFitInit();                    // initialize the list storage 
+                                              and fist block in the list
+
+        struct memBlock* BFAllocated(int);    // create new block based on the
+                                              given size
+
+        int Free(int);                        // free the block based on the 
+                                              given address
+
+        void memPrinter();                    // print out the status of the 
+                                              blocks in memory
+
+BestFit.c - implementation of the threads
+    For the total size of the entire block that we wants to allocate, it will 
+    equals to the (RAND_MAX of the rand() + 1). Each thread created will 
+    iterate 8 times to choose whether it wants to allocate or free. The
+    maximum size of the allocation will be 2 to the power of 13, since we 
+    don't want thread to allocate the size equals to the entire memory's size
+    which will cause deadlock immediately. The allocating and freeing 
+    probability will be set to 50 / 50, so that we can balance out the two jobs
+    threads want to do for each iteration.   
+    
+    RTTTHREAD threadCreate (void *arg) {
+        create list storage for newly block 
+        
+        iterate until reachs end {
+            calculate size it wants to allocate
+            calculate the probability of freeing or allocating
+            if the allocated probability is higher than free probability {
+                allocate the size
+                if allocated successfully 
+                    add the newly created block into the storage 
+            }
+            else {
+                check to see if the storage contains any blocks
+                randomly select blocks to free
+                remove the block out of the storage
+            }
+            thread sleeps for a number of time
+        }
+    }
+
+
+BestFitMonitor.c - implementation of the monitor procedures BF-Allocate & Free
+    
+    We have a global list (memory) to keep track of which memory blocks they 
+
+    have allocated, and also contains which memory blocks will be free during 
+
+    the next iteration.
+
+ 
+    int BestFitInit () {
+        initialize the monitor
+        create LIST storage for memory
+        create the first block of memory 
+    }
+
+    memBlock* BFAllocate (int size) {
+        
+        ask monitor permission to enter 
+        
+        while looking for best fit block {
+            move the cursor to the first block
+            do { 
+                iterate over all the blocks
+                find the best-fit block 
+            } while not at the end of the list storage
+            if we cannot find a suitable block
+                we put the thread to wait in condition queue 
+        }
+        
+        if we do find the best block 
+        allocate new block at the current position
+        update data for new block
+        subtract the allocated size to the size of the best block
+        
+        update address of the old block
+        update the start address of the best fit according to the size allocated    
+    
+        thread leaves the monitor 
+        return address of the new block
+        
+    }
+
+
+    int Free (int address) {
+        
+        ask monitor permission to enter
+
+        move the cursor to the starting block
+
+        do {
+           locate the current address
+           if the current address is matched with the given address {
+                set the status of the current block to free
+                
+                check before block
+                if the before block address is valid {
+                    check the free status of the block
+                        update the address of new free block 
+                        add up the total free size
+                        free the old block's memory allocated
+                }
+                else {
+                    move the address back to the initial block
+                }     
+
+                check after block 
+                if the after block address is valid {
+                    if address of the after block is the same as current {
+                        move next
+                    } 
+                    
+                    if after block is free and not the same as current {
+                        sum up the total free size
+                        remove the after block out of list
+                        free up the old block's memory allocated
+                    }
+                        
+                }
+                
+                signal waiting threads in the condition queue
+                potentially allocated a waiting thread at the deleted block
+                leave the monitor
+                return success
+           }
+
+        } while we are not at the end of list storage
+
+        thread leave the monitor
+        
+        return failure if the given address is not valid
+    }
+
+    
+    void memPrinter () {
+        print out which block is free /or occupied
+    }
+
+      
+
+
