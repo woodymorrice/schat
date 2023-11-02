@@ -1,0 +1,151 @@
+# Group 14 - CMPT 332
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+
+Total size: 32768
+Address: 0 -- Size: 32768 -- FREE
+1 start allocate
+Allocating a block of size 5941
+Address: 0 -- Size: 5941 -- ALLOCATED
+Address: 5941 -- Size: 26827 -- FREE
+2 start allocate
+Allocating a block of size 8151
+Address: 0 -- Size: 5941 -- ALLOCATED
+Address: 5941 -- Size: 8151 -- ALLOCATED
+Address: 14092 -- Size: 18676 -- FREE
+2 start free
+Freeing address 5941
+Address: 0 -- Size: 5941 -- ALLOCATED
+Address: 5941 -- Size: 26827 -- FREE
+3 start allocate
+Allocating a block of size 6462
+Address: 0 -- Size: 5941 -- ALLOCATED
+Address: 5941 -- Size: 6462 -- ALLOCATED
+Address: 12403 -- Size: 20365 -- FREE
+1 start free
+Freeing address 0
+Address: 0 -- Size: 5941 -- FREE
+Address: 5941 -- Size: 6462 -- ALLOCATED
+Address: 12403 -- Size: 20365 -- FREE
+4 start allocate
+Allocating a block of size 4851
+Address: 0 -- Size: 4851 -- ALLOCATED
+Address: 4851 -- Size: 1090 -- FREE
+Address: 5941 -- Size: 6462 -- ALLOCATED
+Address: 12403 -- Size: 20365 -- FREE
+3 start allocate
+Allocating a block of size 38
+Address: 0 -- Size: 4851 -- ALLOCATED
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 1052 -- FREE
+Address: 5941 -- Size: 6462 -- ALLOCATED
+Address: 12403 -- Size: 20365 -- FREE
+4 start allocate
+Allocating a block of size 4411
+Address: 0 -- Size: 4851 -- ALLOCATED
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 1052 -- FREE
+Address: 5941 -- Size: 6462 -- ALLOCATED
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 15954 -- FREE
+2 start allocate
+Allocating a block of size 534
+Address: 0 -- Size: 4851 -- ALLOCATED
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 518 -- FREE
+Address: 5941 -- Size: 6462 -- ALLOCATED
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 15954 -- FREE
+3 start free
+Freeing address 5941
+Address: 0 -- Size: 4851 -- ALLOCATED
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 6980 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 15954 -- FREE
+3 start allocate
+Allocating a block of size 5987
+Address: 0 -- Size: 4851 -- ALLOCATED
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 5987 -- ALLOCATED
+Address: 11410 -- Size: 993 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 15954 -- FREE
+1 start allocate
+Allocating a block of size 807
+Address: 0 -- Size: 4851 -- ALLOCATED
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 5987 -- ALLOCATED
+Address: 11410 -- Size: 807 -- ALLOCATED
+Address: 12217 -- Size: 186 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 15954 -- FREE
+4 start free
+Freeing address 0
+Address: 0 -- Size: 4851 -- FREE
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 5987 -- ALLOCATED
+Address: 11410 -- Size: 807 -- ALLOCATED
+Address: 12217 -- Size: 186 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 15954 -- FREE
+2 start allocate
+Allocating a block of size 7092
+Address: 0 -- Size: 4851 -- FREE
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 5987 -- ALLOCATED
+Address: 11410 -- Size: 807 -- ALLOCATED
+Address: 12217 -- Size: 186 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 7092 -- ALLOCATED
+Address: 23906 -- Size: 8862 -- FREE
+4 start free
+Freeing address 0
+Address: 0 -- Size: 4851 -- FREE
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 5987 -- ALLOCATED
+Address: 11410 -- Size: 807 -- ALLOCATED
+Address: 12217 -- Size: 186 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 7092 -- ALLOCATED
+Address: 23906 -- Size: 8862 -- FREE
+1 start free
+Freeing address 11410
+Address: 0 -- Size: 4851 -- FREE
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 5987 -- ALLOCATED
+Address: 11410 -- Size: 993 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 7092 -- ALLOCATED
+Address: 23906 -- Size: 8862 -- FREE
+4 start allocate
+Allocating a block of size 6360
+Address: 0 -- Size: 4851 -- FREE
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 5987 -- ALLOCATED
+Address: 11410 -- Size: 993 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 7092 -- ALLOCATED
+Address: 23906 -- Size: 6360 -- ALLOCATED
+Address: 30266 -- Size: 2502 -- FREE
+3 start free
+Freeing address 5423
+Address: 0 -- Size: 4851 -- FREE
+Address: 4851 -- Size: 38 -- ALLOCATED
+Address: 4889 -- Size: 534 -- ALLOCATED
+Address: 5423 -- Size: 6980 -- FREE
+Address: 12403 -- Size: 4411 -- ALLOCATED
+Address: 16814 -- Size: 7092 -- ALLOCATED
+Address: 23906 -- Size: 6360 -- ALLOCATED
+Address: 30266 -- Size: 2502 -- FREE
+

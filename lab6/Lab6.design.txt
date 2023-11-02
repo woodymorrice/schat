@@ -30,7 +30,8 @@ BestFit.c - implementation of the threads
     don't want thread to allocate the size equals to the entire memory's size
     which will cause deadlock immediately. The allocating and freeing 
     probability will be set to 50 / 50, so that we can balance out the two jobs
-    threads want to do for each iteration.   
+    that threads want to do for each iteration. Each newly created thread will
+    sleep for a number of time before another new thread is created.    
     
     RTTTHREAD threadCreate (void *arg) {
         create list storage for newly block 
