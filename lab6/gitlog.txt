@@ -1,0 +1,102 @@
+/* CMPT332 - Group 14
+ * Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+
+commit c087ce598b1d95989ae0096b2ae6c2ab87997b28
+Author: phong <wdz468@usask.ca>
+Date:   Thu Nov 2 15:23:49 2023 -0600
+
+    Update owner info of the list source files
+
+commit de6c58abf22a869849dbd23cc25655fc14495849
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Thu Nov 2 12:48:34 2023 -0600
+
+    lab6 - added list source and lines in makefile
+
+commit 8e0436b43cee6aac9247947fc5b909cda4dd5a6f
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Nov 1 22:15:40 2023 -0600
+
+    lab6 design doc minor grammatical corrections
+
+commit e889eec8d070c6729f55ea52e6203516c0a49682
+Author: phong <wdz468@usask.ca>
+Date:   Wed Nov 1 19:03:24 2023 -0600
+
+    Pushing output document to main git repo before hand in
+
+commit ce7eb8c264162229fe8ed47d9f74037540fcbebc
+Author: phong <wdz468@usask.ca>
+Date:   Wed Nov 1 18:56:28 2023 -0600
+
+    Update total maximum threads as required in lab 6
+
+commit 1986fb153389709aff4c24e3595c32c39f26554b
+Author: phong <wdz468@usask.ca>
+Date:   Wed Nov 1 18:48:48 2023 -0600
+
+    Updated design documentation for lab 6
+
+commit 123ed8ef27847e7ef58124c7a7c1e21cd50a17fd
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Nov 1 16:28:55 2023 -0600
+
+    lab6 fixed various bugs
+
+commit dc0f0f207f24f6e6e4973510321183e28d902184
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Nov 1 13:58:11 2023 -0600
+
+    fixes to lab6 free function
+
+commit 297f6a23c5ab08f4eae4743945ae5d207d88e28a
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Nov 1 00:30:35 2023 -0600
+
+    added some clarifying comments
+
+commit 9ed457ba1a67df62d3f9aef74172ef85bc61694a
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Wed Nov 1 00:16:05 2023 -0600
+
+    lab6 functional but buggy
+
+commit f7cd54731ca7a93c53d923f11abf44a20002c60b
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 31 16:01:41 2023 -0600
+
+    Rough draft of BestFit.c, waiting to be tested
+
+commit 1b5f0e5a5cd10557dfff53d927f898513a64c8e9
+Merge: d1a4027 abcfb91
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Tue Oct 31 12:41:41 2023 -0600
+
+    Merge branch 'main' of git.cs.usask.ca:cmpt332/cmpt-332-fall-2023/
+    cmpt332-2023-group14
+
+commit d1a4027e408a38b862934499c236432a070551fc
+Merge: d60a5e7 c21b347
+Author: Woody Morrice <wam553@usask.ca>
+Date:   Tue Oct 31 12:41:35 2023 -0600
+
+    cleaning up repo
+
+commit abcfb917ec911f08e8f5cd52700bfb0456a64aa0
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 31 12:33:57 2023 -0600
+
+    Updated Makefile
+
+commit c21b347888d0de8c6ff1895c2c92574d39d5441a
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 31 09:52:36 2023 -0600
+
+    Modified Makefile and created required files
+
+commit 49990530f3f56b04293844cc6e5d1c6b8bae8104
+Author: phong <wdz468@usask.ca>
+Date:   Tue Oct 31 09:38:46 2023 -0600
+
+    Lab6: Initial commit, updated necessary files
