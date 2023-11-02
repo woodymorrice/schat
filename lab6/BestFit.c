@@ -2,6 +2,14 @@
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
 
+
+
+/* All the list source code files on the behalf of: 
+ * Joseph Medernach, imy309, 11313955
+ * John Miller, knp254, 11323966
+ */ 
+
+
 #include <stdio.h>
 #include <rtthreads.h>
 #include <RttCommon.h>

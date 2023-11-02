@@ -5,6 +5,10 @@
 ** Best-fit Memory Allocation Simulator **
 **            Design Details            **
 
+/* All the list source code files on the behalf of: 
+ * Joseph Medernach, imy309, 11313955
+ * John Miller, knp254, 11323966
+ */ 
 
 BestFitMonitor.h
 
