@@ -16,7 +16,7 @@
 #define PERCENT 100
 #define TOTAL_MEM 32768
 #define MAX_ALLOC 8192
-#define MAX_THRDS 8
+#define MAX_THRDS 4
 #define NUM_ITERS 8
 
 
@@ -102,30 +102,6 @@ int mainp() {
 
     thread = RttCreate(&id, threadCreate, STKSIZE,
                        "simProc", (void*)4, attr, RTTUSR);
-    if (thread == RTTFAILED) { perror("RttCreate"); }
-    
-    RttSleep((int) (rand() % MAX_SLEEP/2));
-
-    thread = RttCreate(&id, threadCreate, STKSIZE,
-                       "simProc", (void*)5, attr, RTTUSR);
-    if (thread == RTTFAILED) { perror("RttCreate"); }
-    
-    RttSleep((int) (rand() % MAX_SLEEP/2));
-
-    thread = RttCreate(&id, threadCreate, STKSIZE,
-                       "simProc", (void*)6, attr, RTTUSR);
-    if (thread == RTTFAILED) { perror("RttCreate"); }
-    
-    RttSleep((int) (rand() % MAX_SLEEP/2));
-
-    thread = RttCreate(&id, threadCreate, STKSIZE,
-                       "simProc", (void*)7, attr, RTTUSR);
-    if (thread == RTTFAILED) { perror("RttCreate"); }
-    
-    RttSleep((int) (rand() % MAX_SLEEP/2));
-
-    thread = RttCreate(&id, threadCreate, STKSIZE,
-                       "simProc", (void*)8, attr, RTTUSR);
     if (thread == RTTFAILED) { perror("RttCreate"); }
 
     /*printf("Threads created\n");*/
