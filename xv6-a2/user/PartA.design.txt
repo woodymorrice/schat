@@ -1,0 +1,70 @@
+# Group 14 - CMPT332
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+
+** Design Detail **
+
+Threading API 
+Contain a structure of thread that has a pointer to char, state, and registers.
+By using malloc() in umalloc.c, we are able to allocate memory for the stack
+size needed. Return address will point to the thread functions, and stack 
+pointer will point to the stack that we just allocated. 
+
+For thread switching, the design for it is basically the same as what we
+are having in the kernel directory, thread_switch() will have assembly code
+to store the information of the thread in registers. 
+
+Mutex 
+
+Contain a structure which has a lock state, a pointer to thread that is 
+currently holding the lock, and lock index id. In this assigment, I designed so 
+it will be able to store multiple spinlocks. (mtx_create) will set the initial 
+value of the members in spinlock structure and added it into the array of lock
+structure. (mtx_lock) will have forever loop to constantly checking the lock
+state. And (mtx_unlock) will just change the lock state and the current
+thread that is holding the lock.
+
+Testing will be in the pro-con.c 
+
+** Pseudocode **
+
+void thread_create (void (*func)()) {
+    set the thread state in the array to RUNNABLE
+    allocating memory for stack
+    make return address point to the function 
+    make stack pointer point to the created stack
+}
+
+int mutex_create(int locked) {
+    check initialized status 
+    if (it is not initialized) {
+        set value for memmbers
+        add the first lock into array
+        change the status of initialized
+    }
+    else {
+        increase lock id
+        set value for members
+        add the lock to the array 
+    }
+    
+    return lock id;
+}
+
+int mtx_lock(int lock_id) {
+    forever loop {
+        constantly checking the lock state
+        if previous lock state is 0
+            change the value of lock state to 1
+            break
+    }
+    return 0 (success) / -1 (failure)
+}
+
+int mtx_unlock (int lock_id) {
+    set lock state to zero
+    assign new value to the thread that is holding the lock
+    return 0 (success) / -1 (failure)
+}
+
