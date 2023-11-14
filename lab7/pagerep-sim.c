@@ -35,14 +35,15 @@ struct page *find_victim_slot() {
     bool notFindIt = true;
     struct page *pageFinded;
     while (notFindIt && next_slot < nslots) {
-        /*reference == 0 && dirty == 0*/
-        if (slots->reference == false && slots->dirty == false) {
+        if (slots->reference == false && 
+            slots->dirty == false) {
             pageFinded = slots;
             notFindIt = false;
         }
         else {
             next_slot ++;
-            if (slots->reference == true && slots->dirty == true) {
+            if (slots->reference == true && 
+                slots->dirty == true) {
                 next_slot ++;
             }
             else {
@@ -51,7 +52,7 @@ struct page *find_victim_slot() {
             }
         }
     }
-    return pageFinded;   
+    return pageFinded;
     /*return slots + (rand() % nslots);*/
 }
 
