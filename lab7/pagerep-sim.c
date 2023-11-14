@@ -27,29 +27,29 @@ int npages;
 int next_slot;
 int nslots;
 struct page *slots;
-
+bool hasFreeSlot;
 /* Handles a page fault via the second-chance algorithm.
  * Returns the pointer to the slot the victim is in. */
 struct page *find_victim_slot() {
     /* TODO: implement second chance page replacement algorithm */
     bool notFindIt = true;
     struct page *pageFinded;
-    while (notFindIt && next_slot < nslots) {
-        if (slots->reference == false && 
-            slots->dirty == false) {
-            pageFinded = slots;
+    while (notFindIt && next_slot <= nslots) {
+        if ((slots+next_slot)->reference == false && 
+            (slots+next_slot)->dirty == false) {
+            pageFinded = (slots+next_slot);
             notFindIt = false;
         }
         else {
-            next_slot ++;
-            if (slots->reference == true && 
-                slots->dirty == true) {
-                next_slot ++;
+            if ((slots+next_slot)->reference == true && 
+                (slots+next_slot)->dirty == true) {
+                (slots+next_slot)->reference=false;
             }
             else {
-                pageFinded = slots;
-                notFindIt = false;
+                (slots+next_slot)->reference=false;
+                (slots+next_slot)->dirty=false;
             }
+            next_slot = (next_slot+1)%nslots;
         }
     }
     return pageFinded;
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     }
     next_slot = 0;
     slots = malloc(sizeof(struct page) * nslots);
-
+    hasFreeSlot = true;
     if (argc == 4) {
         times = atoi(argv[3]);
         if (times <= 0) {
@@ -120,9 +120,13 @@ int main(int argc, char **argv) {
         if (fault) {
             printf(" This triggered a page fault.");
             p = find_victim_slot();
-            if (next_slot < nslots) {
+            if (hasFreeSlot && next_slot < nslots) {
                 printf(" There was a free slot!");
                 p = slots + next_slot++;
+                if(next_slot == nslots){
+                    next_slot = 0;
+                    hasFreeSlot = false;
+                }
             } else {
                 printf(" The chosen victim was page %d.", p->number);
             }
