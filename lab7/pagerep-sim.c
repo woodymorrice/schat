@@ -27,30 +27,42 @@ int npages;
 int next_slot;
 int nslots;
 struct page *slots;
-bool hasFreeSlot;
+int diff; 
+
 /* Handles a page fault via the second-chance algorithm.
  * Returns the pointer to the slot the victim is in. */
 struct page *find_victim_slot() {
     /* TODO: implement second chance page replacement algorithm */
     bool notFindIt = true;
     struct page *pageFinded;
-    while (notFindIt && next_slot <= nslots) {
-        if ((slots+next_slot)->reference == false && 
-            (slots+next_slot)->dirty == false) {
-            pageFinded = (slots+next_slot);
-            notFindIt = false;
-        }
+    int reset = next_slot;
+    if (reset == nslots) {
+        next_slot = next_slot - diff;
+    }
+    else {
+        next_slot = next_slot;
+    }
+    while (notFindIt) {
+        if ((slots + next_slot)->reference == false && 
+            (slots + next_slot)->dirty == false) {
+                pageFinded = (slots + next_slot);
+                diff = (next_slot + 1) % nslots;
+                notFindIt = false;
+            }
         else {
-            if ((slots+next_slot)->reference == true && 
-                (slots+next_slot)->dirty == true) {
-                (slots+next_slot)->reference=false;
+            if ((slots + next_slot)->reference == true && 
+                (slots + next_slot)->dirty == true) {
+                (slots + next_slot)->reference=false;
             }
             else {
-                (slots+next_slot)->reference=false;
-                (slots+next_slot)->dirty=false;
+                (slots + next_slot)->reference=false;
+                (slots + next_slot)->dirty=false;
             }
-            next_slot = (next_slot+1)%nslots;
+            next_slot = (next_slot + 1) % nslots; 
         }
+    }
+    if (reset == nslots) {
+        next_slot = nslots;
     }
     return pageFinded;
     /*return slots + (rand() % nslots);*/
@@ -81,7 +93,6 @@ int main(int argc, char **argv) {
     }
     next_slot = 0;
     slots = malloc(sizeof(struct page) * nslots);
-    hasFreeSlot = true;
     if (argc == 4) {
         times = atoi(argv[3]);
         if (times <= 0) {
@@ -120,13 +131,13 @@ int main(int argc, char **argv) {
         if (fault) {
             printf(" This triggered a page fault.");
             p = find_victim_slot();
-            if (hasFreeSlot && next_slot < nslots) {
+            if (next_slot < nslots) {
                 printf(" There was a free slot!");
                 p = slots + next_slot++;
-                if(next_slot == nslots){
+                /*if(next_slot == nslots){
                     next_slot = 0;
                     hasFreeSlot = false;
-                }
+                }*/
             } else {
                 printf(" The chosen victim was page %d.", p->number);
             }
