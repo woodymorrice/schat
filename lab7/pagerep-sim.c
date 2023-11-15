@@ -46,7 +46,15 @@ struct page *find_victim_slot() {
         if ((slots + next_slot)->reference == false && 
             (slots + next_slot)->dirty == false) {
                 pageFinded = (slots + next_slot);
-                diff = (next_slot + 1) % nslots;
+                if (next_slot == nslots - 1) {
+                    diff = nslots;
+                }
+                else if (next_slot == 0){
+                    diff = nslots - 1;
+                }
+                else {
+                    diff = nslots - (next_slot + 1);
+                }
                 notFindIt = false;
             }
         else {
@@ -57,6 +65,7 @@ struct page *find_victim_slot() {
             else {
                 (slots + next_slot)->reference=false;
                 (slots + next_slot)->dirty=false;
+                
             }
             next_slot = (next_slot + 1) % nslots; 
         }
