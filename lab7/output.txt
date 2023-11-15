@@ -1,0 +1,30 @@
+/* Phong Thanh Nguyen (David)- wdz468 - 11310824*/
+
+Test 1: 
+./sim 12 4 10
+
+R  on page 10. This triggered a page fault. There was a free slot!
+RW on page 10.
+RW on page 11. This triggered a page fault. There was a free slot!
+R  on page 6. This triggered a page fault. There was a free slot!
+RW on page 6.
+RW on page 8. This triggered a page fault. There was a free slot!
+RW on page 7. This triggered a page fault. The chosen victim was page 10.
+R  on page 11.
+R  on page 9. This triggered a page fault. The chosen victim was page 6.
+R  on page 4. This triggered a page fault. The chosen victim was page 8.
+
+Test 2:
+./sim 9 3 10 
+ 
+./pagerep-sim 
+R  on page 8. This triggered a page fault. There was a free slot!
+RW on page 7. This triggered a page fault. There was a free slot!
+RW on page 8.
+R  on page 5. This triggered a page fault. There was a free slot!
+RW on page 4. This triggered a page fault. The chosen victim was page 5.
+RW on page 6. This triggered a page fault. The chosen victim was page 8.
+RW on page 5. This triggered a page fault. The chosen victim was page 7.
+R  on page 8. This triggered a page fault. The chosen victim was page 4.
+R  on page 7. This triggered a page fault. The chosen victim was page 6.
+R  on page 3. This triggered a page fault. The chosen victim was page 5.
