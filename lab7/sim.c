@@ -25,12 +25,48 @@ int npages;
 int next_slot;
 int nslots;
 struct page *slots;
+struct page *oldest;
 
 /* Handles a page fault via the second-chance algorithm.
  * Returns the pointer to the slot the victim is in. */
 struct page *find_victim_slot() {
     /* TODO: implement second chance page replacement algorithm */
-    return slots + (rand() % nslots);
+    /*return slots + (rand() % nslots);*/
+    struct page* iter;
+    int i;
+    
+    /* Need a way to track the oldest page, current
+     * method does not work properly!
+     * Could potentially use another list of size n
+     * traverse it linearly, iterator always pointing to
+     * the least recently added page */
+
+    iter = oldest;
+    for (;;) {
+        if (iter->reference) {
+            iter->reference = false;
+        }
+        else {
+            if (iter->dirty) {
+                iter->dirty = false;
+            }
+            else {
+                if (iter < slots + nslots-1) {
+                    oldest = iter;
+                }
+                else {
+                    oldest = slots;
+                }
+                return iter;
+            }
+        }
+        if (iter == slots + nslots-1) {
+            iter = slots;
+        }
+        else {
+            iter++;
+        }
+    }
 }
 
 int main(int argc, char **argv) {
@@ -74,6 +110,8 @@ int main(int argc, char **argv) {
         p->reference = false;
         p->dirty = false;
     }
+
+    oldest = slots;
 
     while (times < 0 || times-- > 0) {
         page = npages * sqrt((double) rand() / RAND_MAX);
