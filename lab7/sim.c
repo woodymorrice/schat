@@ -1,12 +1,7 @@
 /* Identification:
  * Author: Jarrod Pas
- * Modified by students: */
-
-/* CMPT332 - Group 14
- * Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Modified by students:
  * Woody Morrice - wam553 - 11071060 */
-
-/* Note: code intentionally not commented */
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -25,46 +20,44 @@ int npages;
 int next_slot;
 int nslots;
 struct page *slots;
-struct page *oldest;
+struct page *oldest; /* 'oldest' page */
+
 
 /* Handles a page fault via the second-chance algorithm.
  * Returns the pointer to the slot the victim is in. */
 struct page *find_victim_slot() {
-    /* TODO: implement second chance page replacement algorithm */
-    /*return slots + (rand() % nslots);*/
-    struct page* iter;
-    int i;
-    
-    /* Need a way to track the oldest page, current
-     * method does not work properly!
-     * Could potentially use another list of size n
-     * traverse it linearly, iterator always pointing to
-     * the least recently added page */
+    struct page* res; /* page to evict */
+    struct page* iter; /* iterator */
 
+    res = NULL;
     iter = oldest;
     for (;;) {
-        if (iter->reference) {
+        if (iter->reference) {      /* set ref bit to 0 first */
             iter->reference = false;
         }
         else {
-            if (iter->dirty) {
+            if (iter->dirty) {      /* if ref is 0 set dirty to 0 */
                 iter->dirty = false;
             }
-            else {
-                if (iter < slots + nslots-1) {
-                    oldest = iter;
-                }
-                else {
-                    oldest = slots;
-                }
-                return iter;
+            else {                  /* if both are 0 evict this page */
+                res = iter;
             }
         }
+
+        /* advance the iterator */
         if (iter == slots + nslots-1) {
             iter = slots;
         }
         else {
             iter++;
+        }
+
+        /* if page to evict has been found,
+         * update pointer to next 'oldest' page
+         * then return result */
+        if (res != NULL) {
+            oldest = iter;
+            return res;
         }
     }
 }
@@ -112,7 +105,6 @@ int main(int argc, char **argv) {
     }
 
     oldest = slots;
-
     while (times < 0 || times-- > 0) {
         page = npages * sqrt((double) rand() / RAND_MAX);
         write = rand() % 2;
@@ -141,6 +133,7 @@ int main(int argc, char **argv) {
             } else {
                 printf(" The chosen victim was page %d.", p->number);
             }
+
             p->number = page;
             p->reference = true;
             p->dirty = write;
