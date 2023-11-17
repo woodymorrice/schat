@@ -140,6 +140,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_pingpong\
 	$U/_uthread\
+	$U/_utest\
 	$U/_trace\
 	$U/_uthread\
 	$U/_test\
@@ -166,6 +167,11 @@ UPROGS=\
 	# Woody Morrice - wam553 - 11071060
 	# End CMPT 332 group14 change Fall 2023
 
+$U/utest.o: $U/utest.c
+	$(CC) $(CFLAGS) -c -o $U/utest.o $U/utest.c
+
+$U/_utest: $U/utest.o $(ULIB)
+	$(LD) $(LDFLAGS) -N -e tmain -Ttext 0 -o $U/_utest $U/utest.o $(ULIB)
 
 fs.img: mkfs/mkfs README $(UEXTRA) $(UPROGS)
 	mkfs/mkfs fs.img README $(UEXTRA) $(UPROGS)
