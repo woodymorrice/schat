@@ -11,7 +11,7 @@
 #include "kernel/syscall.h"
 #include "kernel/memlayout.h"
 #include "kernel/riscv.h"
-
+#include "user/grind.h"
 /* from FreeBSD. */
 int
 do_rand(unsigned long *ctx)
