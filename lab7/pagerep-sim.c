@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
 Identification:
 
@@ -10,17 +9,6 @@ Modified by students:  First Last
 
 /* Note: code intentionally not commented */
 
-/* CMPT332 - Group 14
- * Phong Thanh Nguyen (David) - wdz468 - 11310824
- */
-
-
-=======
-/* Identification:
- * Author: Jarrod Pas
- * Modified by students:
- * Woody Morrice - wam553 - 11071060 */
->>>>>>> 57cce5ea810b9a6fdbb7cf28bc7cbd1e982ac061
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -39,49 +27,54 @@ int npages;
 int next_slot;
 int nslots;
 struct page *slots;
-struct page *oldest; /* 'oldest' page */
-
+int diff; 
 
 /* Handles a page fault via the second-chance algorithm.
  * Returns the pointer to the slot the victim is in. */
 struct page *find_victim_slot() {
-
     /* TODO: implement second chance page replacement algorithm */
- 
-    struct page* res; /* page to evict */
-    struct page* iter; /* iterator */
-
-    res = NULL;
-    iter = oldest;
-    for (;;) {
-        if (iter->reference) {      /* set ref bit to 0 first */
-            iter->reference = false;
-        }
-        else {
-            if (iter->dirty) {      /* if ref is 0 set dirty to 0 */
-                iter->dirty = false;
+    bool notFindIt = true;
+    struct page *pageFinded;
+    int reset = next_slot;
+    if (reset == nslots) {
+        next_slot = next_slot - diff;
+    }
+    else {
+        next_slot = next_slot;
+    }
+    while (notFindIt) {
+        if ((slots + next_slot)->reference == false && 
+            (slots + next_slot)->dirty == false) {
+                pageFinded = (slots + next_slot);
+                if (next_slot == nslots - 1) {
+                    diff = nslots;
+                }
+                else if (next_slot == 0){
+                    diff = nslots - 1;
+                }
+                else {
+                    diff = nslots - (next_slot + 1);
+                }
+                notFindIt = false;
             }
-            else {                  /* if both are 0 evict this page */
-                res = iter;
-            }
-        }
-
-        /* advance the iterator */
-        if (iter == slots + nslots-1) {
-            iter = slots;
-        }
         else {
-            iter++;
-        }
-
-        /* if page to evict has been found,
-         * update pointer to next 'oldest' page
-         * then return result */
-        if (res != NULL) {
-            oldest = iter;
-            return res;
+            if ((slots + next_slot)->reference == true && 
+                (slots + next_slot)->dirty == true) {
+                (slots + next_slot)->reference=false;
+            }
+            else {
+                (slots + next_slot)->reference=false;
+                (slots + next_slot)->dirty=false;
+                
+            }
+            next_slot = (next_slot + 1) % nslots; 
         }
     }
+    if (reset == nslots) {
+        next_slot = nslots;
+    }
+    return pageFinded;
+    /*return slots + (rand() % nslots);*/
 }
 
 int main(int argc, char **argv) {
@@ -109,7 +102,6 @@ int main(int argc, char **argv) {
     }
     next_slot = 0;
     slots = malloc(sizeof(struct page) * nslots);
-
     if (argc == 4) {
         times = atoi(argv[3]);
         if (times <= 0) {
@@ -126,7 +118,6 @@ int main(int argc, char **argv) {
         p->dirty = false;
     }
 
-    oldest = slots;
     while (times < 0 || times-- > 0) {
         page = npages * sqrt((double) rand() / RAND_MAX);
         write = rand() % 2;
@@ -152,10 +143,13 @@ int main(int argc, char **argv) {
             if (next_slot < nslots) {
                 printf(" There was a free slot!");
                 p = slots + next_slot++;
+                /*if(next_slot == nslots){
+                    next_slot = 0;
+                    hasFreeSlot = false;
+                }*/
             } else {
                 printf(" The chosen victim was page %d.", p->number);
             }
-
             p->number = page;
             p->reference = true;
             p->dirty = write;
