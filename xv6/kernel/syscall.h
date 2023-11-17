@@ -26,6 +26,7 @@
  * Woody Morrice - wam553 - 11071060 */
 
 #define SYS_trace  22
+#define SYS_getNumFreePages 23
 
 /* End CMPT 332 group14 change Fall 2023 */
 

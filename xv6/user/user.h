@@ -28,6 +28,7 @@ int uptime(void);
  * Woody Morrice - wam553 - 11071060 */
 
 int trace(int);
+int getNumFreePages();
 
 /* End CMPT 332 group14 change Fall 2023 */
 

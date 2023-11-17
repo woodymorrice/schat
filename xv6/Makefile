@@ -144,7 +144,8 @@ UPROGS=\
 	$U/_trace\
 	$U/_uthread\
 	$U/_test\
-	$U/_utest
+	$U/_utest\
+	$U/_cowtest
 	# CMPT 332 GROUP 14 CHANGE, FALL 2023
 	# a2: part a
 

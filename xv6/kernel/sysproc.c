@@ -108,5 +108,12 @@ sys_trace(void)
   return 0;
 }
 
+uint64
+sys_getNumFreePages(void)
+{
+
+    return 0;
+}
+
 /* End CMPT 332 group14 change Fall 2023 */
 
