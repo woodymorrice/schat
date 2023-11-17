@@ -1,4 +1,5 @@
 #include "kernel/types.h"
+#include "kernel/stat.h"
 #include "user/user.h"
 #include "user/grind.h"
 #include <stddef.h>
@@ -11,13 +12,15 @@
 int arrProc[MAX_PROC];
 
 void createProcess() {
-    int index; 
+    int index;
+    int randVal; 
     for (index = 0; index < MAX_PROC; index ++) {
         int process = fork();
         arrProc[index] = process;
         if (process == 0) {
             printf("Process: %ld is sleeping\n", process);
-            sleep(rand() * MAX_SLEEP);
+            randVal = rand();
+            sleep(randVal * MAX_SLEEP);
         }
     }
 }
