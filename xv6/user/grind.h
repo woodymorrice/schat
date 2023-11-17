@@ -1,7 +1,7 @@
 
 
 int do_rand(unsigned long*);
-int rand();
+int rand(void);
 void go(int);
 void iter();
 
