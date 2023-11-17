@@ -26,7 +26,7 @@ void createProcess() {
 }
 
 
-int main() {
+int tmain() {
 
     createProcess();
 
