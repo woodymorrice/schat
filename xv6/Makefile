@@ -141,24 +141,26 @@ UPROGS=\
 	$U/_pingpong\
 	$U/_uthread\
 	$U/_trace\
-	$U/_test
+	$U/_uthread\
+	$U/_test\
+	$U/_utest
 	# CMPT 332 GROUP 14 CHANGE, FALL 2023
 	# a2: part a
- 
-$U/uthread_switch.o: $U/uthread_switch.S 
-	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S
 
-$U/_uthread: $U/uthread.o $U/uthread_switch.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_uthread $U/uthread.o \
-		$U/uthread_switch.o $(ULIB)
-	$(OBJDUMP) -S $U/_uthread > $U/uthread.asm
+#$U/uthread_switch.o: $U/uthread_switch.S 
+#	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S
 
-$U/test.o: $U/test.c
-	$(CC) $(CFLAGS) -c -o $U/test.o $U/test.c
+#$U/_uthread: $U/uthread.o $U/uthread_switch.o $(ULIB)
+#	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_uthread $U/uthread.o \
+#		$U/uthread_switch.o $(ULIB)
+#	$(OBJDUMP) -S $U/_uthread > $U/uthread.asm
 
-$U/_test: $U/test.o $U/uthread.o $U/uthread_switch.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e tmain -Ttext 0 -o $U/_test $U/uthread.o \
-		$U/uthread_switch.o $U/test.o $(ULIB)
+#$U/test.o: $U/test.c
+#	$(CC) $(CFLAGS) -c -o $U/test.o $U/test.c
+
+#$U/_test: $U/test.o $U/uthread.o $U/uthread_switch.o $(ULIB)
+#	$(LD) $(LDFLAGS) -N -e tmain -Ttext 0 -o $U/_test $U/uthread.o \
+#		$U/uthread_switch.o $U/test.o $(ULIB)
 	# Begin CMPT 332 group14 change Fall 2023
 	# Phong Thanh Nguyen (David) - wdz468 - 11310824
 	# Woody Morrice - wam553 - 11071060
