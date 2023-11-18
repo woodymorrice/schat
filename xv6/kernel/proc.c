@@ -318,6 +318,8 @@ fork(void)
 
   /* Copy trace mask to child */
   np->tmask = p->tmask;
+
+  np->priority = p->priority;
   
   /* End CMPT 332 group14 change Fall 2023 */
 

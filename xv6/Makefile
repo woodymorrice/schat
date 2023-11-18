@@ -165,11 +165,18 @@ $U/_test: $U/test.o $U/uthread.o $U/uthread_switch.o $(ULIB)
 	# Woody Morrice - wam553 - 11071060
 	# End CMPT 332 group14 change Fall 2023
 
+$U/square.o: $U/square.c
+	$(CC) $(CFLAGS) -c -o $U/square.o $U/square.c
+
+$U/grind.o: $U/grind.c
+	$(CC) $(CFLAGS) -c -o $U/grind.o $U/grind.c
+
 $U/utest.o: $U/utest.c
 	$(CC) $(CFLAGS) -c -o $U/utest.o $U/utest.c
 
-$U/_utest: $U/utest.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e tmain -Ttext 0 -o $U/_utest $U/utest.o $(ULIB)
+$U/_utest: $U/utest.o  $U/grind.o  $U/square.o $(ULIB)
+	$(LD) $(LDFLAGS) -N -e pmain -Ttext 0 -o $U/_utest $U/utest.o \
+	$U/grind.o $U/square.o $(ULIB)
 
 fs.img: mkfs/mkfs README $(UEXTRA) $(UPROGS)
 	mkfs/mkfs fs.img README $(UEXTRA) $(UPROGS)

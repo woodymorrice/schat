@@ -1,3 +1,4 @@
+#include "kernel/types.h"
 struct stat;
 
 /* system calls */
@@ -39,8 +40,6 @@ void thread_create(void (*func)());
 void thread_schedule(void);
 void thread_yield(void);
 void thread_init(void);
-
-
 
 /* ulib.c */
 int stat(const char*, struct stat*);

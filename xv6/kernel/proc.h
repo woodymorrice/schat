@@ -1,3 +1,4 @@
+
 /* Saved registers for kernel context switches. */
 struct context {
   uint64 ra;
@@ -110,6 +111,8 @@ struct proc {
    * Woody Morrice - wam553 - 11071060 */
 
   int tmask;                   /* Bitmask for syscall tracing */
+  
+  int priority;
 
   /* End CMPT 332 group14 change Fall 2023 */
 };

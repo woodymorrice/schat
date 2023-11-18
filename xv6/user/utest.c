@@ -1,34 +1,74 @@
 #include "kernel/types.h"
 #include "kernel/stat.h"
+#include "kernel/param.h"
 #include "user/user.h"
 #include "user/grind.h"
+#include "user/square.h"
 #include <stddef.h>
 
-
-
 #define MAX_SLEEP 20
-#define MAX_PROC 3
+#define SLEEP 4
 
-int arrProc[MAX_PROC];
+void childProc1();
+void childProc2();
 
-void createProcess() {
+void parentProc() {
+    int randSleep;
+    int randVal;
     int index;
-    int randVal; 
-    for (index = 0; index < MAX_PROC; index ++) {
-        int process = fork();
-        arrProc[index] = process;
-        if (process == 0) {
-            printf("Process: %ld is sleeping\n", process);
-            randVal = rand();
-            sleep(randVal * MAX_SLEEP);
+    int pid;
+    pid = fork();
+    if (pid > 0) {
+        randVal = rand();
+        randSleep = rand() * MAX_SLEEP;
+        sleep(randSleep);
+        printf("Process: %d is running\n", pid);
+        for(index = 0; index < randVal; index ++) {
+            square(index);
         }
+        childProc1();
     }
 }
 
+void childProc1() {
+    int randSleep;
+    int randVal;
+    int index;
+    int pid;
+    pid = fork();
+    if (pid > 0) {
+        randVal = rand();
+        randSleep = rand() * MAX_SLEEP;
+        sleep(randSleep);
+        printf("Process: %d is running\n", pid);
+        for(index = 0; index < randVal; index ++) {
+            square(index);
+        }
+        childProc2();
+    } 
+}
 
-int main() {
+void childProc2() {
+    int randSleep;
+    int randVal;
+    int index;
+    int pid;
+    pid = fork();
+    if (pid > 0) {
+        randVal = rand();
+        randSleep = rand() * MAX_SLEEP;
+        sleep(randSleep);
+        printf("Process: %d is running\n", pid);
+        for(index = 0; index < randVal; index ++) {
+            square(index);
+        }
+    } 
+}
 
-    createProcess();
 
-    return 0;
+int pmain() {
+
+    parentProc();
+
+    exit(0);
 }
