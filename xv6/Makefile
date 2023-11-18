@@ -142,10 +142,13 @@ UPROGS=\
 	$U/_uthread\
 	$U/_utest\
 	$U/_trace\
-	$U/_test
+	$U/_uthread\
+	$U/_test\
+	$U/_utest\
+	$U/_cowtest
 	# CMPT 332 GROUP 14 CHANGE, FALL 2023
 	# a2: part a
- 
+
 $U/uthread_switch.o: $U/uthread_switch.S 
 	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S
 

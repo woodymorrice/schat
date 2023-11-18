@@ -42,6 +42,7 @@ entry("uptime");
 # Woody Morrice - wam553 - 11071060
 
 entry("trace");
+entry("getNumFreePages");
 
 # End CMPT 332 group14 change Fall 2023
 
