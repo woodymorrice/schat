@@ -11,8 +11,6 @@
 /* Begin CMPT 332 group14 change Fall 2023 */
 /* Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
-#include "kalloc.h"
-
 static int freecount;
 /* End CMPT 332 group14 change Fall 2023 */
 
@@ -101,7 +99,7 @@ kalloc(void)
 
 
 /* Begin CMPT 332 group14 change Fall 2023 */
-uint64
+int
 nfree(void)
 {
   /*int n;
@@ -119,5 +117,25 @@ nfree(void)
   release(&kmem.lock);
   return n;*/
   return freecount;
+}
+
+void
+ref_inc(void *p)
+{
+    struct run *r;
+    r = (struct run *)p;
+    acquire(&kmem.lock);
+    r->refcount++;
+    release(&kmem.lock); 
+}
+
+void
+ref_dec(void *p)
+{
+    struct run *r;
+    r = (struct run *)p;
+    acquire(&kmem.lock);
+    r->refcount--;
+    release(&kmem.lock);
 }
 /* End CMPT 332 group14 change Fall 2023 */
