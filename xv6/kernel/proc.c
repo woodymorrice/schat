@@ -10,6 +10,11 @@ struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
 
+/*GROUP14*/
+struct proc runQ[RPROC];
+struct proc sleepQ[RPROC];
+/* END */
+
 struct proc *initproc;
 
 int nextpid = 1;
@@ -125,6 +130,11 @@ found:
   p->pid = allocpid();
   p->state = USED;
 
+  /* GROUP 14 */
+  p->numEx = 0;
+  p->forkCall = 0;
+  /* END */
+
   /* Allocate a trapframe page. */
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
     freeproc(p);
@@ -169,6 +179,13 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+
+  /* GROUP 14 */
+  p->forkCall = 0;
+  p->numEx = 0;
+  p->preShare = 0;
+  /* END */
+
 }
 
 /* Create a user page table for a given process, with no user memory, */
@@ -250,7 +267,15 @@ userinit(void)
   p->cwd = namei("/");
 
   p->state = RUNNABLE;
+    
+  /* GROUP 14 */
+  p->preShare = 100;
+ 
+  p->forkCall = 0;
 
+  p->numEx = 0;
+
+  /* END */
   release(&p->lock);
 }
 
@@ -282,7 +307,7 @@ fork(void)
   int i, pid;
   struct proc *np;
   struct proc *p = myproc();
-
+  p->forkCall += 1;
   /* Allocate process. */
   if((np = allocproc()) == 0){
     return -1;
@@ -319,7 +344,9 @@ fork(void)
   /* Copy trace mask to child */
   np->tmask = p->tmask;
 
-  np->priority = p->priority;
+  np->preShare = (int)(p->preShare / p->forkCall);
+
+  np->numEx = 0;
   
   /* End CMPT 332 group14 change Fall 2023 */
 
@@ -459,28 +486,77 @@ scheduler(void)
   struct cpu *c = mycpu();
 
   c->proc = 0;
+    
+  /* GROUP 14
+  int index;
+  int leastEx = 0;
+  index = 0;  
+  END */
   for(;;){
     /* The most recent process to run may have had interrupts */
     /* turned off; enable them to avoid a deadlock if all */
     /* processes are waiting. */
     intr_on();
 
+    /* GROUP 14 
+    for (p = proc; p < &proc[NPROC]; p++) {
+        if (p->state == RUNNABLE) {
+            runQ[index] = *p;
+            index ++;
+            if (index == RPROC) index = 0;
+            c->proc = 0;
+        }
+    }
+    END */
+/*
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
-        /* Switch to chosen process.  It is the process's job */
-        /* to release its lock and then reacquire it */
-        /* before jumping back to us. */
+           Switch to chosen process.  It is the process's job
+           to release its lock and then reacquire it
+           before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
 
-        /* Process is done running for now. */
-        /* It should have changed its p->state before coming back. */
+           Process is done running for now. 
+           It should have changed its p->state before coming back.
         c->proc = 0;
       }
       release(&p->lock);
+    } 
+    
+*/
+   for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE) {
+        p->state = RUNNING;
+        c->proc = p;
+        swtch(&c->context, &p->context);
+        c->proc = 0;
+      }
+      release(&p->lock);
+    } 
+     
+/*    
+    for (p = proc; p < &runQ[RPROC]; p++) {
+        acquire(&p->lock);
+        Scanning through the runnable queue to find the least executed
+        * process.
+        * 
+        if (p->numEx < leastEx) {
+            p->state = RUNNING;
+            p->numEx += 1;
+             check number of execution is near the promised preShare 
+            * take the process of the runQ and put in sleepQ
+            
+            c->proc = p;
+            swtch(&c->context, &p->context);
+            c->proc = 0;
+        }
+        release(&p->lock);
     }
+*/
   }
 }
 

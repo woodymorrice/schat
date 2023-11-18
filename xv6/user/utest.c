@@ -26,7 +26,8 @@ void parentProc() {
         for(index = 0; index < randVal; index ++) {
             square(index);
         }
-        childProc1();
+        sleep(SLEEP); 
+        printf("Process: %d with square calls: %d.\n", pid, randVal);
     }
 }
 

@@ -112,7 +112,11 @@ struct proc {
 
   int tmask;                   /* Bitmask for syscall tracing */
   
-  int priority;
+  int numEx;                  /* number of this process executed */
+   
+  int preShare;              /* pre-defined share promised to proccess */
+
+  int forkCall;              /* determine the number of child processes */
 
   /* End CMPT 332 group14 change Fall 2023 */
 };
