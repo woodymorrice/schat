@@ -8,6 +8,11 @@
 #include "spinlock.h"
 #include "riscv.h"
 #include "defs.h"
+/* Begin CMPT 332 group14 change Fall 2023 */
+/* Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
+#include "kalloc.h"
+/* End CMPT 332 group14 change Fall 2023 */
 
 void freerange(void *pa_start, void *pa_end);
 
@@ -80,3 +85,25 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); /* fill with junk */
   return (void*)r;
 }
+
+
+/* Begin CMPT 332 group14 change Fall 2023 */
+uint64
+nfree(void)
+{
+  int n;
+  struct run *i;
+
+  n = 0;
+  acquire(&kmem.lock);
+  i = kmem.freelist;
+  if (i != 0) {
+    i = i->next;
+  }
+  for (;(void*)i+PGSIZE <= (void*)PHYSTOP; i += PGSIZE) {
+    n++;
+  } 
+  release(&kmem.lock);
+  return n;
+}
+/* Begin CMPT 332 group14 change Fall 2023 */
