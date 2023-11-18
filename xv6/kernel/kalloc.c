@@ -12,6 +12,8 @@
 /* Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
 #include "kalloc.h"
+
+static int freecount;
 /* End CMPT 332 group14 change Fall 2023 */
 
 void freerange(void *pa_start, void *pa_end);
@@ -21,6 +23,7 @@ extern char end[]; /* first address after kernel. */
 
 struct run {
   struct run *next;
+  int refcount;
 };
 
 struct {
@@ -31,6 +34,8 @@ struct {
 void
 kinit()
 {
+  freecount = 0;
+
   initlock(&kmem.lock, "kmem");
   freerange(end, (void*)PHYSTOP);
 }
@@ -60,10 +65,14 @@ kfree(void *pa)
   memset(pa, 1, PGSIZE);
 
   r = (struct run*)pa;
+  if(r->refcount < 1)
+      panic("kfree: refcount < 1");
 
   acquire(&kmem.lock);
   r->next = kmem.freelist;
   kmem.freelist = r;
+
+  freecount++;
   release(&kmem.lock);
 }
 
@@ -79,10 +88,14 @@ kalloc(void)
   r = kmem.freelist;
   if(r)
     kmem.freelist = r->next;
+
+  freecount--;
   release(&kmem.lock);
 
-  if(r)
+  if(r) {
     memset((char*)r, 5, PGSIZE); /* fill with junk */
+    r->refcount = 1;
+  }
   return (void*)r;
 }
 
@@ -91,19 +104,20 @@ kalloc(void)
 uint64
 nfree(void)
 {
-  int n;
-  struct run *i;
+  /*int n;
+  struct run *p;
 
   n = 0;
   acquire(&kmem.lock);
-  i = kmem.freelist;
-  if (i != 0) {
-    i = i->next;
+  p = kmem.freelist;
+  if (p != 0) {
+    p = p->next;
   }
-  for (;(void*)i+PGSIZE <= (void*)PHYSTOP; i += PGSIZE) {
+  for (;(void*)p+PGSIZE <= (void*)PHYSTOP; p += PGSIZE) {
     n++;
   } 
   release(&kmem.lock);
-  return n;
+  return n;*/
+  return freecount;
 }
-/* Begin CMPT 332 group14 change Fall 2023 */
+/* End CMPT 332 group14 change Fall 2023 */
