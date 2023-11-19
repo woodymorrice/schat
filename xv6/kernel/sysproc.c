@@ -5,11 +5,6 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
-/* Begin CMPT 332 group14 change Fall 2023 */
-/* Phong Thanh Nguyen (David) - wdz468 - 11310824
- * Woody Morrice - wam553 - 11071060 */
-#include "kalloc.h"
-/* End CMPT 332 group14 change Fall 2023 */
 
 uint64
 sys_exit(void)
@@ -111,6 +106,8 @@ sys_trace(void)
 
 /* Begin CMPT 332 group14 change Fall 2023 */
 /* returns the number of free pages of physical memory*/
+/* Phong Thanh Nguyen (David) - wdz468 - 11310824
+ * Woody Morrice - wam553 - 11071060 */
 uint64
 sys_getNumFreePages(void)
 {
