@@ -325,23 +325,29 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     pa = PTE2PA(*pte);
     /* increment page reference */
     ref_inc((void*)pa);
-    /* make sure write is unset and CoW is set */
-    flags = ((PTE_FLAGS(*pte) | PTE_COW) & ~PTE_W);
-    /*if((mem = kalloc()) == 0)
-      goto err;
-    memmove(mem, (char*)pa, PGSIZE);*/
+    /* set PTE_COW and unset PTE_W  */
+    flags = ((PTE_FLAGS(*pte) | PTE_COW) | PTE_W);
 
     /* reinstall the parent's page table */
-    /*uvmunmap(old, i, PGSIZE, 0);*/
-    if(mappages(new, i, PGSIZE, (uint64)pa, flags) != 0){
-      goto err;
+    /*uvmunmap(old, i, PGSIZE, 0);
+    if(mappages(old, i, PGSIZE, pa, flags) != 0){
+      goto err1;
+    }*/
+
+    /* map the page into the child's page table */
+    if(mappages(new, i, PGSIZE, pa, flags) != 0){
+      goto err2;
     }
+
+    /* flush the tlb */
+    sfence_vma();
   }
-  /* point the new process to the old process page table */
-  /*new = old;*/
   return 0;
 
- err:
+ /*err1:
+  uvmunmap(old, 0, i / PGSIZE, 1);
+  return -1;*/
+ err2:
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }
