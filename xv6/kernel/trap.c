@@ -65,6 +65,9 @@ usertrap(void)
     intr_on();
 
     syscall();
+  } else if(r_scause() == 12 || r_scause() == 13 || r_scause() == 15){
+    printf("usertrap(): page fault");
+
   } else if((which_dev = devintr()) != 0){
     /* ok */
   } else {
@@ -72,6 +75,8 @@ usertrap(void)
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
     setkilled(p);
   }
+
+
 
   if(killed(p))
     exit(-1);
