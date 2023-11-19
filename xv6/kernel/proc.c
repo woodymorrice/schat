@@ -346,6 +346,8 @@ fork(void)
 
   np->preShare = (int)(p->preShare / p->forkCall);
 
+  p->preShare = np->preShare;
+
   np->numEx = 0;
   
   /* End CMPT 332 group14 change Fall 2023 */
@@ -484,22 +486,16 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-
+  int totalEx;
   c->proc = 0;
-    
-  /* GROUP 14
-  int index;
-  int leastEx = 0;
-  index = 0;  
-  END */
+  totalEx = 0;
+
   for(;;){
     /* The most recent process to run may have had interrupts */
     /* turned off; enable them to avoid a deadlock if all */
     /* processes are waiting. */
     intr_on();
-
-    /* GROUP 14 
-    for (p = proc; p < &proc[NPROC]; p++) {
+/*    for (p = proc; p < &proc[NPROC]; p++) {
         if (p->state == RUNNABLE) {
             runQ[index] = *p;
             index ++;
@@ -507,7 +503,7 @@ scheduler(void)
             c->proc = 0;
         }
     }
-    END */
+*/
 /*
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
@@ -527,16 +523,20 @@ scheduler(void)
     } 
     
 */
+  
    for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if(p->state == RUNNABLE) {
+      if(((p->numEx/totalEx)*100) != p->preShare && p->state == RUNNABLE) {
         p->state = RUNNING;
+        p->numEx += 1;
         c->proc = p;
         swtch(&c->context, &p->context);
         c->proc = 0;
       }
       release(&p->lock);
-    } 
+    }
+
+   totalEx ++; 
      
 /*    
     for (p = proc; p < &runQ[RPROC]; p++) {

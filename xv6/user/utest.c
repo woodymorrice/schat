@@ -19,15 +19,16 @@ void parentProc() {
     int pid;
     pid = fork();
     if (pid > 0) {
-        randVal = rand();
+        randVal = rand() % 50;
         randSleep = rand() * MAX_SLEEP;
         sleep(randSleep);
         printf("Process: %d is running\n", pid);
         for(index = 0; index < randVal; index ++) {
             square(index);
         }
-        sleep(SLEEP); 
+        sleep(randSleep); 
         printf("Process: %d with square calls: %d.\n", pid, randVal);
+        childProc1();
     }
 }
 
@@ -38,13 +39,16 @@ void childProc1() {
     int pid;
     pid = fork();
     if (pid > 0) {
-        randVal = rand();
+        randVal = rand() % 50;
         randSleep = rand() * MAX_SLEEP;
         sleep(randSleep);
         printf("Process: %d is running\n", pid);
         for(index = 0; index < randVal; index ++) {
             square(index);
         }
+        sleep(randSleep);
+        printf("Process: %d with square calls: %d.\n", pid, randVal); 
+        sleep(randSleep);
         childProc2();
     } 
 }
@@ -56,13 +60,16 @@ void childProc2() {
     int pid;
     pid = fork();
     if (pid > 0) {
-        randVal = rand();
+        randVal = rand() % 50;
         randSleep = rand() * MAX_SLEEP;
         sleep(randSleep);
         printf("Process: %d is running\n", pid);
         for(index = 0; index < randVal; index ++) {
             square(index);
         }
+        sleep(randSleep);
+        printf("Process: %d with square calls: %d\n", pid, randVal);
+        sleep(randSleep);
     } 
 }
 
