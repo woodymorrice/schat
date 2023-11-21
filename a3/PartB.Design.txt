@@ -1,0 +1,36 @@
+getNumFreePages Design
+The design for this system call is relatively simple. I created a static variable in kalloc.c called free_count that is initialized to 0 in kinit(), incremented each time kfree() is called, and decremented each time kalloc is called(). I also created a function called nfree() that returns the value of free_count. The getNumFreePages() syscall is located in sysproc.c and simply calls nfree().
+
+
+Page Reference Count
+I modified the run struct in kalloc.c to contain an instance variable refcount that will be used to track the reference count of pages. When a page is allocated with kalloc() refcount is set to 1, and when kfree() is called, it checks refcount and if it is greater than 1 it panics. Both of these operations are performed while the pre-existing kmem.lock is held. I created the functions void ref_inc(void*) and void ref_dec(void*) that take the page as a void pointer, cast it to struct run and modify its reference count while the lock is held.
+
+
+uvmcopy Design
+The original implementation of uvmcopy would use kalloc to allocate a new page for the child then copy the contents of the parents page into it, but since copies wont occur until a page is written to, when a fork occurs the child page simply needs to point to the same page as the parent. To differentiate between regular read-only pages and copy-on-write pages, I will use the 8th bit for each page as the PTE_COW bit.
+For each page table entry the function performs the following operations:
+Increase the reference count by one.
+Set the write flag to false.
+Set the copy-on-write flag to true.
+Update the page in parent's page table (by unmapping and remapping with the new bits set).
+Map the page into the childs page table.
+
+
+
+The xv6 book says that bits 8 and 9 are reserved for supervisor software which i assume means they are available for extending bits of the kernel so I am setting bit 8 to a copy-on-write bit.
+
+Page Fault Trap Handler
+Section 4.6 in the xv6 book mentions that the scause register indicates the type of page fault, so I added an extra condition in usertrap to handle those page faults.
+If scause = 12, 13 or 15:
+get st_val
+get the associated pagetable entry
+if there is no associated page table entry associated with that entry:
+  print error message, kill process
+if PTE_V and PTE_COW:
+  reduce the reference count by one
+  set write flag to true
+  set copy on write flag to false
+  allocate a physical page with kalloc
+  copy the memory from the page to the new page with memmove
+  unmap the old page
+  map the new page

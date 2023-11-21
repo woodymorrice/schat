@@ -6,6 +6,11 @@
 #include "proc.h"
 #include "defs.h"
 
+#include "list.h"
+
+LIST *prioQ[MAXPRIO];
+struct spinlock prio_lock;
+
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -48,6 +53,7 @@ void
 procinit(void)
 {
   struct proc *p;
+  int i;
   
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
@@ -55,6 +61,11 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+  }
+
+  initlock(&prio_lock, "prio_lock");
+  for (i = 0; i < MAXPRIO; i++) {
+      prioQ[i] = ListCreate();
   }
 }
 
@@ -169,6 +180,8 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  p->tmask = 0;
+  p->prio = 0;
 }
 
 /* Create a user page table for a given process, with no user memory, */
@@ -248,6 +261,10 @@ userinit(void)
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
+  
+  acquire(&prio_lock);
+  ListPrepend(prioQ[0], p);
+  release(&prio_lock);
 
   p->state = RUNNABLE;
 
@@ -319,6 +336,9 @@ fork(void)
   /* Copy trace mask to child */
   np->tmask = p->tmask;
   
+  /* scheduling priority initialized to 0 */
+  np->prio = 0;
+  
   /* End CMPT 332 group14 change Fall 2023 */
 
   release(&np->lock);
@@ -326,6 +346,10 @@ fork(void)
   acquire(&wait_lock);
   np->parent = p;
   release(&wait_lock);
+
+  acquire(&prio_lock);
+  ListPrepend(prioQ[0], np);
+  release(&prio_lock);
 
   acquire(&np->lock);
   np->state = RUNNABLE;
@@ -381,7 +405,11 @@ exit(int status)
 
   /* Parent might be sleeping in wait(). */
   wakeup(p->parent);
-  
+ 
+  /*acquire(&prio_lock);*/
+  ListTrim(prioQ[p->prio]);
+  /*release(&prio_lock);*/
+
   acquire(&p->lock);
 
   p->xstate = status;
@@ -415,6 +443,7 @@ wait(uint64 addr)
 
         havekids = 1;
         if(pp->state == ZOMBIE){
+
           /* Found one. */
           pid = pp->pid;
           if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
@@ -455,6 +484,8 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
+  int i;
+
 
   c->proc = 0;
   for(;;){
@@ -463,21 +494,47 @@ scheduler(void)
     /* processes are waiting. */
     intr_on();
 
-    for(p = proc; p < &proc[NPROC]; p++) {
+    /*for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if(p->state == RUNNABLE) {
+      if(p->state == RUNNABLE) {*/
         /* Switch to chosen process.  It is the process's job */
         /* to release its lock and then reacquire it */
         /* before jumping back to us. */
-        p->state = RUNNING;
+        /*p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
-
+*/
         /* Process is done running for now. */
         /* It should have changed its p->state before coming back. */
-        c->proc = 0;
+       /* c->proc = 0;
       }
       release(&p->lock);
+    }*/
+
+    for (i = 0; i < MAXPRIO; i++) {
+      if (ListCount(prioQ[i]) > 0) {
+        acquire(&prio_lock);
+        p = (struct proc *)ListTrim(prioQ[i]);
+        acquire(&p->lock);
+        if(p->state == RUNNABLE) {
+          /* Switch to chosen process.  It is the process's job */
+          /* to release its lock and then reacquire it */
+          /* before jumping back to us. */
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
+
+          /* Process is done running for now. */
+          /* It should have changed its p->state before coming back. */
+          c->proc = 0;
+        }
+        else {
+          ListPrepend(prioQ[i], p);
+        }
+        release(&p->lock);
+        if (holding(&prio_lock))
+          release(&prio_lock);
+      }
     }
   }
 }
@@ -494,6 +551,10 @@ sched(void)
 {
   int intena;
   struct proc *p = myproc();
+
+  if(holding(&prio_lock)) {
+    release(&prio_lock);
+  }
 
   if(!holding(&p->lock))
     panic("sched p->lock");
@@ -514,6 +575,10 @@ void
 yield(void)
 {
   struct proc *p = myproc();
+  acquire(&prio_lock);
+  ListPrepend(prioQ[p->prio], p);
+  release(&prio_lock);
+
   acquire(&p->lock);
   p->state = RUNNABLE;
   sched();
@@ -564,7 +629,7 @@ sleep(void *chan, struct spinlock *lk)
   /* Go to sleep. */
   p->chan = chan;
   p->state = SLEEPING;
-
+  
   sched();
 
   /* Tidy up. */

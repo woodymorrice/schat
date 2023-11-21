@@ -76,8 +76,8 @@ endif
 
 LDFLAGS = -z max-page-size=4096
 
-$K/kernel: $(OBJS) $K/kernel.ld $U/initcode
-	$(LD) $(LDFLAGS) -T $K/kernel.ld -o $K/kernel $(OBJS)
+$K/kernel: $(OBJS) $K/kernel.ld $U/initcode $K/liblist.a
+	$(LD) $(LDFLAGS) -T $K/kernel.ld -o $K/kernel $(OBJS) -L$K/ -llist
 	$(OBJDUMP) -S $K/kernel > $K/kernel.asm
 	$(OBJDUMP) -t $K/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $K/kernel.sym
 
@@ -96,7 +96,7 @@ tags: $(OBJS) _init
 ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
 
 _%: %.o $(ULIB)
-	$(LD) $(LDFLAGS) -T $U/user.ld -o $@ $^
+	$(LD) $(LDFLAGS) -I. -T $U/user.ld -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
@@ -144,7 +144,25 @@ UPROGS=\
 	$U/_test
 	# CMPT 332 GROUP 14 CHANGE, FALL 2023
 	# a2: part a
- 
+
+$K/liblist.a: $K/list_adders.o $K/list_movers.o \
+	$K/list_removers.o
+	ar -rs $K/liblist.a $K/list_adders.o \
+        $K/list_movers.o $K/list_removers.o
+	ranlib $K/liblist.a
+
+$K/list_adders.o: $K/list_adders.c $K/list.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$K/ \
+        -c $K/list_adders.c -o $K/list_adders.o
+
+$K/list_movers.o: $K/list_movers.c $K/list.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$K/ \
+        -c $K/list_movers.c -o $K/list_movers.o
+
+$K/list_removers.o: $K/list_removers.c $K/list.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$K/ \
+        -c $K/list_removers.c -o $K/list_removers.o
+
 $U/uthread_switch.o: $U/uthread_switch.S 
 	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S
 

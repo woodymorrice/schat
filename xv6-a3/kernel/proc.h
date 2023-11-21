@@ -110,6 +110,7 @@ struct proc {
    * Woody Morrice - wam553 - 11071060 */
 
   int tmask;                   /* Bitmask for syscall tracing */
+  int prio;                    /* scheduling priority */
 
   /* End CMPT 332 group14 change Fall 2023 */
 };

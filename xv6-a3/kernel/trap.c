@@ -9,6 +9,8 @@
 struct spinlock tickslock;
 uint ticks;
 
+int procquant;
+
 extern char trampoline[], uservec[], userret[];
 
 /* in kernelvec.S, calls kerneltrap(). */
@@ -20,6 +22,7 @@ void
 trapinit(void)
 {
   initlock(&tickslock, "time");
+  procquant = 0;
 }
 
 /* set up to take exceptions and traps while in the kernel. */
@@ -77,7 +80,7 @@ usertrap(void)
     exit(-1);
 
   /* give up the CPU if this is a timer interrupt. */
-  if(which_dev == 2)
+  if(which_dev == 2) {
     /* check the current number of clock ticks
      * if clock ticks == priority level:
      *   if proc->prio < 4 increase by 1
@@ -85,7 +88,19 @@ usertrap(void)
      * set clock ticks to 0
      * else:
      * increment clock tick by 1 */
-    yield();
+    if (procquant >= p->prio + 1) {
+      if (p->prio < MAXPRIO - 1) {
+        p->prio++;
+      }
+      procquant = 0;
+      
+      yield();
+    }
+    else {
+      procquant++;
+    }
+  }
+
 
   usertrapret();
 }
