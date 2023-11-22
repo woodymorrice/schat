@@ -184,7 +184,7 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
     panic("uvmunmap: not aligned");
 
   for(a = va; a < va + npages*PGSIZE; a += PGSIZE){
-    if((pte = walk(pagetable, a, 0)) == 0)
+    if((pte = walk(pagetable, a, 1)) == 0)
       panic("uvmunmap: walk");
     if((*pte & PTE_V) == 0)
       panic("uvmunmap: not mapped");
@@ -326,17 +326,23 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     /* increment page reference */
     ref_inc((void*)pa);
     /* set PTE_COW and unset PTE_W  */
-    flags = ((PTE_FLAGS(*pte) | PTE_COW) & ~PTE_W);
+    /*flags = ((PTE_FLAGS(*pte) | PTE_COW) & ~PTE_W);*/
+    /*flags = PTE_FLAGS(*pte);*/
+    *pte &= ~PTE_W;
+    *pte |= PTE_COW;
 
+
+    flags = PTE_FLAGS(*pte);
+    /* just flip the bits instead */
     /* reinstall the parent's page table */
-    /*uvmunmap(old, i, PGSIZE, 0);
+    /*uvmunmap(old, i, 1, 0);
     if(mappages(old, i, PGSIZE, pa, flags) != 0){
       goto err1;
     }*/
 
     /* map the page into the child's page table */
     if(mappages(new, i, PGSIZE, pa, flags) != 0){
-      goto err2;
+      goto err;
     }
 
     /* flush the tlb */
@@ -347,7 +353,7 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
  /*err1:
   uvmunmap(old, 0, i / PGSIZE, 1);
   return -1;*/
- err2:
+ err:
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }

@@ -11,6 +11,8 @@
 /* Begin CMPT 332 group14 change Fall 2023 */
 /* Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
+#define NREFS ((PHYSTOP - KERNBASE) / PGSIZE)
+#define REFIND(p) ((p - KERNBASE) >> 13)
 static int freecount;
 /* End CMPT 332 group14 change Fall 2023 */
 
@@ -21,12 +23,12 @@ extern char end[]; /* first address after kernel. */
 
 struct run {
   struct run *next;
-  int refcount;
 };
 
 struct {
   struct spinlock lock;
   struct run *freelist;
+  int refcount[NREFS];
 } kmem;
 
 void
@@ -41,10 +43,18 @@ kinit()
 void
 freerange(void *pa_start, void *pa_end)
 {
+  int i;
   char *p;
+
   p = (char*)PGROUNDUP((uint64)pa_start);
-  for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
+  for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE){
+    i = REFIND((uint64)p);
+    acquire(&kmem.lock);
+    kmem.refcount[i] = 0;
+    release(&kmem.lock);
+
     kfree(p);
+  }
 }
 
 /* Free the page of physical memory pointed at by pa, */
@@ -55,22 +65,31 @@ void
 kfree(void *pa)
 {
   struct run *r;
+  int index;
 
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
 
+  index = REFIND((uint64)pa);
   /* Fill with junk to catch dangling refs. */
-  memset(pa, 1, PGSIZE);
 
-  r = (struct run*)pa;
-  if(r->refcount < 1)
-      panic("kfree: refcount < 1");
+
+  /*if(refcount[index] > 1)
+      panic("kfree: refcount < 1");*/
 
   acquire(&kmem.lock);
-  r->next = kmem.freelist;
-  kmem.freelist = r;
+  if ((kmem.refcount[index]) == 0) {
+    memset(pa, 1, PGSIZE);
 
-  freecount++;
+    r = (struct run*)pa;
+    r->next = kmem.freelist;
+    kmem.freelist = r;
+
+    freecount++;
+  }
+  else {
+    kmem.refcount[index]--;
+  }
   release(&kmem.lock);
 }
 
@@ -81,18 +100,21 @@ void *
 kalloc(void)
 {
   struct run *r;
+  int index;
 
   acquire(&kmem.lock);
+  /*ref_inc(r);*/
   r = kmem.freelist;
+  index = REFIND((uint64)r);
   if(r)
     kmem.freelist = r->next;
+  kmem.refcount[index] = 1;
 
   freecount--;
   release(&kmem.lock);
 
   if(r) {
     memset((char*)r, 5, PGSIZE); /* fill with junk */
-    r->refcount = 1;
   }
   return (void*)r;
 }
@@ -122,20 +144,16 @@ nfree(void)
 void
 ref_inc(void *p)
 {
-    struct run *r;
-    r = (struct run *)p;
-    acquire(&kmem.lock);
-    r->refcount++;
-    release(&kmem.lock); 
+    int index;
+    index = REFIND((uint64)p);
+    kmem.refcount[index]++; 
 }
 
 void
 ref_dec(void *p)
 {
-    struct run *r;
-    r = (struct run *)p;
-    acquire(&kmem.lock);
-    r->refcount--;
-    release(&kmem.lock);
+    int index;
+    index = REFIND((uint64)p);
+    kmem.refcount[index]--; 
 }
 /* End CMPT 332 group14 change Fall 2023 */
