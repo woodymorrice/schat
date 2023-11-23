@@ -407,7 +407,7 @@ uvmclear(pagetable_t pagetable, uint64 va)
 int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
-  uint64 n, va0, pa0;
+  uint64 n, va0, pa0, flags;
   pte_t *pte;
 
   while(len > 0){
@@ -418,11 +418,21 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
     if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0 ||
        (*pte & PTE_W) == 0)
       return -1;
-    pa0 = PTE2PA(*pte);
     n = PGSIZE - (dstva - va0);
     if(n > len)
       n = len;
-    memmove((void *)(pa0 + (dstva - va0)), src, n);
+    flags = ((PTE_FLAGS(*pte) | PTE_W) & ~PTE_COW);
+    if (*pte & PTE_COW) {
+      pa0 = (uint64)kalloc();
+      memmove((void *)(pa0 + (dstva - va0)), src, n);
+      uvmunmap(pagetable, va0, 1, 0);
+      mappages(pagetable, va0, 4096, pa0, flags); 
+      
+    }
+    else {
+      pa0 = PTE2PA(*pte);
+      memmove((void *)(pa0 + (dstva - va0)), src, n);
+    }
 
     len -= n;
     src += n;

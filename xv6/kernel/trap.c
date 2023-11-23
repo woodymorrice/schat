@@ -67,7 +67,8 @@ usertrap(void)
     intr_on();
 
     syscall();
-  } else if(r_scause() == 15 || r_scause() == 12 || r_scause() == 13){
+  /*} else if(r_scause() == 15 || r_scause() == 12 || r_scause() == 13){*/
+  } else if(r_scause() == 15){
     /*printf("usertrap(): page fault\n");*/
 
     /* get the faulting virtual address */

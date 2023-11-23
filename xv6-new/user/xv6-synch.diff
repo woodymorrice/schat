@@ -1,0 +1,45 @@
+# Group 14 - CMPT332
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+uthread.c 
+
+struct thread {
+    char * stack;
+    int state;
+    struct context context;
+    char *stack;
+}
+
+extern void thread_switch (struct context *, struct context *);
+
+int mtx_create(int locked);
+int mtx_lock(int lock_id);
+int mtx_unlock(int lock_id);
+struct spinlock lockArr [STACK_SIZE]
+int initialized;
+
+void thread_create(void (*func)()) {
+    under your code comment
+}
+
+void thread_scheduler (void) {
+    under your code comment
+}
+
+uthread_switch.S
+
+
+uthread.h
+
+uthread.d 
+    adding user/uthread.h
+
+user.h 
+
+    adding function prototype for thread_create(), mtx_create(), mtx_unlock()
+    mtx_lock()
+
+Makefile 
+
+    adding rule to make test file, uthread_switch.o, uthread.o

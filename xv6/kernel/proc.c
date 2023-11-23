@@ -486,9 +486,9 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  int totalEx;
+  /*int totalEx;*/
   c->proc = 0;
-  totalEx = 0;
+  /*totalEx = 0;*/
 
   for(;;){
     /* The most recent process to run may have had interrupts */
@@ -504,26 +504,25 @@ scheduler(void)
         }
     }
 */
-/*
+
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
-           Switch to chosen process.  It is the process's job
+           /* Switch to chosen process.  It is the process's job
            to release its lock and then reacquire it
-           before jumping back to us.
+           before jumping back to us.*/
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
 
-           Process is done running for now. 
-           It should have changed its p->state before coming back.
+           /*Process is done running for now. 
+           It should have changed its p->state before coming back.*/
         c->proc = 0;
       }
       release(&p->lock);
     } 
     
-*/
-  
+  /*
    for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(((p->numEx/totalEx)*100) != p->preShare && p->state == RUNNABLE) {
@@ -537,7 +536,7 @@ scheduler(void)
     }
 
    totalEx ++; 
-     
+   */  
 /*    
     for (p = proc; p < &runQ[RPROC]; p++) {
         acquire(&p->lock);
