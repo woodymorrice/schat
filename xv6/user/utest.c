@@ -7,72 +7,70 @@
 #include <stddef.h>
 
 #define MAX_SLEEP 20
-#define SLEEP 4
-
-void childProc1();
-void childProc2();
+#define MAX_PROC 3
+#define MAX_RAND 800 
 
 void parentProc() {
-    int randSleep;
-    int randVal;
-    int index;
-    int pid;
-    pid = fork();
-    if (pid > 0) {
-        randVal = rand() % 50;
-        randSleep = rand() * MAX_SLEEP;
-        sleep(randSleep);
-        printf("Process: %d is running\n", pid);
-        for(index = 0; index < randVal; index ++) {
-            square(index);
-        }
-        sleep(randSleep); 
-        printf("Process: %d with square calls: %d.\n", pid, randVal);
-        childProc1();
+    int index, n1, n2, n3;
+    int pid1, pid2, pid3;
+    
+    pid1 = fork();
+       
+    if (pid1 < 0) {
+        printf("pid1: fork fail\n");
+        exit(-1);
     }
-}
 
-void childProc1() {
-    int randSleep;
-    int randVal;
-    int index;
-    int pid;
-    pid = fork();
-    if (pid > 0) {
-        randVal = rand() % 50;
-        randSleep = rand() * MAX_SLEEP;
-        sleep(randSleep);
-        printf("Process: %d is running\n", pid);
-        for(index = 0; index < randVal; index ++) {
+    if(pid1 == 0) {
+        pid2 = fork();
+        if (pid2 < 0) {
+            printf("pid2: fork fail\n");
+            exit(-1);
+        }
+        if (pid2 == 0) {
+            pid3 = fork();
+            if (pid3 < 0) {
+                printf("pid3: fork fail\n");
+                exit(-1);
+            }
+            if (pid3 == 0) {
+                n1 = rand() % MAX_RAND;
+                sleep(rand() * MAX_SLEEP);
+                for(index = 0; index < n1; index ++) {
+                    square(index);
+                }
+                printf("pid3: square calls: %d.\n", n1);
+                exit(0);
+            }
+            else{
+                wait(0);
+            }
+        
+        }
+        else {
+            wait(0);
+            n2 = rand() % MAX_RAND;
+            sleep(rand() * MAX_SLEEP);
+            for (index = 0; index < n2; index ++) { 
+                square(index);
+            }
+            
+            printf("pid2: square calls: %d.\n", n2);
+            exit(0);
+            }
+    }
+
+    else {
+        wait(0);
+        n3 = rand() % MAX_RAND;
+        sleep(rand() * MAX_SLEEP);
+        for(index = 0; index < n3; index ++) {
             square(index);
         }
-        sleep(randSleep);
-        printf("Process: %d with square calls: %d.\n", pid, randVal); 
-        sleep(randSleep);
-        childProc2();
+        printf("pid1: square calls: %d.\n", n3);
+        exit(0); 
     } 
 }
-
-void childProc2() {
-    int randSleep;
-    int randVal;
-    int index;
-    int pid;
-    pid = fork();
-    if (pid > 0) {
-        randVal = rand() % 50;
-        randSleep = rand() * MAX_SLEEP;
-        sleep(randSleep);
-        printf("Process: %d is running\n", pid);
-        for(index = 0; index < randVal; index ++) {
-            square(index);
-        }
-        sleep(randSleep);
-        printf("Process: %d with square calls: %d\n", pid, randVal);
-        sleep(randSleep);
-    } 
-}
-
 
 int pmain() {
 

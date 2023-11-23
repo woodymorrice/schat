@@ -309,24 +309,25 @@ uvmfree(pagetable_t pagetable, uint64 sz)
 /* physical memory. */
 /* returns 0 on success, -1 on failure. */
 /* frees any allocated pages on failure. */
+/*
 int
 uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 {
   pte_t *pte;
   uint64 pa, i;
   uint flags;
-  /*char *mem;*/
+  char *mem;*/
 
-  for(i = 0; i < sz; i += PGSIZE){
+  /*for(i = 0; i < sz; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
       panic("uvmcopy: pte should exist");
     if((*pte & PTE_V) == 0)
       panic("uvmcopy: page not present");
-    pa = PTE2PA(*pte);
-    /* increment page reference */
+    pa = PTE2PA(*pte);*/
+    /* increment page reference 
     ref_inc((void*)pa);
-    /* set PTE_COW and unset PTE_W  */
-    flags = ((PTE_FLAGS(*pte) | PTE_COW) & ~PTE_W);
+       set PTE_COW and unset PTE_W  
+    flags = ((PTE_FLAGS(*pte) | PTE_COW) & ~PTE_W);*/
 
     /* reinstall the parent's page table */
     /*uvmunmap(old, i, PGSIZE, 0);
@@ -335,23 +336,23 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     }*/
 
     /* map the page into the child's page table */
-    if(mappages(new, i, PGSIZE, pa, flags) != 0){
+   /* if(mappages(new, i, PGSIZE, pa, flags) != 0){
       goto err2;
-    }
+    }*/
 
     /* flush the tlb */
-    sfence_vma();
-  }
-  return 0;
+   /* sfence_vma();*/
+/*  }
+  return 0;*/
 
  /*err1:
   uvmunmap(old, 0, i / PGSIZE, 1);
   return -1;*/
- err2:
+ /*err2:
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
-}
-/*
+}*/
+
 int
 uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 {
@@ -381,7 +382,7 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }
-*/
+
 /* mark a PTE invalid for user access. */
 /* used by exec for the user stack guard page. */
 void

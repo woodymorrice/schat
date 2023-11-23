@@ -76,8 +76,8 @@ endif
 
 LDFLAGS = -z max-page-size=4096
 
-$K/kernel: $(OBJS) $K/kernel.ld $U/initcode
-	$(LD) $(LDFLAGS) -T $K/kernel.ld -o $K/kernel $(OBJS)
+$K/kernel: $(OBJS) $K/kernel.ld $U/initcode $K/liblist.a
+	$(LD) $(LDFLAGS) -T $K/kernel.ld -o $K/kernel $(OBJS) -L$K/ -llist
 	$(OBJDUMP) -S $K/kernel > $K/kernel.asm
 	$(OBJDUMP) -t $K/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $K/kernel.sym
 
@@ -96,7 +96,7 @@ tags: $(OBJS) _init
 ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
 
 _%: %.o $(ULIB)
-	$(LD) $(LDFLAGS) -T $U/user.ld -o $@ $^
+	$(LD) $(LDFLAGS) -I. -T $U/user.ld -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
@@ -140,14 +140,29 @@ UPROGS=\
 	$U/_zombie\
 	$U/_pingpong\
 	$U/_uthread\
-	$U/_utest\
 	$U/_trace\
-	$U/_uthread\
 	$U/_test\
-	$U/_utest\
-	$U/_cowtest
+	$U/_utest
 	# CMPT 332 GROUP 14 CHANGE, FALL 2023
 	# a2: part a
+
+$K/liblist.a: $K/list_adders.o $K/list_movers.o \
+	$K/list_removers.o
+	ar -rs $K/liblist.a $K/list_adders.o \
+        $K/list_movers.o $K/list_removers.o
+	ranlib $K/liblist.a
+
+$K/list_adders.o: $K/list_adders.c $K/list.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$K/ \
+        -c $K/list_adders.c -o $K/list_adders.o
+
+$K/list_movers.o: $K/list_movers.c $K/list.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$K/ \
+        -c $K/list_movers.c -o $K/list_movers.o
+
+$K/list_removers.o: $K/list_removers.c $K/list.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$K/ \
+        -c $K/list_removers.c -o $K/list_removers.o
 
 $U/uthread_switch.o: $U/uthread_switch.S 
 	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S
@@ -166,8 +181,7 @@ $U/_test: $U/test.o $U/uthread.o $U/uthread_switch.o $(ULIB)
 	# Begin CMPT 332 group14 change Fall 2023
 	# Phong Thanh Nguyen (David) - wdz468 - 11310824
 	# Woody Morrice - wam553 - 11071060
-	# End CMPT 332 group14 change Fall 2023
-
+	
 $U/square.o: $U/square.c
 	$(CC) $(CFLAGS) -c -o $U/square.o $U/square.c
 
@@ -177,9 +191,10 @@ $U/grind.o: $U/grind.c
 $U/utest.o: $U/utest.c
 	$(CC) $(CFLAGS) -c -o $U/utest.o $U/utest.c
 
-$U/_utest: $U/utest.o  $U/grind.o  $U/square.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e pmain -Ttext 0 -o $U/_utest $U/utest.o \
-	$U/grind.o $U/square.o $(ULIB)
+$U/_utest: $U/utest.o $U/grind.o $U/square.o $(ULIB)
+	$(LD) $(LDFLAGS) -N -e pmain -Ttext 0 -o $U/_utest $U/utest.o $U/grind.o \
+	$U/square.o $(ULIB)
+
 
 fs.img: mkfs/mkfs README $(UEXTRA) $(UPROGS)
 	mkfs/mkfs fs.img README $(UEXTRA) $(UPROGS)

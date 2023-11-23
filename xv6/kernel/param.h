@@ -13,4 +13,4 @@
 #define MAXPATH      128   /* maximum file path name */
 
 /*GROUP14*/
-#define RPROC        10  /* maximum number of process in ready & sleep queue*/
+#define RPROC        10  /* maximum number of process in ready queue */

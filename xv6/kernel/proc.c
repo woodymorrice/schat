@@ -5,18 +5,20 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "list.h"
+#include <stddef.h>
 
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
 
 /*GROUP14*/
+LIST *readyQ;
+struct spinlock qLock;
 struct proc runQ[RPROC];
-struct proc sleepQ[RPROC];
 /* END */
 
 struct proc *initproc;
-
 int nextpid = 1;
 struct spinlock pid_lock;
 
@@ -53,14 +55,17 @@ void
 procinit(void)
 {
   struct proc *p;
-  
+
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
-  }
+  } 
+  initlock(&qLock, "qLock");
+  readyQ = ListCreate();
+
 }
 
 /* Must be called with interrupts disabled, */
@@ -131,8 +136,6 @@ found:
   p->state = USED;
 
   /* GROUP 14 */
-  p->numEx = 0;
-  p->forkCall = 0;
   /* END */
 
   /* Allocate a trapframe page. */
@@ -181,9 +184,8 @@ freeproc(struct proc *p)
   p->state = UNUSED;
 
   /* GROUP 14 */
-  p->forkCall = 0;
-  p->numEx = 0;
-  p->preShare = 0;
+  
+  
   /* END */
 
 }
@@ -266,17 +268,21 @@ userinit(void)
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
+
   p->state = RUNNABLE;
     
   /* GROUP 14 */
-  p->preShare = 100;
- 
-  p->forkCall = 0;
-
-  p->numEx = 0;
-
+  acquire(&qLock);
+  p->preShared = 100;
+  p->numChild = 0;
+  p->numQuanta = 0;
+  p->specProc = 1; 
   /* END */
-  release(&p->lock);
+
+ ListPrepend(readyQ, p);
+ release(&qLock);
+ release(&p->lock);
+
 }
 
 /* Grow or shrink user memory by n bytes. */
@@ -307,7 +313,7 @@ fork(void)
   int i, pid;
   struct proc *np;
   struct proc *p = myproc();
-  p->forkCall += 1;
+
   /* Allocate process. */
   if((np = allocproc()) == 0){
     return -1;
@@ -343,12 +349,12 @@ fork(void)
 
   /* Copy trace mask to child */
   np->tmask = p->tmask;
-
-  np->preShare = (int)(p->preShare / p->forkCall);
-
-  p->preShare = np->preShare;
-
-  np->numEx = 0;
+  
+  p->numChild = ((p->numChild) + 1);
+  np->numChild = 0;
+  np->numQuanta = 0;
+  np->preShared = ((p->preShared) / ((p->numChild) + 1));
+  p->preShared = np->preShared;
   
   /* End CMPT 332 group14 change Fall 2023 */
 
@@ -360,6 +366,7 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  ListPrepend(readyQ, np);
   release(&np->lock);
 
   return pid;
@@ -486,22 +493,46 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  int totalEx;
-  c->proc = 0;
-  totalEx = 0;
 
+/*  int totalEx;*/
+  c->proc = 0;
+  /*totalEx = 0;*/
+  ListFirst(readyQ);
   for(;;){
     /* The most recent process to run may have had interrupts */
     /* turned off; enable them to avoid a deadlock if all */
     /* processes are waiting. */
     intr_on();
-/*    for (p = proc; p < &proc[NPROC]; p++) {
-        if (p->state == RUNNABLE) {
-            runQ[index] = *p;
-            index ++;
-            if (index == RPROC) index = 0;
-            c->proc = 0;
-        }
+    
+    while(ListCount(readyQ) > 0){
+            p = ListCurr(readyQ);
+            acquire(&p->lock);
+            if (p->state == RUNNABLE) {
+                p->state = RUNNING;
+                p->numQuanta = p->numQuanta + 1;
+                c->proc = p;
+                swtch(&c->context, &p->context);
+                c->proc = 0; 
+            }
+            if(p->state == SLEEPING) {
+                if(ListCount(readyQ) > 1) {
+                    ListTrim(readyQ);
+                }
+            }
+            release(&p->lock);
+    }
+  
+   
+/*
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE) { 
+        p->state = RUNNING;
+        c->proc = p;
+        swtch(&c->context, &p->context);
+        c->proc = 0;
+      }
+      release(&p->lock);
     }
 */
 /*
@@ -524,39 +555,6 @@ scheduler(void)
     
 */
   
-   for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(((p->numEx/totalEx)*100) != p->preShare && p->state == RUNNABLE) {
-        p->state = RUNNING;
-        p->numEx += 1;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-        c->proc = 0;
-      }
-      release(&p->lock);
-    }
-
-   totalEx ++; 
-     
-/*    
-    for (p = proc; p < &runQ[RPROC]; p++) {
-        acquire(&p->lock);
-        Scanning through the runnable queue to find the least executed
-        * process.
-        * 
-        if (p->numEx < leastEx) {
-            p->state = RUNNING;
-            p->numEx += 1;
-             check number of execution is near the promised preShare 
-            * take the process of the runQ and put in sleepQ
-            
-            c->proc = p;
-            swtch(&c->context, &p->context);
-            c->proc = 0;
-        }
-        release(&p->lock);
-    }
-*/
   }
 }
 
@@ -572,7 +570,8 @@ sched(void)
 {
   int intena;
   struct proc *p = myproc();
-
+  if(holding(&qLock))
+    panic("Let the lock go");
   if(!holding(&p->lock))
     panic("sched p->lock");
   if(mycpu()->noff != 1)
@@ -593,6 +592,9 @@ yield(void)
 {
   struct proc *p = myproc();
   acquire(&p->lock);
+  acquire(&qLock);
+  ListPrepend(readyQ, p);
+  release(&qLock);
   p->state = RUNNABLE;
   sched();
   release(&p->lock);
@@ -604,7 +606,6 @@ void
 forkret(void)
 {
   static int first = 1;
-
   /* Still holding p->lock from scheduler. */
   release(&myproc()->lock);
 
@@ -665,6 +666,7 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
+        ListPrepend(readyQ, p);
       }
       release(&p->lock);
     }
@@ -686,6 +688,7 @@ kill(int pid)
       if(p->state == SLEEPING){
         /* Wake process from sleep(). */
         p->state = RUNNABLE;
+        ListPrepend(readyQ, p);
       }
       release(&p->lock);
       return 0;
