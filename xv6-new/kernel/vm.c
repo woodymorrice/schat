@@ -367,6 +367,8 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
   uint64 n, va0, pa0;
   pte_t *pte;
+  /*char* mem;*/
+  /*uint flags;*/
 
   while(len > 0){
     va0 = PGROUNDDOWN(dstva);
@@ -377,6 +379,34 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
        (*pte & PTE_W) == 0)
       return -1;
     pa0 = PTE2PA(*pte);
+
+    /* Start CMPT 332 group14 change Fall 2023 */
+    /* if the physical page bein g copied to is copy-on-write */
+    /*if (*pte & PTE_COW) {*/
+      /* if it only has one reference, just make it writeable */
+      /*if (ref_cnt((void*)pa0) == 1) {
+        *pte &= ~PTE_COW; *pte |= PTE_W;
+      }
+      else {*/
+        /* decrease the old pages reference number */
+        /*ref_dec((void*)pa0);*/
+        /* allocate a new page */
+        /*mem = kalloc();*/
+
+        /* flip the flag bits */
+        /*flags = ((PTE_FLAGS(*pte) | PTE_W) & ~PTE_COW);*/
+        /* unmap the old page */
+        /*uvmunmap(pagetable, va0, 1, 0);*/
+        /* map the new page */
+        /*mappages(pagetable, va0, 4096, (uint64)mem, flags);*/
+        /* copy the existing data to the new page */
+        /*memmove(mem, (char*)pa0, PGSIZE);*/
+        /* assign the new page to pa0 for the next memmove */
+       /* pa0 = (uint64)mem;
+      }
+    }*/
+    /* End CMPT 332 group14 change Fall 2023 */
+
     n = PGSIZE - (dstva - va0);
     if(n > len)
       n = len;
