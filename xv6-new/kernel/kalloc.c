@@ -8,17 +8,6 @@
 #include "spinlock.h"
 #include "riscv.h"
 #include "defs.h"
-/* Begin CMPT 332 group14 change Fall 2023 */
-/* Phong Thanh Nguyen (David) - wdz468 - 11310824
- * Woody Morrice - wam553 - 11071060 */
-
-/* page size in bits for bit shifting instead of division */
-#define PGSZNBITS 12
-/* the number of physical pages */ 
-#define NPAGES ((PHYSTOP - KERNBASE) >> PGSZNBITS)
-/* the index into the reference count table for the given page p */
-#define RCIND(p) ((p - KERNBASE) >> PGSZNBITS)
-/* End CMPT 332 group14 change Fall 2023 */
 
 void freerange(void *pa_start, void *pa_end);
 
@@ -33,8 +22,14 @@ struct {
   struct spinlock lock;
   struct run *freelist;
   /* Begin CMPT 332 group14 change Fall 2023 */
+  /* Phong Thanh Nguyen (David) - wdz468 - 11310824
+   * Woody Morrice - wam553 - 11071060 */
+  
+  /* page ref table - indexed by relative page # */
   int refcnt[NPAGES];
+  /* count of free physical pages */
   int freecnt;
+
   /* End CMPT 332 group14 change Fall 2023 */
 } kmem;
 
@@ -42,8 +37,11 @@ void
 kinit()
 {
   /* Begin CMPT 332 group14 change Fall 2023 */
+
   kmem.freecnt = 0; /* don't need lock here */
+  
   /* End CMPT 332 group14 change Fall 2023 */
+
   initlock(&kmem.lock, "kmem");
   freerange(end, (void*)PHYSTOP);
 }
@@ -53,18 +51,20 @@ freerange(void *pa_start, void *pa_end)
 {
   char *p;
   /* Begin CMPT 332 group14 change Fall 2023 */
-  int index; 
-  /* End CMPT 332 group14 change Fall 2023 */
+ 
+  int index;
+      
   p = (char*)PGROUNDUP((uint64)pa_start);
   for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE){
-    /* Begin CMPT 332 group14 change Fall 2023 */
-    /* initialize all refcounts to 0 while the allocator
-     * is being initialized */
+
+    /* initialize all refcounts to 0 while
+     * the allocator is being initialized */
     index = RCIND((uint64)p);
-    kmem. refcnt [index] = 0;
-    /* End CMPT 332 group14 change Fall 2023 */
+    kmem.refcnt[index] = 0;
+    
     kfree(p);
   }
+  /* End CMPT 332 group14 change Fall 2023 */
 }
 
 /* Free the page of physical memory pointed at by pa, */
@@ -76,18 +76,17 @@ kfree(void *pa)
 {
   struct run *r;
   /* Begin CMPT 332 group14 change Fall 2023 */
-  int index;
-
-  index = RCIND((uint64)pa);
-  /* End CMPT 332 group14 change Fall 2023 */
 
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
 
   acquire(&kmem.lock);
-  kmem.refcnt[index]--;
-  /* Begin CMPT 332 group14 change Fall 2023 */
-  if (kmem.refcnt[index] < 1) {
+
+  /* default functionality of xv6 would be that
+   * every page has one reference, so this accounts
+   * for those existing calls to kfree() */
+  ref_dec((void*)pa);
+  if (ref_cnt((void*)pa) < 1) {
     /* Fill with junk to catch dangling refs. */
     memset(pa, 1, PGSIZE);
 
@@ -97,8 +96,9 @@ kfree(void *pa)
 
     kmem.freecnt++;
   }
-  /* End CMPT 332 group14 change Fall 2023 */
+
   release(&kmem.lock);
+  /* End CMPT 332 group14 change Fall 2023 */
 }
 
 /* Allocate one 4096-byte page of physical memory. */
@@ -133,34 +133,77 @@ kalloc(void)
 int
 nfree(void)
 {
-  return kmem.freecnt;
+  int cnt;
+  int hold;
+
+  hold = 0;
+
+  if (!holding(&kmem.lock)){
+    acquire(&kmem.lock);
+    hold = 1;
+  }
+  cnt = kmem.freecnt;
+  if (hold && holding(&kmem.lock))
+    release(&kmem.lock);
+
+  return cnt;
 }
 
 void
 ref_inc(void *p)
 {
   int index;
+  int hold;
+
+  hold = 0;
+
   index = RCIND((uint64)p);
-  acquire(&kmem.lock);
+  
+  if (!holding(&kmem.lock)){
+    acquire(&kmem.lock);
+    hold = 1;
+  }
   kmem.refcnt[index]++;
-  release(&kmem.lock);
+  if (hold && holding(&kmem.lock))
+    release(&kmem.lock);
 }
 
 void
 ref_dec(void *p)
 {
   int index;
+  int hold;
+
+  hold = 0;
   index = RCIND((uint64)p);
-  acquire(&kmem.lock);
+
+  if (!holding(&kmem.lock)){
+    acquire(&kmem.lock);
+    hold = 1;
+  }
   kmem.refcnt[index]--;
-  release(&kmem.lock);
+  if (hold && holding(&kmem.lock))
+    release(&kmem.lock);
 }
 
 int
 ref_cnt(void *p)
 {
   int index;
+  int cnt;
+  int hold;
+
+  hold = 0;
   index = RCIND((uint64)p);
-  return kmem.refcnt[index];
+
+  if (!holding(&kmem.lock)){
+    acquire(&kmem.lock);
+    hold = 1;
+  }
+  cnt = kmem.refcnt[index];
+  if (hold && holding(&kmem.lock))
+    release(&kmem.lock);
+
+  return cnt;
 }
 /* End CMPT 332 group14 change Fall 2023 */
