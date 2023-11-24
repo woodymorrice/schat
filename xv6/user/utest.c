@@ -15,9 +15,6 @@ int parentID[MAX_PROC];
 int parentProc(int children) {
     int index, pid, randVal, randSleep;
     
-    randVal = rand() % MAX_RAND;
-    randSleep = rand() * MAX_SLEEP;
-
     if (children == 0) {
         return -1;     
     }
@@ -31,6 +28,10 @@ int parentProc(int children) {
     }
 
     if(pid == 0) {
+        
+        randVal = rand() % MAX_RAND;
+        randSleep = rand() * MAX_SLEEP;
+
         sleep(randSleep);
         for(index = 0; index < randVal; index ++) {
             square(index);

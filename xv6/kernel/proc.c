@@ -500,22 +500,44 @@ scheduler(void)
 
   for (;;) {
     intr_on();
+     quanta ++;
+
+    acquire(&qLock);
+    if (ListCount(readyQ) > 0) {
+        p = ListTrim(readyQ);
+        release(&qLock);
+        if (p->numQuanta != p->preShared){
+            acquire(&p->lock);
+            p->numQuanta = p->numQuanta + 1;
+            p->state = RUNNING;
+            c->proc = p;
+            swtch(&c->context, &p->context);
+            c->proc = 0;    
+            release(&p->lock);
+        }
+    }
+    else {
+        release(&qLock);
+        p = &proc[0];
+        p->numQuanta = 0;
+    }
+/*
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
-           /* Switch to chosen process.  It is the process's job
+            Switch to chosen process.  It is the process's job
            to release its lock and then reacquire it
-           before jumping back to us.*/
+           before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
 
-           /*Process is done running for now. 
-           It should have changed its p->state before coming back.*/
+           Process is done running for now. 
+           It should have changed its p->state before coming back.
         c->proc = 0;
       }
       release(&p->lock);
-     }
+     }*/
   }
 }
 
