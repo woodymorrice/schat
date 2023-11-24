@@ -52,7 +52,7 @@
 #define PGSZNBITS 12
 /* the number of physical pages */ 
 #define NPAGES ((PHYSTOP - KERNBASE) >> PGSZNBITS)
-/* the index into the reference count table for the given page p */
+/* the index into the reference count table for the given page pa */
 #define RCIND(pa) ((pa - KERNBASE) >> PGSZNBITS)
 
 /* End CMPT 332 group14 change Fall 2023 */

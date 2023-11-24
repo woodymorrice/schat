@@ -37,10 +37,12 @@ void
 usertrap(void)
 {
   /* Begin CMPT 332 group14 change Fall 2023 */
+
   uint64 va, pa;
   uint flags;
   pte_t *pte;
   char* mem;
+
   /* End CMPT 332 group14 change Fall 2023 */
   int which_dev = 0;
 
@@ -71,12 +73,21 @@ usertrap(void)
     intr_on();
 
     syscall();
-  /* page fault handler -- should only handle store page faults?? */
+  /* page fault handler -- should only handle store page faults */
   } else if(r_scause() == 15) {
 
     /* get the faulting address */
     va = PGROUNDDOWN(r_stval());
+    if(va >= MAXVA){
+      setkilled(p);
+      goto err;
+    }
+    /* grab the associated page table entry */
     pte = walk(p->pagetable, va, 0);
+    if(*pte == 0){
+      setkilled(p);
+      goto err;
+    }
 
     if ((*pte & PTE_V) && (*pte & PTE_U) && (*pte & PTE_COW)) {
       pa = PTE2PA(*pte);
@@ -91,7 +102,6 @@ usertrap(void)
 
         uvmunmap(p->pagetable, va, 1, 0);
         mappages(p->pagetable, va, 4096, (uint64)mem, flags);
-        /*ref_dec((void*)pa);*/
         kfree((void*)pa);
       }
 
@@ -109,6 +119,7 @@ usertrap(void)
     setkilled(p);
   }
 
+ err:
   if(killed(p))
     exit(-1);
 

@@ -326,8 +326,9 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     /* increment page references */
     ref_inc((void*)pa);
     /* can flips the bits of the parent page directly instead of
-     * having to reinstall it -- thanks Delaney! */
-    *pte &= ~PTE_W; *pte |= PTE_COW;
+     * having to reinstall it -- thanks Delaney! */ 
+    *pte &= ~PTE_W;
+    *pte |= PTE_COW;
     flags = (PTE_FLAGS(*pte));
 
     /* map the page into the childs page table */
@@ -375,8 +376,9 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
     if(va0 >= MAXVA)
       return -1;
     pte = walk(pagetable, va0, 0);
-    if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0)
+    if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0) {
       return -1;
+    }
     pa0 = PTE2PA(*pte);
 
     /* Start CMPT 332 group14 change Fall 2023 */
@@ -388,7 +390,7 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
       }
       else {
         /* decrease the old pages reference number */
-        ref_dec((void*)pa0);
+        /*ref_dec((void*)pa0);*/
         /* allocate a new page */
         mem = kalloc();
         /* flip the flag bits */
@@ -399,6 +401,7 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
         uvmunmap(pagetable, va0, 1, 0);
         /* map the new page */
         mappages(pagetable, va0, PGSIZE, (uint64)mem, flags);
+        kfree((void*)pa0);
         /* assign the new page to pa0 for the next memmove */
         pa0 = (uint64)mem;
       }

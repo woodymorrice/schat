@@ -52,15 +52,15 @@ freerange(void *pa_start, void *pa_end)
   char *p;
   /* Begin CMPT 332 group14 change Fall 2023 */
  
-  int index;
+  int idx;
       
   p = (char*)PGROUNDUP((uint64)pa_start);
   for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE){
 
-    /* initialize all refcounts to 0 while
+    /* initialize all refcounts to 1 while
      * the allocator is being initialized */
-    index = RCIND((uint64)p);
-    kmem.refcnt[index] = 0;
+    idx = RCIND((uint64)p);
+    kmem.refcnt[idx] = 1;
     
     kfree(p);
   }
@@ -75,15 +75,15 @@ void
 kfree(void *pa)
 {
   struct run *r;
-  /* Begin CMPT 332 group14 change Fall 2023 */
 
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
 
   acquire(&kmem.lock);
-
-  /* default functionality of xv6 would be that
-   * every page has one reference, so this accounts
+  /* Begin CMPT 332 group14 change Fall 2023 */
+  
+  /* by default xv6 works as if each page has one
+   * reference, so this call to ref_dec() accounts
    * for those existing calls to kfree() */
   ref_dec((void*)pa);
   if (ref_cnt((void*)pa) < 1) {
@@ -97,8 +97,8 @@ kfree(void *pa)
     kmem.freecnt++;
   }
 
-  release(&kmem.lock);
   /* End CMPT 332 group14 change Fall 2023 */
+  release(&kmem.lock);
 }
 
 /* Allocate one 4096-byte page of physical memory. */
@@ -109,18 +109,20 @@ kalloc(void)
 {
   struct run *r;
   /* Begin CMPT 332 group14 change Fall 2023 */
-  int index;
-  /* End CMPT 332 group14 change Fall 2023 */
+  
+  int idx;
 
   acquire(&kmem.lock);
   r = kmem.freelist;
-  /* Begin CMPT 332 group14 change Fall 2023 */
-  index = RCIND((uint64)r);
+
+  idx = RCIND((uint64)r);
+  kmem.refcnt[idx] = 1;
+
   if(r)
     kmem.freelist = r->next;
-  kmem.refcnt[index] = 1;
 
   kmem.freecnt--;
+
   /* End CMPT 332 group14 change Fall 2023 */
   release(&kmem.lock);
 
@@ -130,11 +132,17 @@ kalloc(void)
 }
 
 /* Begin CMPT 332 group14 change Fall 2023 */
+/* since the follow functions all need the lock,
+ * they have all been designed in such a way that
+ * they can function inside AND outside pre-existing
+ * critical sections */
+
+/* returns the total number of free physical pages */
 int
 nfree(void)
 {
-  int cnt;
   int hold;
+  int cnt;
 
   hold = 0;
 
@@ -149,60 +157,76 @@ nfree(void)
   return cnt;
 }
 
+/* increments the reference count for page pa */
 void
-ref_inc(void *p)
+ref_inc(void *pa)
 {
-  int index;
   int hold;
+  int idx;
 
   hold = 0;
 
-  index = RCIND((uint64)p);
+  idx = RCIND((uint64)pa);
   
   if (!holding(&kmem.lock)){
     acquire(&kmem.lock);
     hold = 1;
   }
-  kmem.refcnt[index]++;
+  kmem.refcnt[idx]++;
   if (hold && holding(&kmem.lock))
     release(&kmem.lock);
+
+  if (ref_cnt(pa) > 64)
+    panic("ref_inc(): too many refs");
 }
 
+/* decrements the reference count for page pa */
 void
-ref_dec(void *p)
+ref_dec(void *pa)
 {
-  int index;
   int hold;
+  int idx;
 
   hold = 0;
-  index = RCIND((uint64)p);
+  idx = RCIND((uint64)pa);
 
   if (!holding(&kmem.lock)){
     acquire(&kmem.lock);
     hold = 1;
   }
-  kmem.refcnt[index]--;
+  kmem.refcnt[idx]--;
   if (hold && holding(&kmem.lock))
     release(&kmem.lock);
+
+  if (ref_cnt(pa) < 0)
+    panic("ref_dec(): negative refs");
 }
 
+/* returns the reference count for page pa */
 int
-ref_cnt(void *p)
+ref_cnt(void *pa)
 {
-  int index;
-  int cnt;
   int hold;
+  int idx;
+  int cnt;
 
   hold = 0;
-  index = RCIND((uint64)p);
+  idx = RCIND((uint64)pa);
+  if (idx > NPAGES-1 || idx < 0)
+    panic("ref_cnt(): invalid index");
 
   if (!holding(&kmem.lock)){
     acquire(&kmem.lock);
     hold = 1;
   }
-  cnt = kmem.refcnt[index];
+  cnt = kmem.refcnt[idx];
   if (hold && holding(&kmem.lock))
     release(&kmem.lock);
+
+  if (cnt > 64)
+    panic("ref_cnt(): too many refs");
+  if (cnt < 0)
+    panic("ref_cnt(): negative refs");
 
   return cnt;
 }
