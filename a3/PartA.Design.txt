@@ -1,49 +1,8 @@
+/*
+
+*/
 
 
-Old scheduler: handler switches to the kernel scheduler, which then selects
-
-the first available process to run. 
-
-
-Total number of proc in xv6: 
-NPROC 64
-NCPU 8
-
-If you want to increase the stack size of user process: 
-    look for (userinit() in proc.c)
-
-* Assume process with single thread only
-
-Depend on how many process that is in the process table.
-2 priorities queues
-
-pump up the priority: a thresh hold to keep track how long the process has 
-been waiting on each timer interrupt
-
-        also based on the number of time it has been running
-
-
-* think of way not to change how fork() function
-
-assuming all the process created have the same share at first
-depends on how many quantum it already running
-
-Definition of share: the fairness of process
-
-depends on number of time it has been running, waiting, share might be 
-different 
-
-we don't have to pass in the amount of share 
-
-priorities is something that only the scheduler knows. 
-
-New scheduler:  schedule processs based on fair shares of the CPU
-
-    - Each process has a share
-            ---> Try to look into the structure of the fork () return value
-            ---> Might make changes in there to create a random number of 
-            
-            share.
 
                   A    B   C        Total 
 Pre-share        100   50  75       225
@@ -55,52 +14,6 @@ important
 Possible        A A C B A A B C .....
 sequence 
 
-
-
-    - Scheduler must ensure that the number of quanta a process has been 
-      
-      allocated  " stay near " its predefined share
-
-
-    Ready queue: only store RUNNABLE processes
-
-    - if a process calls sleep(), it should not stay in the ready queue
-
-    ---> Can use monitor to store the process which put to sleep
-
-    
-
-    - Scheduler should put processes just created or woken up to the 
-
-    back of the ready queue
-
-    ---> ListPrepend(), ListTrim()
-
-For a process to have priorities, problems might come up: 
-
-    1. Priority inversion - a low-priority and high priority process both
-    use a particular lock. If the low-priority process can prevent the 
-    high priority processes from making progress.
-
-    2. Convoy - long convo of waiting processes can form when many high-
-    priority process are waiting for a low priority process which has the 
-    lock.
-
-
-
-
-
-Test: user program
-
-    call fork() to generare children:
-        - children sleep for a rand()
-        
-        - woken up and compute square () for a random number of calls
-
-
---> "Verify that some "group" of processes as you have defined it gets a
-
-"share" of the CPU as you defined. 
 
 
 

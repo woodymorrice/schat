@@ -10,71 +10,58 @@
 #define MAX_PROC 3
 #define MAX_RAND 800 
 
-void parentProc() {
-    int index, n1, n2, n3;
-    int pid1, pid2, pid3;
+int parentID[MAX_PROC];
+
+int parentProc(int children) {
+    int index, pid, randVal, randSleep;
     
-    pid1 = fork();
+    randVal = rand() % MAX_RAND;
+    randSleep = rand() * MAX_SLEEP;
+
+    if (children == 0) {
+        return -1;     
+    }
+    
+    pid = fork();
+    parentID[MAX_PROC - children] = getpid(); 
        
-    if (pid1 < 0) {
-        printf("pid1: fork fail\n");
+    if (pid < 0) {
+        printf("pid: fork fail\n");
         exit(-1);
     }
 
-    if(pid1 == 0) {
-        pid2 = fork();
-        if (pid2 < 0) {
-            printf("pid2: fork fail\n");
-            exit(-1);
-        }
-        if (pid2 == 0) {
-            pid3 = fork();
-            if (pid3 < 0) {
-                printf("pid3: fork fail\n");
-                exit(-1);
-            }
-            if (pid3 == 0) {
-                n1 = rand() % MAX_RAND;
-                sleep(rand() * MAX_SLEEP);
-                for(index = 0; index < n1; index ++) {
-                    square(index);
-                }
-                printf("pid3: square calls: %d.\n", n1);
-                exit(0);
-            }
-            else{
-                wait(0);
-            }
-        
-        }
-        else {
-            wait(0);
-            n2 = rand() % MAX_RAND;
-            sleep(rand() * MAX_SLEEP);
-            for (index = 0; index < n2; index ++) { 
-                square(index);
-            }
-            
-            printf("pid2: square calls: %d.\n", n2);
-            exit(0);
-            }
-    }
-
-    else {
-        wait(0);
-        n3 = rand() % MAX_RAND;
-        sleep(rand() * MAX_SLEEP);
-        for(index = 0; index < n3; index ++) {
+    if(pid == 0) {
+        sleep(randSleep);
+        for(index = 0; index < randVal; index ++) {
             square(index);
         }
-        printf("pid1: square calls: %d.\n", n3);
-        exit(0); 
-    } 
+        if( children == MAX_PROC ) {
+            printf("Child with PID: %d,", getpid());
+            printf(" and my parent ID: %d,", parentID[MAX_PROC - children]);
+            printf(" square calls: %d\n", randVal);
+        }
+        else {
+            printf("Child with PID: %d,", getpid());
+            printf(" and parent ID: %d,", parentID[MAX_PROC - (children + 1)]);
+            printf(" square calls: %d\n", randVal); 
+        }
+    
+        children --;
+        parentProc(children);
+        exit(0);
+    }
+    
+    else {
+        wait((int*)0);
+    }
+    
+   return 0;
+    
 }
 
 int pmain() {
 
-    parentProc();
+    parentProc(3);
 
     exit(0);
 }

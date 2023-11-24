@@ -139,6 +139,7 @@ void
 kerneltrap()
 {
   int which_dev = 0;
+  struct proc *p = myproc(); 
   uint64 sepc = r_sepc();
   uint64 sstatus = r_sstatus();
   uint64 scause = r_scause();
@@ -155,7 +156,8 @@ kerneltrap()
   }
 
   /* give up the CPU if this is a timer interrupt. */
-  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
+  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING &&
+    p->numQuanta != p->preShared)
     yield();
 
   /* the yield() may have caused some traps to occur, */

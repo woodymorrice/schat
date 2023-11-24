@@ -7,6 +7,7 @@
 #include "defs.h"
 #include "list.h"
 #include <stddef.h>
+#include <stdbool.h>
 
 struct cpu cpus[NCPU];
 
@@ -14,6 +15,7 @@ struct proc proc[NPROC];
 
 /*GROUP14*/
 LIST *readyQ;
+int quanta = 1;
 struct spinlock qLock;
 struct proc runQ[RPROC];
 /* END */
@@ -62,10 +64,11 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
-  } 
-  initlock(&qLock, "qLock");
+      p->numQuanta = 0;
+  }
+ 
+  initlock(&qLock, "qLock"); 
   readyQ = ListCreate();
-
 }
 
 /* Must be called with interrupts disabled, */
@@ -134,9 +137,6 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
-
-  /* GROUP 14 */
-  /* END */
 
   /* Allocate a trapframe page. */
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -272,16 +272,16 @@ userinit(void)
   p->state = RUNNABLE;
     
   /* GROUP 14 */
-  acquire(&qLock);
   p->preShared = 100;
   p->numChild = 0;
   p->numQuanta = 0;
   p->specProc = 1; 
   /* END */
+  acquire(&qLock);
+  ListPrepend(readyQ, p);
+  release(&qLock);
 
- ListPrepend(readyQ, p);
- release(&qLock);
- release(&p->lock);
+  release(&p->lock);
 
 }
 
@@ -366,8 +366,11 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
-  ListPrepend(readyQ, np);
   release(&np->lock);
+  
+  acquire(&qLock);
+  ListPrepend(readyQ, np);
+  release(&qLock);
 
   return pid;
 }
@@ -485,76 +488,92 @@ wait(uint64 addr)
 /* Each CPU calls scheduler() after setting itself up. */
 /* Scheduler never returns.  It loops, doing: */
 /*  - choose a process to run. */
-/*  - swtch to start running that process. */
+/*  - swtch to start running that process.  */
 /*  - eventually that process transfers control */
-/*    via swtch back to the scheduler. */
+/*    via swtch back to the scheduler.*/
 void
 scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
+  
 
 /*  int totalEx;*/
   c->proc = 0;
   /*totalEx = 0;*/
-  ListFirst(readyQ);
   for(;;){
     /* The most recent process to run may have had interrupts */
     /* turned off; enable them to avoid a deadlock if all */
     /* processes are waiting. */
     intr_on();
+    quanta ++;
     
-    while(ListCount(readyQ) > 0){
-            p = ListCurr(readyQ);
+    acquire(&qLock);
+    if (ListCount(readyQ) > 0) {
+        p = ListTrim(readyQ);
+
+        if (p != NULL && ((p->numQuanta / quanta) * 100) < p->preShared) { 
+            release(&qLock);
             acquire(&p->lock);
-            if (p->state == RUNNABLE) {
-                p->state = RUNNING;
-                p->numQuanta = p->numQuanta + 1;
-                c->proc = p;
-                swtch(&c->context, &p->context);
-                c->proc = 0; 
-            }
-            if(p->state == SLEEPING) {
-                if(ListCount(readyQ) > 1) {
-                    ListTrim(readyQ);
-                }
-            }
+            p->state = RUNNING;
+            p->numQuanta = p->numQuanta + 1;
+            c->proc = p;
+            swtch(&c->context, &p->context);
+            c->proc = 0;
             release(&p->lock);
+            acquire(&qLock);
+        }
+
     }
-  
-   
-/*
+    release(&qLock);
+    
+
+  /* 
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if(p->state == RUNNABLE) { 
+      if(p->state == RUNNABLE && 
+        (p->numQuanta < p->preShared)) { 
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
         c->proc = 0;
       }
       release(&p->lock);
-    }
-*/
+    }*/
 /*
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
-           Switch to chosen process.  It is the process's job
-           to release its lock and then reacquire it
-           before jumping back to us.
+         acquire(&qLock);
+         ListPrepend(readyQ, p);
+         release(&qLock);  
+      }
+      if (ListCount(readyQ) > 0) {
+          acquire(&qLock);
+          ListTrim(readyQ);
+          release(&qLock);
+          
+          p->state = RUNNING;
+          c->proc = p;
+          
+          swtch(&c->context, &p->context);
+          c->proc = 0;
+      }   
+      release(&p->lock);
+     }
+*/
+ /*   
+    while (ListCount(readyQ) > 0) {
+        acquire(&qLock);
+        p = ListTrim(readyQ);
+        acquire(&p->lock);
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
-
-           Process is done running for now. 
-           It should have changed its p->state before coming back.
         c->proc = 0;
-      }
-      release(&p->lock);
-    } 
-    
-*/
-  
+        release(&p->lock);
+        release(&qLock);
+    }*/ 
   }
 }
 
@@ -666,7 +685,9 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
+        acquire(&qLock);
         ListPrepend(readyQ, p);
+        release(&qLock);
       }
       release(&p->lock);
     }
@@ -688,7 +709,9 @@ kill(int pid)
       if(p->state == SLEEPING){
         /* Wake process from sleep(). */
         p->state = RUNNABLE;
+        acquire(&qLock);
         ListPrepend(readyQ, p);
+        release(&qLock);
       }
       release(&p->lock);
       return 0;
