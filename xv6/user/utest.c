@@ -1,68 +1,60 @@
-#include "kernel/types.h"
-#include "kernel/stat.h"
+#include "kernel/types.h"                                                       
 #include "kernel/param.h"
+#include "kernel/memlayout.h"
+#include "kernel/riscv.h"
+
+#include "kernel/stat.h"                                                        
 #include "user/user.h"
-#include "user/grind.h"
-#include "user/square.h"
+#include "user/grind.h"                                                         
+#include "user/square.h"                                                        
 #include <stddef.h>
 
-#define MAX_SLEEP 20
-#define MAX_PROC 3
-#define MAX_RAND 800 
+#define MX_SLP 20
+#define MX_CHLD 5
+#define MAX_SQ 800
+#define MX_LVL 8
 
-int parentID[MAX_PROC];
+int forktest(int lvl) {
+  int i, chld, pid, nulvl;
 
-int parentProc(int children) {
-    int index, pid, randVal, randSleep;
-    
-    if (children == 0) {
-        return -1;     
-    }
-    
+  /* wont spawn more children so print output */
+  if (lvl == 0) {
+    printf("!");
+    return(0);
+  }
+
+  /* create a random number of children */
+  chld = rand() % MX_CHLD;
+  for (i = 0; i < chld; i++) {
     pid = fork();
-    parentID[MAX_PROC - children] = getpid(); 
-       
+
+    /* error in fork */
     if (pid < 0) {
-        printf("pid: fork fail\n");
-        exit(-1);
+        return(-1);
+    } 
+    /* child code */
+    else if (pid == 0) {
+      /* randomly choose depth of subtree */
+      nulvl = rand() % (lvl - 1);
+      forktest(nulvl-1);
     }
-
-    if(pid == 0) {
-        
-        randVal = rand() % MAX_RAND;
-        randSleep = rand() * MAX_SLEEP;
-
-        sleep(randSleep);
-        for(index = 0; index < randVal; index ++) {
-            square(index);
-        }
-        if( children == MAX_PROC ) {
-            printf("Child with PID: %d,", getpid());
-            printf(" and my parent ID: %d,", parentID[MAX_PROC - children]);
-            printf(" square calls: %d\n", randVal);
-        }
-        else {
-            printf("Child with PID: %d,", getpid());
-            printf(" and parent ID: %d,", parentID[MAX_PROC - (children + 1)]);
-            printf(" square calls: %d\n", randVal); 
-        }
-    
-        children --;
-        parentProc(children);
-        exit(0);
-    }
-    
+    /* parent code */
     else {
-        wait((int*)0);
+      /* print output */
+      printf("!");
     }
-    
-   return 0;
-    
+  }
+
+
+  exit(0);
 }
+
 
 int pmain() {
-
-    parentProc(3);
-
-    exit(0);
+  if (forktest(MX_LVL) != 0) {
+    printf("utest: error");
+    exit(-1);
+  }
+  exit(0);
 }
+
