@@ -36,8 +36,6 @@ trapinithart(void)
 void
 usertrap(void)
 {
-  
-
   int which_dev = 0;
 
   if((r_sstatus() & SSTATUS_SPP) != 0)
@@ -67,33 +65,6 @@ usertrap(void)
     intr_on();
 
     syscall();
-<<<<<<< HEAD
-=======
-  /*} else if(r_scause() == 15 || r_scause() == 12 || r_scause() == 13){*/
-  } else if(r_scause() == 15){
-    /*printf("usertrap(): page fault\n");*/
-
-    /* get the faulting virtual address */
-    uint64 va = PGROUNDDOWN(r_stval());
-    pte_t *pte = walk(p->pagetable, va, 0);
-
-    if ((*pte & PTE_V) && (*pte & PTE_COW)) {
-      /*printf("PTE_COW\n");*/
-      uint64 pa = PTE2PA(*pte);
-      uint flags = ((PTE_FLAGS(*pte) | PTE_W) & ~PTE_COW);
-      char *mem = kalloc();
-      memmove(mem, (char*)pa, PGSIZE);
-
-      uvmunmap(p->pagetable, va, 1, 0);
-      mappages(p->pagetable, va, 4096, (uint64)mem, flags);
-    } else {
-      printf("usertrap(): invalid address\n");
-      setkilled(p);
-    }
-
-
-
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
   } else if((which_dev = devintr()) != 0){
     /* ok */
   } else {
@@ -101,8 +72,6 @@ usertrap(void)
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
     setkilled(p);
   }
-
-
 
   if(killed(p))
     exit(-1);

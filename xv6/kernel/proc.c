@@ -496,67 +496,10 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-<<<<<<< HEAD
-  
-=======
-  /*int totalEx;*/
   c->proc = 0;
-  /*totalEx = 0;*/
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
 
-/*  int totalEx;*/
-  c->proc = 0;
-  /*totalEx = 0;*/
-  for(;;){
-    /* The most recent process to run may have had interrupts */
-    /* turned off; enable them to avoid a deadlock if all */
-    /* processes are waiting. */
+  for (;;) {
     intr_on();
-    quanta ++;
-    
-    acquire(&qLock);
-    if (ListCount(readyQ) > 0) {
-        p = ListTrim(readyQ);
-
-        if (p != NULL && ((p->numQuanta / quanta) * 100) < p->preShared) { 
-            release(&qLock);
-            acquire(&p->lock);
-            p->state = RUNNING;
-            p->numQuanta = p->numQuanta + 1;
-            c->proc = p;
-            swtch(&c->context, &p->context);
-            c->proc = 0;
-            release(&p->lock);
-            acquire(&qLock);
-        }
-
-    }
-<<<<<<< HEAD
-    release(&qLock);
-    
-
-  /* 
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE && 
-        (p->numQuanta < p->preShared)) { 
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-        c->proc = 0;
-      }
-      release(&p->lock);
-    }*/
-/*
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-         acquire(&qLock);
-         ListPrepend(readyQ, p);
-         release(&qLock);  
-=======
-*/
-
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
@@ -570,56 +513,9 @@ scheduler(void)
            /*Process is done running for now. 
            It should have changed its p->state before coming back.*/
         c->proc = 0;
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
       }
-      if (ListCount(readyQ) > 0) {
-          acquire(&qLock);
-          ListTrim(readyQ);
-          release(&qLock);
-          
-          p->state = RUNNING;
-          c->proc = p;
-          
-          swtch(&c->context, &p->context);
-          c->proc = 0;
-      }   
       release(&p->lock);
-<<<<<<< HEAD
      }
-*/
- /*   
-    while (ListCount(readyQ) > 0) {
-        acquire(&qLock);
-        p = ListTrim(readyQ);
-=======
-    } 
-    
-  /*
-   for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(((p->numEx/totalEx)*100) != p->preShare && p->state == RUNNABLE) {
-        p->state = RUNNING;
-        p->numEx += 1;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-        c->proc = 0;
-      }
-      release(&p->lock);
-    }
-
-   totalEx ++; 
-   */  
-/*    
-    for (p = proc; p < &runQ[RPROC]; p++) {
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
-        acquire(&p->lock);
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-        c->proc = 0;
-        release(&p->lock);
-        release(&qLock);
-    }*/ 
   }
 }
 

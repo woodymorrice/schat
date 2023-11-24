@@ -23,4 +23,4 @@ submissions/
 ph
 barrier
 /lab-*.json
-.DS_Store
+.DS_Store../xv6-new/user/_cat ../xv6-new/user/_cowtest ../xv6-new/user/_echo ../xv6-new/user/_forktest ../xv6-new/user/_grep ../xv6-new/user/_grind ../xv6-new/user/_init ../xv6-new/user/_kill ../xv6-new/user/_ln ../xv6-new/user/_ls ../xv6-new/user/_mkdir ../xv6-new/user/_pingpong ../xv6-new/user/_rm ../xv6-new/user/_sh ../xv6-new/user/_stressfs ../xv6-new/user/_test ../xv6-new/user/_trace ../xv6-new/user/_usertests ../xv6-new/user/_uthread ../xv6-new/user/_wc ../xv6-new/user/_zombie
