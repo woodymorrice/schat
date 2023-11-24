@@ -5,22 +5,13 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
-#include "list.h"
-#include <stddef.h>
-#include <stdbool.h>
 
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
 
-/*GROUP14*/
-LIST *readyQ;
-int quanta = 1;
-struct spinlock qLock;
-struct proc runQ[RPROC];
-/* END */
-
 struct proc *initproc;
+
 int nextpid = 1;
 struct spinlock pid_lock;
 
@@ -57,18 +48,14 @@ void
 procinit(void)
 {
   struct proc *p;
-
+  
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
-      p->numQuanta = 0;
   }
- 
-  initlock(&qLock, "qLock"); 
-  readyQ = ListCreate();
 }
 
 /* Must be called with interrupts disabled, */
@@ -182,12 +169,6 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
-
-  /* GROUP 14 */
-  
-  
-  /* END */
-
 }
 
 /* Create a user page table for a given process, with no user memory, */
@@ -268,21 +249,9 @@ userinit(void)
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
-
   p->state = RUNNABLE;
-    
-  /* GROUP 14 */
-  p->preShared = 100;
-  p->numChild = 0;
-  p->numQuanta = 0;
-  p->specProc = 1; 
-  /* END */
-  acquire(&qLock);
-  ListPrepend(readyQ, p);
-  release(&qLock);
 
   release(&p->lock);
-
 }
 
 /* Grow or shrink user memory by n bytes. */
@@ -350,12 +319,6 @@ fork(void)
   /* Copy trace mask to child */
   np->tmask = p->tmask;
   
-  p->numChild = ((p->numChild) + 1);
-  np->numChild = 0;
-  np->numQuanta = 0;
-  np->preShared = ((p->preShared) / ((p->numChild) + 1));
-  p->preShared = np->preShared;
-  
   /* End CMPT 332 group14 change Fall 2023 */
 
   release(&np->lock);
@@ -367,10 +330,6 @@ fork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   release(&np->lock);
-  
-  acquire(&qLock);
-  ListPrepend(readyQ, np);
-  release(&qLock);
 
   return pid;
 }
@@ -488,138 +447,38 @@ wait(uint64 addr)
 /* Each CPU calls scheduler() after setting itself up. */
 /* Scheduler never returns.  It loops, doing: */
 /*  - choose a process to run. */
-/*  - swtch to start running that process.  */
+/*  - swtch to start running that process. */
 /*  - eventually that process transfers control */
-/*    via swtch back to the scheduler.*/
+/*    via swtch back to the scheduler. */
 void
 scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-<<<<<<< HEAD
-  
-=======
-  /*int totalEx;*/
-  c->proc = 0;
-  /*totalEx = 0;*/
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
 
-/*  int totalEx;*/
   c->proc = 0;
-  /*totalEx = 0;*/
   for(;;){
     /* The most recent process to run may have had interrupts */
     /* turned off; enable them to avoid a deadlock if all */
     /* processes are waiting. */
     intr_on();
-    quanta ++;
-    
-    acquire(&qLock);
-    if (ListCount(readyQ) > 0) {
-        p = ListTrim(readyQ);
-
-        if (p != NULL && ((p->numQuanta / quanta) * 100) < p->preShared) { 
-            release(&qLock);
-            acquire(&p->lock);
-            p->state = RUNNING;
-            p->numQuanta = p->numQuanta + 1;
-            c->proc = p;
-            swtch(&c->context, &p->context);
-            c->proc = 0;
-            release(&p->lock);
-            acquire(&qLock);
-        }
-
-    }
-<<<<<<< HEAD
-    release(&qLock);
-    
-
-  /* 
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE && 
-        (p->numQuanta < p->preShared)) { 
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-        c->proc = 0;
-      }
-      release(&p->lock);
-    }*/
-/*
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-         acquire(&qLock);
-         ListPrepend(readyQ, p);
-         release(&qLock);  
-=======
-*/
 
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
-           /* Switch to chosen process.  It is the process's job
-           to release its lock and then reacquire it
-           before jumping back to us.*/
+        /* Switch to chosen process.  It is the process's job */
+        /* to release its lock and then reacquire it */
+        /* before jumping back to us. */
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
 
-           /*Process is done running for now. 
-           It should have changed its p->state before coming back.*/
-        c->proc = 0;
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
-      }
-      if (ListCount(readyQ) > 0) {
-          acquire(&qLock);
-          ListTrim(readyQ);
-          release(&qLock);
-          
-          p->state = RUNNING;
-          c->proc = p;
-          
-          swtch(&c->context, &p->context);
-          c->proc = 0;
-      }   
-      release(&p->lock);
-<<<<<<< HEAD
-     }
-*/
- /*   
-    while (ListCount(readyQ) > 0) {
-        acquire(&qLock);
-        p = ListTrim(readyQ);
-=======
-    } 
-    
-  /*
-   for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(((p->numEx/totalEx)*100) != p->preShare && p->state == RUNNABLE) {
-        p->state = RUNNING;
-        p->numEx += 1;
-        c->proc = p;
-        swtch(&c->context, &p->context);
+        /* Process is done running for now. */
+        /* It should have changed its p->state before coming back. */
         c->proc = 0;
       }
       release(&p->lock);
     }
-
-   totalEx ++; 
-   */  
-/*    
-    for (p = proc; p < &runQ[RPROC]; p++) {
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
-        acquire(&p->lock);
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-        c->proc = 0;
-        release(&p->lock);
-        release(&qLock);
-    }*/ 
   }
 }
 
@@ -635,8 +494,7 @@ sched(void)
 {
   int intena;
   struct proc *p = myproc();
-  if(holding(&qLock))
-    panic("Let the lock go");
+
   if(!holding(&p->lock))
     panic("sched p->lock");
   if(mycpu()->noff != 1)
@@ -657,9 +515,6 @@ yield(void)
 {
   struct proc *p = myproc();
   acquire(&p->lock);
-  acquire(&qLock);
-  ListPrepend(readyQ, p);
-  release(&qLock);
   p->state = RUNNABLE;
   sched();
   release(&p->lock);
@@ -671,6 +526,7 @@ void
 forkret(void)
 {
   static int first = 1;
+
   /* Still holding p->lock from scheduler. */
   release(&myproc()->lock);
 
@@ -731,9 +587,6 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
-        acquire(&qLock);
-        ListPrepend(readyQ, p);
-        release(&qLock);
       }
       release(&p->lock);
     }
@@ -755,9 +608,6 @@ kill(int pid)
       if(p->state == SLEEPING){
         /* Wake process from sleep(). */
         p->state = RUNNABLE;
-        acquire(&qLock);
-        ListPrepend(readyQ, p);
-        release(&qLock);
       }
       release(&p->lock);
       return 0;

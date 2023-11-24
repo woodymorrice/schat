@@ -184,7 +184,7 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
     panic("uvmunmap: not aligned");
 
   for(a = va; a < va + npages*PGSIZE; a += PGSIZE){
-    if((pte = walk(pagetable, a, 1)) == 0)
+    if((pte = walk(pagetable, a, 0)) == 0)
       panic("uvmunmap: walk");
     if((*pte & PTE_V) == 0)
       panic("uvmunmap: not mapped");
@@ -246,7 +246,7 @@ uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, int xperm)
       return 0;
     }
     memset(mem, 0, PGSIZE);
-    if(mappages(pagetable, a, PGSIZE, (uint64)mem, PTE_R|PTE_U|xperm) != 0){
+    if(mappages(pagetable, a, PGSIZE, (uint64)mem, PTE_R|PTE_U|xperm) != 0){ 
       kfree(mem);
       uvmdealloc(pagetable, a, oldsz);
       return 0;
@@ -309,78 +309,12 @@ uvmfree(pagetable_t pagetable, uint64 sz)
 /* physical memory. */
 /* returns 0 on success, -1 on failure. */
 /* frees any allocated pages on failure. */
-/*
 int
 uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 {
   pte_t *pte;
   uint64 pa, i;
   uint flags;
-  char *mem;*/
-
-  /*for(i = 0; i < sz; i += PGSIZE){
-    if((pte = walk(old, i, 0)) == 0)
-      panic("uvmcopy: pte should exist");
-    if((*pte & PTE_V) == 0)
-      panic("uvmcopy: page not present");
-    pa = PTE2PA(*pte);*/
-    /* increment page reference 
-    ref_inc((void*)pa);
-<<<<<<< HEAD
-       set PTE_COW and unset PTE_W  
-    flags = ((PTE_FLAGS(*pte) | PTE_COW) & ~PTE_W);*/
-=======
-    /* set PTE_COW and unset PTE_W  */
-    /*flags = ((PTE_FLAGS(*pte) | PTE_COW) & ~PTE_W);*/
-    /*flags = PTE_FLAGS(*pte);*/
-    *pte &= ~PTE_W;
-    *pte |= PTE_COW;
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
-
-
-    flags = PTE_FLAGS(*pte);
-    /* just flip the bits instead */
-    /* reinstall the parent's page table */
-    /*uvmunmap(old, i, 1, 0);
-    if(mappages(old, i, PGSIZE, pa, flags) != 0){
-      goto err1;
-    }*/
-
-    /* map the page into the child's page table */
-<<<<<<< HEAD
-   /* if(mappages(new, i, PGSIZE, pa, flags) != 0){
-      goto err2;
-    }*/
-=======
-    if(mappages(new, i, PGSIZE, pa, flags) != 0){
-      goto err;
-    }
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
-
-    /* flush the tlb */
-   /* sfence_vma();*/
-/*  }
-  return 0;*/
-
- /*err1:
-  uvmunmap(old, 0, i / PGSIZE, 1);
-  return -1;*/
-<<<<<<< HEAD
- /*err2:
-=======
- err:
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
-  uvmunmap(new, 0, i / PGSIZE, 1);
-  return -1;
-}*/
-
-int
-uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
-{
-  pte_t *pte;
-  uint64 pa, i;
-  uint flags;
-  char *mem;
 
   for(i = 0; i < sz; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
@@ -388,14 +322,23 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     if((*pte & PTE_V) == 0)
       panic("uvmcopy: page not present");
     pa = PTE2PA(*pte);
-    flags = PTE_FLAGS(*pte);
-    if((mem = kalloc()) == 0)
-      goto err;
-    memmove(mem, (char*)pa, PGSIZE);
-    if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
-      kfree(mem);
+    /* Start CMPT 332 group14 change Fall 2023 */
+    /* increment page references */
+    ref_inc((void*)pa);
+    /* can flips the bits of the parent page directly instead of
+     * having to reinstall it -- thanks Delaney! */ 
+    *pte &= ~PTE_W;
+    *pte |= PTE_COW;
+    flags = (PTE_FLAGS(*pte));
+
+    /* map the page into the childs page table */
+    if(mappages(new, i, PGSIZE, pa, flags) != 0){
       goto err;
     }
+
+    /* flush the tlb */
+    sfence_vma();
+    /* End CMPT 332 group14 change Fall 2023 */
   }
   return 0;
 
@@ -423,32 +366,53 @@ uvmclear(pagetable_t pagetable, uint64 va)
 int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
-  uint64 n, va0, pa0, flags;
+  uint64 n, va0, pa0;
   pte_t *pte;
+  char* mem;
+  uint flags;
 
   while(len > 0){
     va0 = PGROUNDDOWN(dstva);
     if(va0 >= MAXVA)
       return -1;
     pte = walk(pagetable, va0, 0);
-    if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0 ||
-       (*pte & PTE_W) == 0)
+    if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0) {
       return -1;
+    }
+    pa0 = PTE2PA(*pte);
+
+    /* Start CMPT 332 group14 change Fall 2023 */
+    /* if the physical page bein g copied to is copy-on-write */
+    if ((*pte & PTE_COW) && (*pte & ~PTE_W)) {
+      /* if it only has one reference, just make it writeable */
+      if (ref_cnt((void*)pa0) == 1) {
+        *pte &= ~PTE_COW; *pte |= PTE_W;
+      }
+      else {
+        /* decrease the old pages reference number */
+        /*ref_dec((void*)pa0);*/
+        /* allocate a new page */
+        mem = kalloc();
+        /* flip the flag bits */
+        flags = ((PTE_FLAGS(*pte) & ~PTE_COW) | PTE_W);
+        /* copy the existing data to the new page */
+        memmove(mem, (char*)pa0, PGSIZE);
+        /* unmap the old page */
+        uvmunmap(pagetable, va0, 1, 0);
+        /* map the new page */
+        mappages(pagetable, va0, PGSIZE, (uint64)mem, flags);
+        kfree((void*)pa0);
+        /* assign the new page to pa0 for the next memmove */
+        pa0 = (uint64)mem;
+      }
+    }
+    /* End CMPT 332 group14 change Fall 2023 */
+
+
     n = PGSIZE - (dstva - va0);
     if(n > len)
       n = len;
-    flags = ((PTE_FLAGS(*pte) | PTE_W) & ~PTE_COW);
-    if (*pte & PTE_COW) {
-      pa0 = (uint64)kalloc();
-      memmove((void *)(pa0 + (dstva - va0)), src, n);
-      uvmunmap(pagetable, va0, 1, 0);
-      mappages(pagetable, va0, 4096, pa0, flags); 
-      
-    }
-    else {
-      pa0 = PTE2PA(*pte);
-      memmove((void *)(pa0 + (dstva - va0)), src, n);
-    }
+    memmove((void *)(pa0 + (dstva - va0)), src, n);
 
     len -= n;
     src += n;

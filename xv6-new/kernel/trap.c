@@ -36,8 +36,14 @@ trapinithart(void)
 void
 usertrap(void)
 {
-  
+  /* Begin CMPT 332 group14 change Fall 2023 */
 
+  uint64 va, pa;
+  uint flags;
+  pte_t *pte;
+  char* mem;
+
+  /* End CMPT 332 group14 change Fall 2023 */
   int which_dev = 0;
 
   if((r_sstatus() & SSTATUS_SPP) != 0)
@@ -67,33 +73,44 @@ usertrap(void)
     intr_on();
 
     syscall();
-<<<<<<< HEAD
-=======
-  /*} else if(r_scause() == 15 || r_scause() == 12 || r_scause() == 13){*/
-  } else if(r_scause() == 15){
-    /*printf("usertrap(): page fault\n");*/
+  /* page fault handler -- should only handle store page faults */
+  } else if(r_scause() == 15) {
 
-    /* get the faulting virtual address */
-    uint64 va = PGROUNDDOWN(r_stval());
-    pte_t *pte = walk(p->pagetable, va, 0);
+    /* get the faulting address */
+    va = PGROUNDDOWN(r_stval());
+    if(va >= MAXVA){
+      setkilled(p);
+      goto err;
+    }
+    /* grab the associated page table entry */
+    pte = walk(p->pagetable, va, 0);
+    if(*pte == 0){
+      setkilled(p);
+      goto err;
+    }
 
-    if ((*pte & PTE_V) && (*pte & PTE_COW)) {
-      /*printf("PTE_COW\n");*/
-      uint64 pa = PTE2PA(*pte);
-      uint flags = ((PTE_FLAGS(*pte) | PTE_W) & ~PTE_COW);
-      char *mem = kalloc();
-      memmove(mem, (char*)pa, PGSIZE);
+    if ((*pte & PTE_V) && (*pte & PTE_U) && (*pte & PTE_COW)) {
+      pa = PTE2PA(*pte);
+      if (ref_cnt((void*)pa) == 1) {
+        *pte &= ~PTE_COW; *pte |= PTE_W; 
+      }
+      else {
+        /*ref_dec((void*)pa);*/
+        flags = ((PTE_FLAGS(*pte) | PTE_W) & ~PTE_COW);
+        mem = kalloc();
+        memmove(mem, (char*)pa, PGSIZE);
 
-      uvmunmap(p->pagetable, va, 1, 0);
-      mappages(p->pagetable, va, 4096, (uint64)mem, flags);
-    } else {
+        uvmunmap(p->pagetable, va, 1, 0);
+        mappages(p->pagetable, va, 4096, (uint64)mem, flags);
+        kfree((void*)pa);
+      }
+
+    }
+    else {
       printf("usertrap(): invalid address\n");
       setkilled(p);
     }
 
-
-
->>>>>>> 7f0fd905dd4c894eaf46be3ee17612697ca11049
   } else if((which_dev = devintr()) != 0){
     /* ok */
   } else {
@@ -102,8 +119,7 @@ usertrap(void)
     setkilled(p);
   }
 
-
-
+ err:
   if(killed(p))
     exit(-1);
 
@@ -166,7 +182,6 @@ void
 kerneltrap()
 {
   int which_dev = 0;
-  struct proc *p = myproc(); 
   uint64 sepc = r_sepc();
   uint64 sstatus = r_sstatus();
   uint64 scause = r_scause();
@@ -183,8 +198,7 @@ kerneltrap()
   }
 
   /* give up the CPU if this is a timer interrupt. */
-  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING &&
-    p->numQuanta != p->preShared)
+  if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
     yield();
 
   /* the yield() may have caused some traps to occur, */
