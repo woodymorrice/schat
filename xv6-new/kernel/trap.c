@@ -78,7 +78,7 @@ usertrap(void)
     va = PGROUNDDOWN(r_stval());
     pte = walk(p->pagetable, va, 0);
 
-    if ((*pte & PTE_V) && (*pte & PTE_COW)) {
+    if ((*pte & PTE_V) && (*pte & PTE_U) && (*pte & PTE_COW)) {
       pa = PTE2PA(*pte);
       if (ref_cnt((void*)pa) == 1) {
         *pte &= ~PTE_COW; *pte |= PTE_W; 
@@ -91,6 +91,7 @@ usertrap(void)
 
         uvmunmap(p->pagetable, va, 1, 0);
         mappages(p->pagetable, va, 4096, (uint64)mem, flags);
+        /*ref_dec((void*)pa);*/
         kfree((void*)pa);
       }
 

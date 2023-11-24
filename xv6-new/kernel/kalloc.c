@@ -33,8 +33,8 @@ struct {
   struct spinlock lock;
   struct run *freelist;
   /* Begin CMPT 332 group14 change Fall 2023 */
-  int refcount[NPAGES];
-  int freecount;
+  int refcnt[NPAGES];
+  int freecnt;
   /* End CMPT 332 group14 change Fall 2023 */
 } kmem;
 
@@ -42,7 +42,7 @@ void
 kinit()
 {
   /* Begin CMPT 332 group14 change Fall 2023 */
-  kmem.freecount = 0; /* don't need lock here */
+  kmem.freecnt = 0; /* don't need lock here */
   /* End CMPT 332 group14 change Fall 2023 */
   initlock(&kmem.lock, "kmem");
   freerange(end, (void*)PHYSTOP);
@@ -61,7 +61,7 @@ freerange(void *pa_start, void *pa_end)
     /* initialize all refcounts to 0 while the allocator
      * is being initialized */
     index = RCIND((uint64)p);
-    kmem.refcount[index] = 0;
+    kmem. refcnt [index] = 0;
     /* End CMPT 332 group14 change Fall 2023 */
     kfree(p);
   }
@@ -85,9 +85,9 @@ kfree(void *pa)
     panic("kfree");
 
   acquire(&kmem.lock);
-  kmem.refcount[index]--;
+  kmem.refcnt[index]--;
   /* Begin CMPT 332 group14 change Fall 2023 */
-  if ((kmem.refcount[index] < 1)) {
+  if (kmem.refcnt[index] < 1) {
     /* Fill with junk to catch dangling refs. */
     memset(pa, 1, PGSIZE);
 
@@ -95,7 +95,7 @@ kfree(void *pa)
     r->next = kmem.freelist;
     kmem.freelist = r; 
 
-    kmem.freecount++;
+    kmem.freecnt++;
   }
   /* End CMPT 332 group14 change Fall 2023 */
   release(&kmem.lock);
@@ -118,9 +118,9 @@ kalloc(void)
   index = RCIND((uint64)r);
   if(r)
     kmem.freelist = r->next;
-  kmem.refcount[index] = 1;
+  kmem.refcnt[index] = 1;
 
-  kmem.freecount--;
+  kmem.freecnt--;
   /* End CMPT 332 group14 change Fall 2023 */
   release(&kmem.lock);
 
@@ -133,7 +133,7 @@ kalloc(void)
 int
 nfree(void)
 {
-  return kmem.freecount;
+  return kmem.freecnt;
 }
 
 void
@@ -142,7 +142,7 @@ ref_inc(void *p)
   int index;
   index = RCIND((uint64)p);
   acquire(&kmem.lock);
-  kmem.refcount[index]++;
+  kmem.refcnt[index]++;
   release(&kmem.lock);
 }
 
@@ -152,7 +152,7 @@ ref_dec(void *p)
   int index;
   index = RCIND((uint64)p);
   acquire(&kmem.lock);
-  kmem.refcount[index]--;
+  kmem.refcnt[index]--;
   release(&kmem.lock);
 }
 
@@ -161,6 +161,6 @@ ref_cnt(void *p)
 {
   int index;
   index = RCIND((uint64)p);
-  return kmem.refcount[index];
+  return kmem.refcnt[index];
 }
 /* End CMPT 332 group14 change Fall 2023 */
