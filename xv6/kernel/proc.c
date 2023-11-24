@@ -13,11 +13,10 @@ struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
 
-/*GROUP14*/
+/*GROUP14 CMPT332 CHANGE 2023*/
 LIST *readyQ;
 int quanta = 1;
 struct spinlock qLock;
-struct proc runQ[RPROC];
 /* END */
 
 struct proc *initproc;
@@ -64,11 +63,14 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      /* GROUP 14 CMPT332 CHANGE 2023 */
       p->numQuanta = 0;
+      /* END */
   }
- 
+  /* GROUP 14 CMPT332 CHANGE 2023*/ 
   initlock(&qLock, "qLock"); 
   readyQ = ListCreate();
+  /* END */
 }
 
 /* Must be called with interrupts disabled, */
@@ -183,8 +185,10 @@ freeproc(struct proc *p)
   p->xstate = 0;
   p->state = UNUSED;
 
-  /* GROUP 14 */
-  
+  /* GROUP 14 CMPT 332 CHANGE 2023*/
+  p->preShared = 0;
+  p->numChild = 0;
+  p->numQuanta = 0; 
   
   /* END */
 
@@ -271,16 +275,16 @@ userinit(void)
 
   p->state = RUNNABLE;
     
-  /* GROUP 14 */
+  /* GROUP 14 CMPT332 CHANGE 2023 */
   p->preShared = 100;
   p->numChild = 0;
   p->numQuanta = 0;
   p->specProc = 1; 
-  /* END */
+ 
   acquire(&qLock);
   ListPrepend(readyQ, p);
   release(&qLock);
-
+  /* END */
   release(&p->lock);
 
 }
@@ -368,9 +372,11 @@ fork(void)
   np->state = RUNNABLE;
   release(&np->lock);
   
+  /* GROUP 14 CMPT332 CHANGE 2023*/
   acquire(&qLock);
   ListPrepend(readyQ, np);
   release(&qLock);
+  /* END */
 
   return pid;
 }
@@ -483,7 +489,7 @@ wait(uint64 addr)
     sleep(p, &wait_lock);  /*DOC: wait-sleep */
   }
 }
-
+/* CMPT 332 GROUP 14 CHANGE, 2023*/
 /* Per-CPU process scheduler. */
 /* Each CPU calls scheduler() after setting itself up. */
 /* Scheduler never returns.  It loops, doing: */
@@ -521,6 +527,7 @@ scheduler(void)
         p = &proc[0];
         p->numQuanta = 0;
     }
+/* END */
 /*
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
@@ -575,9 +582,11 @@ yield(void)
 {
   struct proc *p = myproc();
   acquire(&p->lock);
+  /* GROUP 14 CMPT 332 CHANGE, 2023*/
   acquire(&qLock);
   ListPrepend(readyQ, p);
   release(&qLock);
+  /* END */
   p->state = RUNNABLE;
   sched();
   release(&p->lock);
@@ -649,9 +658,11 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
+        /* GROUP 14 CMPT 332 CHANGE, 2023*/
         acquire(&qLock);
         ListPrepend(readyQ, p);
         release(&qLock);
+        /* END */
       }
       release(&p->lock);
     }
@@ -673,9 +684,11 @@ kill(int pid)
       if(p->state == SLEEPING){
         /* Wake process from sleep(). */
         p->state = RUNNABLE;
+        /* GROUP 14 CMPT 332 CHANGE, 2023 */
         acquire(&qLock);
         ListPrepend(readyQ, p);
         release(&qLock);
+        /* END */
       }
       release(&p->lock);
       return 0;

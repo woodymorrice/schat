@@ -1,0 +1,100 @@
+/*
+CMPT 332 - GROUP 14
+Phong Thanh Nguyen (David)- wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
+*/
+
+Part A: Fair Share Scheduler
+-----------------------------------------------------------------------------
+kernel/proc.c: 
+LIST *readyQ;                                                                   
+    int quanta = 1;                                                                 
+    struct spinlock qLock;  
+
+void procinit(void) 
+    initlock(&qLock, "qLock");                                                    
+    readyQ = ListCreate(); 
+
+static void freeproc();
+    p->preShared = 0;                                                             
+    p->numChild = 0;                                                              
+    p->numQuanta = 0;
+
+void userinit(void)
+
+    p->preShared = 100;                                                           
+    p->numChild = 0;                                                              
+    p->numQuanta = 0;                                                             
+    p->specProc = 1;                                                              
+                                                                                
+    acquire(&qLock);                                                              
+    ListPrepend(readyQ, p);                                                       
+    release(&qLock);
+
+int fork(void) 
+                                                                                   
+  p->numChild = ((p->numChild) + 1);                                            
+  np->numChild = 0;                                                             
+  np->numQuanta = 0;                                                            
+  np->preShared = ((p->preShared) / ((p->numChild) + 1));                       
+  p->preShared = np->preShared; 
+
+  acquire(&qLock);                                                              
+  ListPrepend(readyQ, np);                                                      
+  release(&qLock);    
+
+void scheduler ()
+
+    intr_on();                                                                  
+     quanta ++;                                                                 
+                                                                                
+    acquire(&qLock);                                                            
+    if (ListCount(readyQ) > 0) {                                                
+        p = ListTrim(readyQ);                                                   
+        release(&qLock);                                                        
+        if (p->numQuanta != p->preShared){                                      
+            acquire(&p->lock);                                                  
+            p->numQuanta = p->numQuanta + 1;                                    
+            p->state = RUNNING;                                                 
+            c->proc = p;                                                        
+            swtch(&c->context, &p->context);                                    
+            c->proc = 0;                                                        
+            release(&p->lock);                                                  
+        }                                                                       
+    }                                                                           
+    else {                                                                      
+        release(&qLock);                                                        
+        p = &proc[0];                                                           
+        p->numQuanta = 0; 
+
+void yield ()
+
+  acquire(&qLock);                                                              
+  ListPrepend(readyQ, p);                                                       
+  release(&qLock);    
+
+
+void wakeup(void *chan) 
+
+    acquire(&qLock);                                                        
+    ListPrepend(readyQ, p);                                                 
+    release(&qLock);
+
+
+int kill (int pid) 
+
+    acquire(&qLock);                                                        
+    ListPrepend(readyQ, p);                                                 
+    release(&qLock); 
+
+
+kernel/proc.h
+
+  int preShared;               /* Pre-defined share for each process*/          
+  int numQuanta;               /* Number of quanta that a process has running*/ 
+  int numChild;                /* Number of child = number of fork() */         
+                                                                                
+  int specProc;                /* Try to differentiate the init process */ 
+
+
+

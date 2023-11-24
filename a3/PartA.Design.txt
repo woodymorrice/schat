@@ -1,13 +1,39 @@
 /*
-
+CMPT332 - Group 14
+Phong Thanh Nguyen (David) - wdz468 - 11310824
+Woody Morrice - wam553 - 11071060
 */
 
+** Design Details **
+The goal of this design is to implement an advanced scheduler for xv6 based on
+
+concept of Fair-Share Scheduling. 
+
+We defined "share" of a process to be the number of quanta time that process
+
+can run on the CPU. Whenever a process called fork() to create child, 
+
+its share got divided by the number of child that it created. 
+
+To maximize the seeking time for RUNNABLE processes, we created a ready queue
+
+with list implementation from Assignment 1. The scheduler will mainly look in
+
+here to pick the best process to run. Since we are working on mutiple CPUs, 
+
+we created spinlock on the queue to ensure that no multiple processes can
+
+access the queue. 
+
+(Condition of the best process to pick): 
+                
+    = (((process' quanta) * 100) / total quanta) * 1000 < process' preShared 
 
 
-                  A    B   C        Total 
-Pre-share        100   50  75       225
 
-Percentage       44%   22% 33%
+                  A    B   C      
+
+Percentage       45%   22% 33%
 important        
 (CPU times)
 
@@ -16,4 +42,31 @@ sequence
 
 
 
+* Pro *
+Searching time for RUNNABLE process is faster when you are using linked list
+
+as a queue, rather than looping through array of 64 processes
+
+Easy to retrieve a process pre-defined share.
+
+Easy to keep track of which process is picked by the scheduler.
+
+* Con *
+Hard when debugging, because you have to go through gdb and actually figure 
+
+out what is going in xv6 to put a breakpoint. 
+
+A lot of context switching between processes to make sure the processes have
+
+a fair number of quanta time on CPU.
+
+We couldn't finish part A on time, the problem in this part was that: we know 
+
+after a while, all the RUNNABLE process changed to SLEEPING state and never 
+
+wake up again, so the sheduler keep looping forever with the final process,
+
+going back and forth with it. That is the reason why, only one process get 
+
+printed out.
 

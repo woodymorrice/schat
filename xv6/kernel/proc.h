@@ -112,11 +112,11 @@ struct proc {
 
   int tmask;                   /* Bitmask for syscall tracing */
   
-  int preShared;
-  int numQuanta;
-  int numChild;
+  int preShared;               /* Pre-defined share for each process*/
+  int numQuanta;               /* Number of quanta that a process has running*/
+  int numChild;                /* Number of child = number of fork() */
 
-  int specProc;  
+  int specProc;                /* Try to differentiate the init process */
 
   /* End CMPT 332 group14 change Fall 2023 */
 };

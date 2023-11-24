@@ -145,7 +145,8 @@ UPROGS=\
 	$U/_utest
 	# CMPT 332 GROUP 14 CHANGE, FALL 2023
 	# a2: part a
-
+# CMPT 332 GROUP 14 CHANGE, FALL 2023
+# A3
 $K/liblist.a: $K/list_adders.o $K/list_movers.o \
 	$K/list_removers.o
 	ar -rs $K/liblist.a $K/list_adders.o \
@@ -194,7 +195,7 @@ $U/utest.o: $U/utest.c
 $U/_utest: $U/utest.o $U/grind.o $U/square.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e pmain -Ttext 0 -o $U/_utest $U/utest.o $U/grind.o \
 	$U/square.o $(ULIB)
-
+# --------------------------------------------------------------------------
 
 fs.img: mkfs/mkfs README $(UEXTRA) $(UPROGS)
 	mkfs/mkfs fs.img README $(UEXTRA) $(UPROGS)

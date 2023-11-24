@@ -19,7 +19,6 @@ int forktest(int lvl) {
 
   /* wont spawn more children so print output */
   if (lvl == 0) {
-    printf("!");
     return(0);
   }
 
@@ -41,7 +40,6 @@ int forktest(int lvl) {
     /* parent code */
     else {
       /* print output */
-      printf("!");
     }
   }
 
