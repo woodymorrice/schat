@@ -9,16 +9,16 @@
 #include "user/square.h"                                                        
 #include <stddef.h>
 
-#define MX_SLP 20
-#define MX_CHLD 5
-#define MAX_SQ 800
-#define MX_LVL 8
+#define MX_SLP 5
+#define MX_CHLD 10
+#define MX_SQ 100
+#define MX_LVL 12
 
 int forktest(int lvl) {
-  int i, chld, pid, nulvl;
+  int i, j, chld, pid, slp, sq, nulvl;
 
   /* wont spawn more children so print output */
-  if (lvl == 0) {
+  if (lvl < 1) {
     return(0);
   }
 
@@ -33,6 +33,15 @@ int forktest(int lvl) {
     } 
     /* child code */
     else if (pid == 0) {
+      /* sleep for some time */
+      slp = rand() % MX_SLP;
+      sleep(slp);
+
+      /* compute some squares */
+      sq = rand() % MX_SQ;
+      for (j = 1; j < sq; j++) {
+        square(j);
+      }
       /* randomly choose depth of subtree */
       nulvl = rand() % (lvl - 1);
       forktest(nulvl-1);
@@ -43,8 +52,7 @@ int forktest(int lvl) {
     }
   }
 
-
-  exit(0);
+  return(0);
 }
 
 

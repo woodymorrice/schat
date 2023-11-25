@@ -1,0 +1,62 @@
+* CMPT332 - Group 14
+* Phong Thanh Nguyen (David) - wdz468 - 11310824
+* Woody Morrice - wam553 - 11071060
+
+Test Output
+
+We performed our testing in a separate instance of xv6 with the original
+scheduler, so the marker’s test output may be different. We were able to
+run cowtest several times consecutively. As you can see pages are properly
+freed.
+
+xv6 kernel is booting
+
+hart 2 starting
+hart 1 starting
+init: starting sh
+$ cowtest
+Free pages in phys. page table: 32527
+simple: ok
+Free pages in phys. page table: 32485
+simple: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+file: ok
+Free pages in phys. page table: 32481
+ALL COW TESTS PASSED
+$ cowtest
+Free pages in phys. page table: 32527
+simple: ok
+Free pages in phys. page table: 32485
+simple: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+file: ok
+Free pages in phys. page table: 32481
+ALL COW TESTS PASSED
+$ cowtest
+Free pages in phys. page table: 32527
+simple: ok
+Free pages in phys. page table: 32485
+simple: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+three: ok
+Free pages in phys. page table: 32485
+file: ok
+Free pages in phys. page table: 32481
+ALL COW TESTS PASSED
+

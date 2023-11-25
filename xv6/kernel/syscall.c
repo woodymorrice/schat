@@ -107,6 +107,7 @@ extern uint64 sys_close(void);
  * Woody Morrice - wam553 - 11071060 */
 
 extern uint64 sys_trace(void);
+extern uint64 sys_getNumFreePages(void);
 
 /* End CMPT 332 group14 change Fall 2023 */
 
@@ -138,6 +139,7 @@ static uint64 (*syscalls[])(void) = {
 /* Begin CMPT 332 group14 change Fall 2023 */
 
 [SYS_trace]   sys_trace,
+[SYS_getNumFreePages] sys_getNumFreePages,
 };
 
 char* syscall_names[] = {
@@ -145,7 +147,7 @@ char* syscall_names[] = {
     "kill", "exec", "fstat", "chdir", "dup",
     "getpid", "sbrk", "sleep", "uptime", "open",
     "write", "mknod", "unlink", "link", "mkdir",
-    "close", "trace",
+    "close", "trace", "getNumFreePages"
 };
 
 /* End CMPT 332 group14 change Fall 2023 */
