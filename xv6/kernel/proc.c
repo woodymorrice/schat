@@ -17,6 +17,7 @@ struct proc proc[NPROC];
 LIST *readyQ;
 int quanta = 1;
 struct spinlock qLock;
+void printProc(struct proc*);
 /* END */
 
 struct proc *initproc;
@@ -359,13 +360,14 @@ fork(void)
   np->numQuanta = 0;
   np->preShared = ((p->preShared) / ((p->numChild) + 1));
   p->preShared = np->preShared;
-  
+ 
   /* End CMPT 332 group14 change Fall 2023 */
 
   release(&np->lock);
 
   acquire(&wait_lock);
   np->parent = p;
+  printProc(np);
   release(&wait_lock);
 
   acquire(&np->lock);
@@ -489,6 +491,29 @@ wait(uint64 addr)
     sleep(p, &wait_lock);  /*DOC: wait-sleep */
   }
 }
+
+
+void printProc(struct proc  *process) {
+    struct proc *p = process;
+    if (p->parent != NULL) {
+        printf("\n");
+        printf("\n");
+        printf("Parent pid: %d contains: \n", (p->parent)->pid);
+        printf("    Pre-shared of parent: %d\n", (p->parent)->preShared);
+        printf("    Child pid: %d, preShared: %d\n", p->pid, p->preShared);
+        printf("------------ NUMBER QUANTA ------------\n");
+        printf("    Parent's quanta: %d\n", (p->parent)->numQuanta);
+        printf("    Child's quanta: %d\n", p->numQuanta);
+    }
+    else {
+        printf("Parent pid: NULL, must be 'init' \n");
+        printf("    Pre-shared of parent: %d\n", p->preShared);
+        printf("------------ NUMBER QUANTA ------------\n");
+        printf("    Parent's quanta: %d\n", p->numQuanta);
+        printf("    Child's quanta: %d\n", p->numQuanta);
+    }
+    
+}
 /* CMPT 332 GROUP 14 CHANGE, 2023*/
 /* Per-CPU process scheduler. */
 /* Each CPU calls scheduler() after setting itself up. */
@@ -503,11 +528,10 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-
+  
   for (;;) {
     intr_on();
      quanta ++;
-/*
     acquire(&qLock);
     if (ListCount(readyQ) > 0) {
         p = ListTrim(readyQ);
@@ -527,7 +551,7 @@ scheduler(void)
         p = &proc[0];
         p->numQuanta = 0;
     }
-END */
+/*
     for(p = proc; p < &proc[NPROC]; p++) {
       if(p->state == RUNNABLE) {
         acquire(&qLock);
@@ -552,6 +576,7 @@ END */
       }
       else {release(&qLock);}
    }
+*/
 /*
     for(p = proc; p < &proc[NPROC]; p++) {
      acquire(&p->lock);
