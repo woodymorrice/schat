@@ -6,8 +6,13 @@ Woody Morrice - wam553 - 11071060
 
 Part A: Fair Share Scheduler
 -----------------------------------------------------------------------------
-kernel/proc.c: 
-LIST *readyQ;                                                                   
+kernel/proc.c:
+
+    #include "list.h"
+    #include <stddef.h>                                                             
+    #include <stdbool.h>  
+
+    LIST *readyQ;                                                                   
     int quanta = 1;                                                                 
     struct spinlock qLock;  
 
