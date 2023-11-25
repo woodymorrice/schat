@@ -44,6 +44,19 @@
 #define KERNBASE 0x80000000L
 #define PHYSTOP (KERNBASE + 128*1024*1024)
 
+/* Begin CMPT 332 group14 change Fall 2023 */                                   
+/* Phong Thanh Nguyen (David) - wdz468 - 11310824                               
+ * Woody Morrice - wam553 - 11071060 */                                         
+                                                                                
+/* page size in bits for bit shifting instead of division */                    
+#define PGSZNBITS 12                                                            
+/* the number of physical pages */                                              
+#define NPAGES ((PHYSTOP - KERNBASE) >> PGSZNBITS)                              
+/* the index into the reference count table for the given page pa */            
+#define RCIND(pa) ((pa - KERNBASE) >> PGSZNBITS)                                
+                                                                                
+/* End CMPT 332 group14 change Fall 2023 */
+
 /* map the trampoline page to the highest address, */
 /* in both user and kernel space. */
 #define TRAMPOLINE (MAXVA - PGSIZE)

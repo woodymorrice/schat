@@ -376,21 +376,20 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
     if(va0 >= MAXVA)
       return -1;
     pte = walk(pagetable, va0, 0);
-    if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0) {
+    if(pte == 0 || (*pte & PTE_V) == 0 ||
+            ((*pte & ~PTE_W)&&(*pte & ~PTE_COW)) == 0 ||  (*pte & PTE_U) == 0) {
       return -1;
     }
     pa0 = PTE2PA(*pte);
 
     /* Start CMPT 332 group14 change Fall 2023 */
-    /* if the physical page bein g copied to is copy-on-write */
+    /* if the physical page being copied to is copy-on-write */
     if ((*pte & PTE_COW) && (*pte & ~PTE_W)) {
       /* if it only has one reference, just make it writeable */
       if (ref_cnt((void*)pa0) == 1) {
         *pte &= ~PTE_COW; *pte |= PTE_W;
       }
       else {
-        /* decrease the old pages reference number */
-        /*ref_dec((void*)pa0);*/
         /* allocate a new page */
         mem = kalloc();
         /* flip the flag bits */
@@ -401,6 +400,8 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
         uvmunmap(pagetable, va0, 1, 0);
         /* map the new page */
         mappages(pagetable, va0, PGSIZE, (uint64)mem, flags);
+        /* decrease the old pages reference number
+         * pages don't get freed properly unless I call kfree here*/
         kfree((void*)pa0);
         /* assign the new page to pa0 for the next memmove */
         pa0 = (uint64)mem;

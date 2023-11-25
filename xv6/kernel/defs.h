@@ -66,7 +66,11 @@ void            kinit(void);
 int             nfree(void);
 void            ref_inc(void *);
 void            ref_dec(void *);
-
+/* Begin CMPT 332 group14 change Fall 2023 */                                   
+void            ref_inc(void *);                                                
+void            ref_dec(void *);                                                
+int             ref_cnt(void *);                                                
+/* End CMPT 332 group14 change Fall 2023 */ 
 
 /* log.c */
 void            initlog(int, struct superblock*);
