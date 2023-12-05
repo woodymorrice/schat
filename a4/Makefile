@@ -13,13 +13,17 @@ LIST = -L. -llist
 
 all: memsim
 
-memsim: memsim.o liblist.a
+memsim: memsim.o random.o liblist.a
 	$(CC) $(LIB1) -z noexecstack -o memsim \
-		memsim.o $(LIB2) $(LIST)
+		memsim.o random.o $(LIB2) $(LIST) -lm
 
-memsim.o: memsim.c list.h
+memsim.o: memsim.c list.h random.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
-        -c memsim.c -o memsim.o	
+        -c memsim.c -o memsim.o
+
+random.o: random.c random.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I. \
+        -c random.c -o random.o
 
 best-fit: monitor.o best-fit.o best-fit-monitor.o liblist.a 
 	$(CC) $(LIB1) -z noexecstack -o best-fit best-fit-monitor.o \
@@ -59,5 +63,6 @@ list_removers.o: list_removers.c list.h
 .PHONY: clean all
 
 clean: 
-	rm -f *.o *.a best-fit
+	rm -f *.o *.a memsim \
+		  best-fit random
 	

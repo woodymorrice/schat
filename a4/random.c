@@ -2,38 +2,37 @@
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
+/*#include <stdio.h>
+#include <stdlib.h>*/
+#include <random.h>
 
 #define MEAN 10
 #define STDDEV 3
 
-double exrand(int randi) {
+double exrand(int mean) {
     double x;
-    x = (double)randi/(double)RAND_MAX;
-    return (-MEAN*log(x));
+    x = (double)rand()/(double)RAND_MAX;
+    return (-mean*log(x));
 }
 
-double normrand(int randi) {
+double normrand(int mean, int stddev) {
     double u1, u2, x, u3;
     do {
-        u1 = (double)randi/(double)RAND_MAX;
+        u1 = (double)rand()/(double)RAND_MAX;
         u2 = (double)rand()/(double)RAND_MAX;
         x = -(log(u1)); 
     } while (u2 > pow(M_E, -(x-1)*(x-1)/2));
     u3 = (double)rand()/(double)RAND_MAX;
     if (u3 > 0.5) {
-        return MEAN+STDDEV*x;
+        return mean+stddev*x;
     }
     else {
-        return MEAN-STDDEV*x;
+        return mean-stddev*x;
     }
 
 }
 
-
+/*
 int main() {
     int i;
     double x;
@@ -46,4 +45,4 @@ int main() {
         printf("normrand(): %d\n", (int)normrand(randi) + 1);
     }
     return 0;
-}
+}*/
