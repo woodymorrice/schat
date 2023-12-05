@@ -8,6 +8,8 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+
 #include <rtthreads.h>
 #include <RttCommon.h>
 
@@ -18,8 +20,8 @@
 #define MINARGS 2
 #define MAXARGS 2
 #define MINREQS 1
-#define MAXREQS 1000
-#define NUM_THRDS 1
+#define MAXREQS 10000
+#define NUM_THRDS 48
 #define THRD_NMSZ 32
 #define MIN_ALLOC 1
 #define MAX_ALLOC 2048
@@ -30,6 +32,7 @@
 #define FIRSTFIT 1
 #define NTHRDARGS 2
 #define INTCHRS 4
+#define MODE 0755
 
 /* NOTE: MIN_SLP can't be one because if it's 0 on the last line of
  * the generated random number file, atoi() will fail on that line.
@@ -47,7 +50,7 @@ void sim_proc(void* num) {
     args = (int*)num;
     
     /* get the name of the random # input file */
-    if (snprintf(procnum, sizeof(procnum), "%d.txt", args[1]) == 0) {
+    if (snprintf(procnum, sizeof(procnum), "./tmp/%d.txt", args[1]) == 0) {
         fprintf(stderr, "snprintf failed in sim_proc()\n");
         exit(EXIT_FAILURE);
     }
@@ -61,13 +64,15 @@ void sim_proc(void* num) {
     /* iterate through the random numbers */
     for (i = 0; i < reqs*2; i++) {
         /* read a line from the file */
+        do {
         if (fgets(line, sizeof(line), f) == NULL) {
             fprintf(stderr, "fgets failed in sim_proc()\n");
             exit(EXIT_FAILURE);  
         }
+        } while (line[0] == '\n');
         /* convert that line to an int */
         if ((readnum = atoi(line)) == 0) {
-            fprintf(stderr, "atoi failed in sim_proc()\n");
+            fprintf(stderr, "atoi failed in sim_proc(): %s\n", line);
             exit(EXIT_FAILURE);
         }
 
@@ -124,13 +129,22 @@ int gen_rands(int reqs) {
     int i, j, alloc, slp;
     char buf[THRD_NMSZ];
     FILE *f;
+    struct stat st;
     /* create a list of random numbers for each thread */
     for (i = 0; i < NUM_THRDS; i++) {
         /* even lines are allocation sizes,
          * odd lines are sleep times */
 
+        /*st = {0};*/
+        if (stat("tmp/", &st) != 0) {
+            if (mkdir("tmp/", 0755) != 0) {
+                fprintf(stderr, "mkdir failed in gen_rands()\n");
+                return EXIT_FAILURE; 
+            }
+        }
+
         /* name the file of random numbers (i) */
-        if (snprintf(buf, sizeof(buf), "%d.txt", i) == 0) {
+        if (snprintf(buf, sizeof(buf), "./tmp/%d.txt", i) == 0) {
             fprintf(stderr, "snprintf failed in gen_rands()\n");
             return EXIT_FAILURE;
         }
@@ -214,10 +228,10 @@ int mainp(int argc, char* argv[]) {
     }
 
     /* create threads and run first fit algorithm */
-    if (init_thrds(FIRSTFIT) != 0) {
+    /*if (init_thrds(FIRSTFIT) != 0) {
         fprintf(stderr, "init_thrds for First Fit failed\n");
         exit(EXIT_FAILURE);
-    }
+    }*/
 
     return EXIT_SUCCESS;
 }

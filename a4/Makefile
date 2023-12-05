@@ -64,5 +64,6 @@ list_removers.o: list_removers.c list.h
 
 clean: 
 	rm -f *.o *.a memsim \
-		  best-fit random
+		  best-fit random \
+		  tmp/*
 	
