@@ -9,6 +9,10 @@
 #define MEAN 10
 #define STDDEV 3
 
+double unirand() {
+    return (double)rand()/(double)RAND_MAX;
+}
+
 double exrand(int mean) {
     double x;
     x = (double)rand()/(double)RAND_MAX;

@@ -1,8 +1,8 @@
 /* CMPT332 - Group 14
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
-#ifndef BESTFITMONITOR
-#define BESTFITMONITOR
+#ifndef MEMMONITOR
+#define MEMFITMONITOR
 
 typedef struct memStruct {
     LIST *blocks;
@@ -14,8 +14,7 @@ typedef struct memStruct {
     int usedSpace;
 
     int nOps;
-}
-
+} memStruct;
 
 typedef struct memBlock {
     int isFree;
@@ -23,9 +22,13 @@ typedef struct memBlock {
     int size;
 } memBlock;
 
-int BestFitInit();
-struct memBlock* BFAllocate(int);
-int Free(int);
-void memPrinter();
+
+int bestInit();
+int firstInit();
+struct memBlock* MyMalloc(int, int);
+struct memBlock* bestFit(int);
+struct memBlock* firstFit(int);
+int Free(int, int);
+void memPrinter(int);
 
 #endif

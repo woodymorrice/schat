@@ -8,5 +8,6 @@
 #define MN_ALLOC 512 /* avg allocation size */
 #define STDDEV_ALLOC 512 /* std. deviation */
 
+double unirand();
 double exrand(int);
 double normrand(int, int);

@@ -15,13 +15,14 @@
 
 #include <list.h>
 #include <random.h>
-
+#include <monitor.h>
+#include <memmonitor.h>
 
 #define MINARGS 2
 #define MAXARGS 2
 #define MINREQS 1
 #define MAXREQS 10000
-#define NUM_THRDS 48
+#define NUM_THRDS 1
 #define THRD_NMSZ 32
 #define MIN_ALLOC 1
 #define MAX_ALLOC 2048
@@ -33,18 +34,28 @@
 #define NTHRDARGS 2
 #define INTCHRS 4
 #define MODE 0755
+#define FREEPROB 0.5
 
 /* NOTE: MIN_SLP can't be one because if it's 0 on the last line of
  * the generated random number file, atoi() will fail on that line.
- * Don't ask me why. */
+ * ** Actually the reason it can't be 0 is because atoi() returns 0
+ * if it can't convert to an integer, so there is no way to differentiate
+ * between an error in conversion and the value being converted simply
+ * being a 0 */
 
 static int reqs;
+static int fin;
 
 void sim_proc(void* num) {
     int* args;
-    char procnum[THRD_NMSZ], line[INTCHRS+1];
+    char procnum[THRD_NMSZ]; /*, line[64];*/
     FILE* f;
-    int i, readnum;
+    int i, alloc, sz, slp, randFree, n, j;
+    unsigned long id;
+    LIST* blocks;
+    memBlock* block;
+
+    blocks = ListCreate();
 
     /* args[0] = algorithm, args[1] = proc number */
     args = (int*)num;
@@ -62,22 +73,80 @@ void sim_proc(void* num) {
     }
 
     /* iterate through the random numbers */
-    for (i = 0; i < reqs*2; i++) {
+    for (i = 0; i < reqs*3; i++) {
         /* read a line from the file */
-        do {
-        if (fgets(line, sizeof(line), f) == NULL) {
+        if (fscanf(f, "%d ", &n) != 1) {
+            fprintf(stderr, "fscanf failed in sim_proc()\n");
+            perror("");
+            exit(EXIT_FAILURE);   
+        }
+        /*do {
+        if (fgets(line, 64, f) == NULL) {
             fprintf(stderr, "fgets failed in sim_proc()\n");
             exit(EXIT_FAILURE);  
         }
-        } while (line[0] == '\n');
+        if (line[0] == '\n')
+            printf("bad line: %s\n", line);
+        } while (line[0] == '\n');*/
         /* convert that line to an int */
-        if ((readnum = atoi(line)) == 0) {
+        /*if ((readnum = atoi(line)) == 0) {
             fprintf(stderr, "atoi failed in sim_proc(): %s\n", line);
             exit(EXIT_FAILURE);
-        }
+        }*/
 
+        /* get process ID */
+        id = RttMyThreadId().lid;
+
+        /* alloc or free? */
+        if      (i % 3 == 0) {
+            /*alloc = atoi(line);*/
+            alloc = n;
+            if (alloc) {
+                printf("Proc %d Allocating\n", (int)id);
+            } else {
+                printf("Proc %d Freeing\n", (int)id); 
+            }
+        }
+        else if (i % 3 == 1) {
+            /*sz = atoi(line);*/
+            sz = n;
+            if (ListCount(blocks) < 1) {
+                alloc = 1;
+            }
+            if (alloc) {
+                printf("Proc %d Block Size: %d Mbs\n", (int)id, sz);
+                block = MyMalloc(args[0], sz);
+                if (block == NULL) {
+                    fprintf(stderr, "MyMalloc failed in sim_proc()\n");
+                    exit(EXIT_FAILURE);
+                }
+                ListPrepend(blocks, block);
+            }
+            else {
+                randFree = (int)(rand() % ListCount(blocks));
+                ListFirst(blocks);
+                for (j = 0; j < randFree; j++) {
+                    block = ListNext(blocks);
+                }
+                if (Free(args[0], block->startAddr) != 0) {
+                    fprintf(stderr, "Free failed in sim_proc()\n");
+                    exit(EXIT_FAILURE);
+                }
+                ListRemove(blocks);
+            }
+        }
+        else if (i % 3 == 2) {
+            /*slp = atoi(line);*/
+            slp = n;
+            printf("Proc %d Sleeping for %d seconds\n", (int)id, slp);
+            RttSleep(slp);
+        }
+        else {
+            fprintf(stderr, "fatal error in sim_proc()\n");
+            exit(EXIT_FAILURE);
+        }
         /* test print */
-        printf("%d\n", readnum);
+        /*printf("%d\n", readnum);*/
     }
 
     free(args); /*cant check return value :( */
@@ -85,6 +154,15 @@ void sim_proc(void* num) {
         fprintf(stderr, "fclose failed in sim_proc()\n");
         exit(EXIT_FAILURE); 
     }
+
+    printf("thread %d finished\n", (int)id); 
+    fin += 1;
+    if (fin == NUM_THRDS) {
+        printf("simulation finished\n");
+        memPrinter(0);
+        exit(0);
+    }
+    RttExit();
 }
 
 int init_thrds(int algo) {
@@ -97,6 +175,13 @@ int init_thrds(int algo) {
     attr.startingtime = RTTZEROTIME;
     attr.priority = RTTNORM;
     attr.deadline = RTTNODEADLINE;
+
+    if (algo == 0) {
+        bestInit();
+    }
+    else {
+        firstInit();
+    }
 
     for (i = 0; i < NUM_THRDS; i++) {
         /* threadname = same as rndm num file it will read */
@@ -122,11 +207,11 @@ int init_thrds(int algo) {
         
     }
     return EXIT_SUCCESS;
-
 }
 
 int gen_rands(int reqs) {
-    int i, j, alloc, slp;
+    int i, j, alloc, sz, slp;
+    double prob;
     char buf[THRD_NMSZ];
     FILE *f;
     struct stat st;
@@ -157,15 +242,29 @@ int gen_rands(int reqs) {
 
         /* generate the number of requests passed in */
         for (j = 0; j < reqs; j++) {
-            /* generate an allocation size */
-            alloc = (int) normrand(MN_ALLOC, STDDEV_ALLOC);
-            if (alloc < MIN_ALLOC) {
-                alloc = MIN_ALLOC;
+
+            /* allocate or free? */
+            alloc = 1;
+            prob = unirand();
+            if (prob > FREEPROB) {
+                alloc = 1;
             }
-            if (alloc > MAX_ALLOC) {
-                alloc = MAX_ALLOC;
+            else {
+                alloc = 0;
             }
             if (fprintf(f, "%d\n", alloc) == 0) {
+                fprintf(stderr, "fprintf failed in gen_rands()\n");
+                return EXIT_FAILURE;
+            }
+            /* generate an allocation size */
+            sz = (int) normrand(MN_ALLOC, STDDEV_ALLOC);
+            if (sz < MIN_ALLOC) {
+                sz = MIN_ALLOC;
+            }
+            if (sz > MAX_ALLOC) {
+                sz = MAX_ALLOC;
+            }
+            if (fprintf(f, "%d\n", sz) == 0) {
                 fprintf(stderr, "fprintf failed in gen_rands()\n");
                 return EXIT_FAILURE;
             }
@@ -221,6 +320,7 @@ int mainp(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    fin = 0;
     /* create threads and run best fit algorithm */
     if (init_thrds(BESTFIT) != 0) {
         fprintf(stderr, "init_thrds for Best Fit failed\n");

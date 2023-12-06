@@ -14,6 +14,7 @@ LIST *urgentq;
 LIST *conQueue[10];
 /* Allows up to 10 condition variables */
 
+
 const int STKSIZE = 65536;
 const int ENTER = 20;
 const int LEAVE = 21;
@@ -23,6 +24,17 @@ static RttThreadId server; /* so threads know where to send msgs */
 static unsigned int size = 4; /* message size */
 static int reply; /* holds replies (their contents never matter) */
 static int conds; /* # of condition variables */
+static RttThreadId sendArr[100];
+
+int RttMonKill() {
+    int i;
+    for (i = 0; i < 100; i++) {
+        RttKill(sendArr[i]);
+    }
+    RttKill(server);
+
+    return 0;
+}
 
 /* RttMonServer -- server PROCESS that handles
  * the coordination by putting processes on lists
@@ -33,11 +45,12 @@ RTTTHREAD MonServer() {
     RttThreadId *waiting; /* ptr to thread being pulled off q */
 
     /* Array to store PIDs from received messages */
-    RttThreadId sendArr[100];
+    /*RttThreadId sendArr[100];*/
     int index;
 
     index = 0;
     occupied = 0;
+
 
     for (;;) {
         if (0 !=
