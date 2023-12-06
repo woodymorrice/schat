@@ -15,6 +15,7 @@
 #include <monitor.h>
 #include <list.h>
 #include <memmonitor.h>
+#include <random.h>
 
 /* Total memory for this simulation will be 8 gbs (8,589,934,592 or
  * 2^33 bytes), but since the minimum allocation will be 1 mb (1,048,576
@@ -27,24 +28,23 @@
 #define CONDS 1 /* number of conditions variables */
 #define MEM_AVAIL 0
 
-static memStruct* bestMem;
-static memStruct* firstMem;
+static memStruct* tMem;
 
-int bestInit() {
+int memInit() {
     memBlock* init;
 
     /* init monitor */
     RttMonInit(CONDS);
 
     /* init memory structure */
-    bestMem = malloc(sizeof(memStruct));
-    bestMem->blocks = ListCreate();
-    bestMem->nFree = 1;
-    bestMem->nUsed = 0;
-    bestMem->maxSize = 8192;
-    bestMem->freeSpace = 8192;
-    bestMem->usedSpace = 0;
-    bestMem->nOps = 0;
+    tMem = malloc(sizeof(memStruct));
+    tMem->blocks = ListCreate();
+    tMem->nFree = 1;
+    tMem->nUsed = 0;
+    tMem->maxSize = 8192;
+    tMem->freeSpace = 8192;
+    tMem->usedSpace = 0;
+    tMem->nOps = 0;
 
 
     /* Create initial block of memory */
@@ -53,36 +53,7 @@ int bestInit() {
     init->startAddr = 0;
     init->size = TOTAL_MEM;
 
-    ListPrepend(bestMem->blocks, init);
-
-    return EXIT_SUCCESS; 
-}
-
-int firstInit() {
-    memBlock* init;
-
-    /* init monitor */
-    RttMonInit(CONDS);
-
-    /* init memory structure */
-    firstMem = malloc(sizeof(memStruct));
-    firstMem->blocks = ListCreate();
-    firstMem->nFree = 1;
-    firstMem->nUsed = 0;
-    firstMem->maxSize = 8192;
-    firstMem->freeSpace = 8192;
-    firstMem->usedSpace = 0;
-    firstMem->nOps = 0;
-
-
-    /* Create initial block of memory */
-    init = malloc(sizeof(memBlock));
-    init->isFree = true;
-    init->startAddr = 0;
-    init->size = TOTAL_MEM;
-
-    ListPrepend(firstMem->blocks, init);
-
+    ListPrepend(tMem->blocks, init);
     return EXIT_SUCCESS;
 }
 
@@ -90,27 +61,38 @@ memBlock* MyMalloc(int alg, int size) {
     memBlock* block;
     block = NULL;
     while (block == NULL) {
-        if (alg == 0) { /* best fit */
+        if (alg == 0) {
             block = bestFit(size);
         }
-        else { /* first fit */
+        else {
             block = firstFit(size);
         }
         if (block == NULL) {
             RttMonWait(MEM_AVAIL);
         }
     }
+    tMem->nUsed++;
+    tMem->freeSpace -= size;
+    tMem->usedSpace += size;
+    tMem->nOps += 1;
+
     return block;
 }
 
 memBlock* bestFit(int sz) {
+    LIST* mem;
     memBlock* iter;
     memBlock* best;
+    memBlock* new;
+
+    RttMonEnter();
+    mem = tMem->blocks;
 
     best = NULL;
-    ListFirst(bestMem->blocks);
-    do {
-        iter = ListCurr(bestMem->blocks);
+    iter = ListFirst(mem);
+    /*do {
+        iter = ListCurr(mem);*/
+    while (iter != NULL) {
         /* if a free block is big enough */
         if (iter->isFree == true &&
             iter->size > sz) {
@@ -120,83 +102,168 @@ memBlock* bestFit(int sz) {
                 best = iter;
             }
         }
-    } while (ListNext(bestMem->blocks) != NULL);
+        iter = ListNext(mem);
+    }
+    /*} while (ListNext(mem) != NULL);*/
     
+    if (best != NULL) {
+        /* create a new block */
+        new = malloc(sizeof(memBlock));
+        new->isFree = false;
+        /* subtract its size from the old block */
+        new->size = sz;
+        best->size -= sz;
+
+        /* find the old blocks spot in the list */
+        iter = ListFirst(mem);
+        while (iter->startAddr != best->startAddr) {
+            iter = ListNext(mem);
+            /*iter = ListCurr(mem);*/
+        }
+
+        new->startAddr = best->startAddr;
+        best->startAddr += sz;
+
+        ListInsert(mem, new);
+
+        RttMonLeave();
+
+        return new;
+    }
+    else {
+        RttMonLeave();
+        return best;
+    }
+
+    RttMonLeave();
     return best;
 }
 
 memBlock* firstFit(int sz) {
+    LIST* mem;
     memBlock* iter;
+    memBlock* found;
+    memBlock* new;
 
-    ListFirst(firstMem->blocks);
-    do {
-        iter = ListCurr(firstMem->blocks);
+    RttMonEnter();
+    mem = tMem->blocks;
+
+    found = NULL;
+    iter = ListFirst(mem);
+    while (iter != NULL) {
+        iter = ListCurr(mem);
         /* if a free block is big enough */
         if (iter->isFree == true &&
             iter->size > sz) {
-            return iter;
+            found = iter;
+            break;
         }
-    } while (ListNext(bestMem->blocks) != NULL);
+        iter = ListNext(mem);
+    }
     
+    if (found != NULL) {
+        /* create a new block */
+        new = malloc(sizeof(memBlock));
+        new->isFree = false;
+        /* subtract its size from the old block */
+        new->size = sz;
+        iter->size -= sz;
+
+        new->startAddr = iter->startAddr;
+        iter->startAddr += sz;
+
+        ListInsert(mem, new);
+
+        RttMonLeave();
+
+        return new;
+    }
+    else {
+        RttMonLeave();
+        return found;
+    }
+
+    RttMonLeave();
     return NULL;
 }
 
-int Free(int alg, int address) {
+int Free(int address) {
     memBlock* iterator;
     memBlock* before;
     memBlock* after;
-    LIST* memory;
+    LIST* mem;
+    bool bef, aft;
 
     RttMonEnter();
 
-    if (alg == 0) {
-        memory = bestMem->blocks;
-    }
-    else {
-        memory = firstMem->blocks;
-    }
+    mem = tMem->blocks;
 
-    if (ListCount(memory) < 1) {
+    if (ListCount(mem) < 1) {
         fprintf(stderr, "Free: no initial memory block\n");
         exit(EXIT_FAILURE);
     }
+    if (ListCount(mem) < 2) {
+        fprintf(stderr, "Free: cannot free initial memory block\n");
+        exit(EXIT_FAILURE);
+    }
+
+    tMem->nOps += 1;
 
     before = NULL;
     after = NULL;
 
-    ListFirst(memory);
-    do {
-        iterator = ListCurr(memory);
+    iterator = ListFirst(mem);
+    /*do {*/
+    while (iterator != NULL) {
+        bef = false;
+        aft = false;
+
+        iterator = ListCurr(mem);
         /* if the block to free has been found */
         if (iterator->startAddr == address) {
             /* set it to free */
             iterator->isFree = true;
             
+            /* update stats */
+            tMem->nUsed -= 1;
+            tMem->freeSpace += iterator->size;
+            tMem->usedSpace -= iterator->size;
+            
             /* if the block before it is free */
-            before = ListPrev(memory);
+            before = ListPrev(mem);
             if (before != NULL) {
                 if (before->isFree == true) {
+                    bef = true;
                     iterator->startAddr = before->startAddr;
                     iterator->size += before->size;
-                    ListRemove(memory);
+                    ListRemove(mem);
                     free(before);
                 }
                 else {
-                    ListNext(memory);
+                    ListNext(mem);
                 }
             }
 
             /* if the block after it is free */
-            after = ListNext(memory);
+            after = ListNext(mem);
             if (after != NULL) {
                 if (after == iterator) {
-                    after = ListNext(memory);
+                    after = ListNext(mem);
                 }
                 if (after->isFree == true) {
+                    aft = true;
                     iterator->size += after->size;
-                    ListRemove(memory);
+                    ListRemove(mem);
                     free(after);
                 }
+            }
+
+            /* update # of free blocks */
+            if (bef == true && aft == true) {
+                tMem->nFree -= 1;
+            }
+            else if (bef == false && aft == false) {
+                tMem->nFree += 1;
             }
 
             RttMonSignal(MEM_AVAIL);
@@ -205,34 +272,36 @@ int Free(int alg, int address) {
 
             return EXIT_SUCCESS;
         }
-
-    } while (ListNext(memory) != NULL);
+    iterator = ListNext(mem);
+    }
+    /*} while (ListNext(mem) != NULL);*/
 
     RttMonLeave();
 
     return EXIT_FAILURE;
 }
 
-/* memPrinter -- show the current state of the memory block */
-void memPrinter(int alg) {
-    memBlock* iterator;
-    LIST* memory;
+int unblock() {
+    RttMonSignal(0);
+    return 0;
+}
 
-    if (alg == 0) {
-        memory = bestMem->blocks;
-    }
-    else {
-        memory = firstMem->blocks;
-    }
+/* memPrinter -- show the current state of the memory block */
+void memPrinter() {
+   /* memBlock* iterator;*/
+    LIST* mem;
+
+    RttMonEnter();
+    mem = tMem->blocks;
  
-    if (ListCount(memory) < 1) {
+    if (ListCount(mem) < 1) {
         fprintf(stderr, "no initial memory block\n");
         exit(EXIT_FAILURE);
     }
 
-    ListFirst(memory);
+    /*ListFirst(mem);
     do {
-        iterator = ListCurr(memory);
+        iterator = ListCurr(mem);
         if (iterator->isFree == true) {
             printf("Address: %d -- Size: %d -- FREE\n",
                    iterator->startAddr, iterator->size);
@@ -241,5 +310,20 @@ void memPrinter(int alg) {
             printf("Address: %d -- Size: %d -- ALLOCATED\n",
                    iterator->startAddr, iterator->size);
         }
-    } while (ListNext(memory) != NULL);
+    } while (ListNext(mem) != NULL);*/
+
+    /*printf("Free blocks: %d\n", tMem->nFree);
+    printf("Used blocks: %d\n", tMem->nUsed);
+    printf("Total Size: %d\n", tMem->maxSize);
+    printf("Free Space: %d\n", tMem->freeSpace);
+    printf("Used Space: %d\n", tMem->usedSpace);
+    printf("Number of Operations: %d\n", tMem->nOps);*/
+    printf("%d,%d,%d,%d,%d,"
+           "%d,%d,%d,%d,%d,"
+           "%d,%f,%d,%d,%d\n",
+           tMem->nFree, tMem->nUsed, tMem->freeSpace, tMem->usedSpace,
+           tMem->nOps, tMem->maxSize, NUM_THRDS, MIN_ALLOC, MAX_ALLOC,
+           MN_ALLOC, STDDEV_ALLOC, FREEPROB, MIN_SLP, MAX_SLP, MN_SLP);
+
+    RttMonLeave();
 }

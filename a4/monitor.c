@@ -107,6 +107,7 @@ RTTTHREAD MonServer() {
                 messageType -= 10;
                 if (messageType > conds - 1) {
                     fprintf(stderr, "Error: CV does not exist\n");
+                    exit(0);
                 }
 
                 /* if there is non-empty cvlist */
@@ -131,7 +132,7 @@ RTTTHREAD MonServer() {
                 /* if monitor is occupied add to entering queue */
                 if (occupied) {
                     ListPrepend(enterq, &sendArr[index]);
-                    printf("%d items in enterq\n", ListCount(enterq));
+                    /*printf("%d items in enterq\n", ListCount(enterq));*/
                 }
                 /* else set monitor to occupied and reply to sender */
                 else {

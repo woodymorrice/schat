@@ -2,12 +2,10 @@
  * Phong Thanh Nguyen (David) - wdz468 - 11310824
  * Woody Morrice - wam553 - 11071060 */
 
-/*#include <stdio.h>
-#include <stdlib.h>*/
 #include <random.h>
-
-#define MEAN 10
-#define STDDEV 3
+ 
+#define SLPMEAN 10
+#define SLPSTDDEV 3
 
 double unirand() {
     return (double)rand()/(double)RAND_MAX;

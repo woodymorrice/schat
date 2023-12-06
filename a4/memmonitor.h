@@ -22,13 +22,12 @@ typedef struct memBlock {
     int size;
 } memBlock;
 
-
-int bestInit();
-int firstInit();
+int memInit();
 struct memBlock* MyMalloc(int, int);
 struct memBlock* bestFit(int);
 struct memBlock* firstFit(int);
-int Free(int, int);
-void memPrinter(int);
+int Free(int);
+int unblock();
+void memPrinter();
 
 #endif

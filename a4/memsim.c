@@ -8,6 +8,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <sys/stat.h>
 
 #include <rtthreads.h>
@@ -19,29 +20,17 @@
 #include <memmonitor.h>
 
 #define MINARGS 2
-#define MAXARGS 2
+#define MAXARGS 4
 #define MINREQS 1
 #define MAXREQS 10000
-#define NUM_THRDS 1
 #define THRD_NMSZ 32
-#define MIN_ALLOC 1
-#define MAX_ALLOC 2048
-#define MIN_SLP 1 /* this CANNOT be 0 */
-#define MAX_SLP 5
 #define STKSIZE 65539
 #define BESTFIT 0
 #define FIRSTFIT 1
 #define NTHRDARGS 2
 #define INTCHRS 4
 #define MODE 0755
-#define FREEPROB 0.5
-
-/* NOTE: MIN_SLP can't be one because if it's 0 on the last line of
- * the generated random number file, atoi() will fail on that line.
- * ** Actually the reason it can't be 0 is because atoi() returns 0
- * if it can't convert to an integer, so there is no way to differentiate
- * between an error in conversion and the value being converted simply
- * being a 0 */
+#define BUF_SIZE 128
 
 static int reqs;
 static int fin;
@@ -101,11 +90,11 @@ void sim_proc(void* num) {
         if      (i % 3 == 0) {
             /*alloc = atoi(line);*/
             alloc = n;
-            if (alloc) {
+            /*if (alloc) {
                 printf("Proc %d Allocating\n", (int)id);
             } else {
                 printf("Proc %d Freeing\n", (int)id); 
-            }
+            }*/
         }
         else if (i % 3 == 1) {
             /*sz = atoi(line);*/
@@ -114,7 +103,7 @@ void sim_proc(void* num) {
                 alloc = 1;
             }
             if (alloc) {
-                printf("Proc %d Block Size: %d Mbs\n", (int)id, sz);
+                /*printf("Proc %d Block Size: %d Mbs\n", (int)id, sz);*/
                 block = MyMalloc(args[0], sz);
                 if (block == NULL) {
                     fprintf(stderr, "MyMalloc failed in sim_proc()\n");
@@ -124,11 +113,16 @@ void sim_proc(void* num) {
             }
             else {
                 randFree = (int)(rand() % ListCount(blocks));
-                ListFirst(blocks);
+                block = ListFirst(blocks);
                 for (j = 0; j < randFree; j++) {
                     block = ListNext(blocks);
                 }
-                if (Free(args[0], block->startAddr) != 0) {
+                if (block == NULL) {
+                    fprintf(stderr, "no block to free (bad)\n");
+                    exit(EXIT_FAILURE);
+
+                }
+                if (Free(block->startAddr) != 0) {
                     fprintf(stderr, "Free failed in sim_proc()\n");
                     exit(EXIT_FAILURE);
                 }
@@ -138,7 +132,7 @@ void sim_proc(void* num) {
         else if (i % 3 == 2) {
             /*slp = atoi(line);*/
             slp = n;
-            printf("Proc %d Sleeping for %d seconds\n", (int)id, slp);
+            /*printf("Proc %d Sleeping for %d seconds\n", (int)id, slp);*/
             RttSleep(slp);
         }
         else {
@@ -155,14 +149,52 @@ void sim_proc(void* num) {
         exit(EXIT_FAILURE); 
     }
 
-    printf("thread %d finished\n", (int)id); 
+    /*printf("thread %d finished\n", (int)id);*/
     fin += 1;
+    /*memPrinter();*/
     if (fin == NUM_THRDS) {
-        printf("simulation finished\n");
-        memPrinter(0);
+        /*printf("simulation finished\n");*/
+        printf("%d ", reqs); 
+        memPrinter();
         exit(0);
     }
     RttExit();
+}
+
+void getInput() {
+    char buf[BUF_SIZE];
+    int msgLength;
+                                                                          
+    /* unblock stdin */                                                         
+    if (-1 == fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK)) {              
+        fprintf(stderr, "error %d: couldn't set stdin to non-blocking",         
+                errno);                                                         
+        exit(EXIT_FAILURE);
+    }                                                        
+    for (;;) {                                                                  
+        /* get input */             
+        /*printf(" are we blocking?\n");*/
+        msgLength = read(0, buf, BUF_SIZE-1);                                   
+        if (msgLength > 0) {                                                    
+            buf[msgLength] = '\0';                                              
+                                                                                
+            /* exit commands */                                                 
+            if (strncmp("exit\n", buf, msgLength) == 0 ||                       
+                strncmp("quit\n", buf, msgLength) == 0) {                       
+                                                                                
+                fcntl(0, F_SETFL, fcntl(0, F_GETFL) | ~O_NONBLOCK);
+                exit(0);                            
+            }
+            else if (strncmp("stats\n", buf, msgLength) == 0) {
+                memPrinter();
+            }                                               
+        }                                                                       
+    }                                                                           
+}
+
+void unblocker() {
+    unblock();
+    RttSleep(5);
 }
 
 int init_thrds(int algo) {
@@ -176,12 +208,9 @@ int init_thrds(int algo) {
     attr.priority = RTTNORM;
     attr.deadline = RTTNODEADLINE;
 
-    if (algo == 0) {
-        bestInit();
-    }
-    else {
-        firstInit();
-    }
+    fin = 0;
+
+    memInit();
 
     for (i = 0; i < NUM_THRDS; i++) {
         /* threadname = same as rndm num file it will read */
@@ -206,6 +235,22 @@ int init_thrds(int algo) {
 
         
     }
+
+    /* unblocker, might not be necessary */
+    /*thread = RttCreate(&id, unblocker, STKSIZE,
+                       "unblocker", NULL, attr, RTTUSR);
+    if (thread == RTTFAILED) {
+        fprintf(stderr, "RttCreate() failed on thread %d\n", i);
+        exit(EXIT_FAILURE);
+    }*/
+    /* user input thread */
+    attr.priority = RTTLOW;
+    thread = RttCreate(&id, getInput, STKSIZE,
+                       "input", NULL, attr, RTTUSR);
+    if (thread == RTTFAILED) {
+        fprintf(stderr, "RttCreate() failed on thread %d\n", i);
+        exit(EXIT_FAILURE);
+    }
     return EXIT_SUCCESS;
 }
 
@@ -215,6 +260,8 @@ int gen_rands(int reqs) {
     char buf[THRD_NMSZ];
     FILE *f;
     struct stat st;
+
+    srand(time(NULL));
     /* create a list of random numbers for each thread */
     for (i = 0; i < NUM_THRDS; i++) {
         /* even lines are allocation sizes,
@@ -294,7 +341,7 @@ int gen_rands(int reqs) {
 /* mainp - 
  * */
 int mainp(int argc, char* argv[]) {
-    /*int i;*/
+    int alg, rands;
 
     /* verify args */
     /* argv[1] -> the number of requests to
@@ -305,8 +352,19 @@ int mainp(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    /* (reqs)arg1 = # of requests
+     * (alg)arg2 = algorithm
+     * (rands)arg3 = generate new random #s */
     reqs = atoi(argv[1]);
+    alg = 0;
+    rands = 1;
 
+    if (argc > 2) {
+        alg = atoi(argv[2]);
+    }
+    if (argc > 3) {
+        rands = atoi(argv[3]);
+    }
 
     /* testing args */
     /*printf("%d\n", argc);
@@ -315,14 +373,14 @@ int mainp(int argc, char* argv[]) {
     }*/
 
     /* generates a of random numbers for each thread in the test */
-    if (gen_rands(atoi(argv[1])) != 0) {
+    if (rands && (gen_rands(reqs) != 0)) {
         fprintf(stderr, "gen_rands failed\n");
         exit(EXIT_FAILURE);
     }
 
     fin = 0;
     /* create threads and run best fit algorithm */
-    if (init_thrds(BESTFIT) != 0) {
+    if (init_thrds(alg) != 0) {
         fprintf(stderr, "init_thrds for Best Fit failed\n");
         exit(EXIT_FAILURE);
     }
