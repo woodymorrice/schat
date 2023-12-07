@@ -40,7 +40,7 @@ void sim_proc(void* num) {
     char procnum[THRD_NMSZ]; /*, line[64];*/
     FILE* f;
     int i, alloc, sz, slp, randFree, n, j;
-    unsigned long id;
+    /*unsigned long id;*/
     LIST* blocks;
     memBlock* block;
 
@@ -84,7 +84,7 @@ void sim_proc(void* num) {
         }*/
 
         /* get process ID */
-        id = RttMyThreadId().lid;
+        /*id = RttMyThreadId().lid;*/
 
         /* alloc or free? */
         if      (i % 3 == 0) {
@@ -133,7 +133,7 @@ void sim_proc(void* num) {
             /*slp = atoi(line);*/
             slp = n;
             /*printf("Proc %d Sleeping for %d seconds\n", (int)id, slp);*/
-            RttSleep(slp);
+            RttUSleep(((unsigned)slp)*1000);
         }
         else {
             fprintf(stderr, "fatal error in sim_proc()\n");
@@ -154,7 +154,7 @@ void sim_proc(void* num) {
     /*memPrinter();*/
     if (fin == NUM_THRDS) {
         /*printf("simulation finished\n");*/
-        printf("%d ", reqs); 
+        printf("%d,%d,", NUM_THRDS, reqs); 
         memPrinter();
         exit(0);
     }

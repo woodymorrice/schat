@@ -24,7 +24,7 @@
  * 8192 and we will use that to represent our total memory size. So 1
  * will represent 1 mb, 2 = 2 mb, and so on. */
 
-#define TOTAL_MEM 8192
+#define TOTAL_MEM 2097152
 #define CONDS 1 /* number of conditions variables */
 #define MEM_AVAIL 0
 
@@ -41,8 +41,8 @@ int memInit() {
     tMem->blocks = ListCreate();
     tMem->nFree = 1;
     tMem->nUsed = 0;
-    tMem->maxSize = 8192;
-    tMem->freeSpace = 8192;
+    tMem->maxSize = TOTAL_MEM;
+    tMem->freeSpace = TOTAL_MEM;
     tMem->usedSpace = 0;
     tMem->nOps = 0;
 
@@ -68,6 +68,8 @@ memBlock* MyMalloc(int alg, int size) {
             block = firstFit(size);
         }
         if (block == NULL) {
+            printf("going to sleep...\n");
+            memPrinter();
             RttMonWait(MEM_AVAIL);
         }
     }
@@ -288,8 +290,9 @@ int unblock() {
 
 /* memPrinter -- show the current state of the memory block */
 void memPrinter() {
-   /* memBlock* iterator;*/
+    /*memBlock* iter;*/
     LIST* mem;
+
 
     RttMonEnter();
     mem = tMem->blocks;
@@ -299,8 +302,8 @@ void memPrinter() {
         exit(EXIT_FAILURE);
     }
 
-    /*ListFirst(mem);
-    do {
+    /*iter = ListFirst(mem);
+    while (iter != NULL) {
         iterator = ListCurr(mem);
         if (iterator->isFree == true) {
             printf("Address: %d -- Size: %d -- FREE\n",
@@ -310,7 +313,8 @@ void memPrinter() {
             printf("Address: %d -- Size: %d -- ALLOCATED\n",
                    iterator->startAddr, iterator->size);
         }
-    } while (ListNext(mem) != NULL);*/
+        iter = ListNext(mem);
+    }*/
 
     /*printf("Free blocks: %d\n", tMem->nFree);
     printf("Used blocks: %d\n", tMem->nUsed);
@@ -319,11 +323,9 @@ void memPrinter() {
     printf("Used Space: %d\n", tMem->usedSpace);
     printf("Number of Operations: %d\n", tMem->nOps);*/
     printf("%d,%d,%d,%d,%d,"
-           "%d,%d,%d,%d,%d,"
-           "%d,%f,%d,%d,%d\n",
-           tMem->nFree, tMem->nUsed, tMem->freeSpace, tMem->usedSpace,
-           tMem->nOps, tMem->maxSize, NUM_THRDS, MIN_ALLOC, MAX_ALLOC,
-           MN_ALLOC, STDDEV_ALLOC, FREEPROB, MIN_SLP, MAX_SLP, MN_SLP);
+           "%d,%d,%d,%f\n",
+           tMem->nOps, tMem->nFree, tMem->freeSpace, tMem->nUsed,
+           tMem->usedSpace, tMem-> maxSize, MN_ALLOC, STDDEV_ALLOC, FREEPROB);
 
     RttMonLeave();
 }

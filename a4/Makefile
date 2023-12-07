@@ -25,7 +25,7 @@ random.o: random.c random.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -I. \
         -c random.c -o random.o
 
-memmonitor.o: memmonitor.c memmonitor.h list.h monitor.h	
+memmonitor.o: memmonitor.c memmonitor.h list.h monitor.h random.h	
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
 		-c memmonitor.c -o memmonitor.o
 
