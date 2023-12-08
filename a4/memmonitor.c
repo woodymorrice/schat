@@ -30,7 +30,6 @@
 #define FFMemAvail 0
 
 static memStruct* tMem;
-/*static struct timeval start;*/
 
 int memInit() {
     memBlock* init;
@@ -58,13 +57,12 @@ int memInit() {
 
     ListPrepend(tMem->blocks, init);
 
-    gettimeofday(&tMem->tm, NULL);
-
     return EXIT_SUCCESS;
 }
 
 memBlock* MyMalloc(int alg, int size) {
     memBlock* block;
+    memStat* stat;
     block = NULL;
     while (block == NULL) {
         if (alg == 0) {
@@ -75,7 +73,8 @@ memBlock* MyMalloc(int alg, int size) {
         }
         if (block == NULL) {
             printf("going to sleep...\n");
-            memPrinter();
+            stat = malloc(sizeof(memStat));
+            MyMemStats(alg, 0, stat);
             RttMonWait(FFMemAvail);
         }
     }
@@ -271,15 +270,10 @@ int MyFree(void* address) {
     return EXIT_FAILURE;
 }
 
-int unblock() {
-    RttMonSignal(0);
-    return 0;
-}
-
 /* memPrinter -- show the current state of the memory block */
-void memPrinter() {
+/*void memPrinter() {*/
     /*memBlock* iter;*/
-    LIST* mem;
+    /*LIST* mem;
 
     RttMonEnter();
     mem = tMem->blocks;
@@ -287,21 +281,9 @@ void memPrinter() {
     if (ListCount(mem) < 1) {
         fprintf(stderr, "no initial memory block\n");
         exit(EXIT_FAILURE);
-    }
-
-    /*iter = ListFirst(mem);
-    while (iter != NULL) {
-        iterator = ListCurr(mem);
-        if (iterator->isFree == true) {
-            printf("Address: %d -- Size: %d -- FREE\n",
-                   iterator->startAddr, iterator->size);
-        }
-        else {
-            printf("Address: %d -- Size: %d -- ALLOCATED\n",
-                   iterator->startAddr, iterator->size);
-        }
-        iter = ListNext(mem);
     }*/
+
+
 
     /*printf("Free blocks: %d\n", tMem->nFree);
     printf("Used blocks: %d\n", tMem->nUsed);
@@ -309,20 +291,17 @@ void memPrinter() {
     printf("Free Space: %d\n", tMem->freeSpace);
     printf("Used Space: %d\n", tMem->usedSpace);
     printf("Number of Operations: %d\n", tMem->nOps);*/
-    printf("%d,%d,%d,%d,%d,"
+    /*printf("%d,%d,%d,%d,%d,"
            "%d,%d,%d,%f\n",
            tMem->nOps, tMem->nFree, tMem->freeSpace, tMem->nUsed,
            tMem->usedSpace, tMem-> maxSize, MN_ALLOC, STDDEV_ALLOC, FREEPROB);
 
     RttMonLeave();
-}
+}*/
 
 void* MyMemStats(int alg, int stat, void* statCont) {
     LIST* mem;
     memStat* cont;
-    struct timeval cur;
-    
-    gettimeofday(&cur, NULL);
 
     RttMonEnter();
     mem = tMem->blocks;
@@ -340,7 +319,12 @@ void* MyMemStats(int alg, int stat, void* statCont) {
         printf("All Stats:\n");
     }
 
+    printf("Last block: %d\n", ((memBlock*)mem->tail->item)->size); 
     cont = (memStat*)statCont;
+    printf("%d,%d,%d,%d,%d,"
+           "%d,%d,%d,%f\n",
+           tMem->nOps, tMem->nFree, tMem->freeSpace, tMem->nUsed,
+           tMem->usedSpace, tMem-> maxSize, MN_ALLOC, STDDEV_ALLOC, FREEPROB);
     cont->nFree = tMem->nFree;
     printf("Free blocks: %d\n", tMem->nFree);
     printf("Gaps in memory: %d\n", tMem->nFree-1);
@@ -355,10 +339,6 @@ void* MyMemStats(int alg, int stat, void* statCont) {
     printf("Number of Operations: %d\n", tMem->nOps);
     cont->blSrch = tMem->blSrch;
     printf("Nodes Searched: %d\n", tMem->blSrch);
-    cont->tm.tv_sec -= tMem->tm.tv_sec;
-    cont->tm.tv_usec -= tMem->tm.tv_usec;
-    printf("Time: %ld.%ld seconds\n", cont->tm.tv_sec,
-            cont->tm.tv_usec);
 
     RttMonLeave();
 

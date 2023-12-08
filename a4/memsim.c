@@ -111,8 +111,7 @@ void sim_proc(void* num) {
     }
     fin += 1;
     if (fin == NUM_THRDS) {
-        printf("%d,%d,", NUM_THRDS, reqs); 
-        memPrinter();
+        printf("%d,%d,", NUM_THRDS, reqs);
         curStat = malloc(sizeof(memStat));
         ListPrepend(stats, MyMemStats(memAlg, 0, curStat));
         exit(0);
@@ -145,17 +144,11 @@ void getInput() {
                 exit(0);                            
             }
             else if (strncmp("stats\n", buf, msgLength) == 0) {
-                memPrinter();
                 curStat = malloc(sizeof(memStat));
                 ListPrepend(stats, MyMemStats(memAlg, 0, curStat));
             }                                               
         }                                                                       
     }                                                                           
-}
-
-void unblocker() {
-    unblock();
-    RttSleep(5);
 }
 
 int init_thrds(int algo) {

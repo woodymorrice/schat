@@ -3,7 +3,7 @@
  * Woody Morrice - wam553 - 11071060 */
 
 /* Important Test Variables */
-#define NUM_THRDS 5
+#define NUM_THRDS 8
 #define MIN_ALLOC 1
 #define MAX_ALLOC 64
 #define MIN_SLP 1 /* this CANNOT be 0 */
