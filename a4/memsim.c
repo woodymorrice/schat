@@ -87,7 +87,7 @@ void sim_proc(void* num) {
                     exit(EXIT_FAILURE);
 
                 }
-                if (MyFree(block->startAddr) != 0) {
+                if (MyFree(block) != 0) {
                     fprintf(stderr, "Free failed in sim_proc()\n");
                     exit(EXIT_FAILURE);
                 }

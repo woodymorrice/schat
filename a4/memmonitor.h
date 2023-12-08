@@ -14,6 +14,8 @@ typedef struct memStruct {
     int usedSpace;
 
     int nOps;
+    int blSrch;
+    struct timeval tm;
 } memStruct;
 
 typedef struct memBlock {
@@ -29,13 +31,15 @@ typedef struct memStat {
     int freeSpace;
     int usedSpace;
     int nOps;
+    int blSrch;
+    struct timeval tm;
 } memStat;
 
 int memInit();
 struct memBlock* MyMalloc(int, int);
 struct memBlock* bestFit(int);
 struct memBlock* firstFit(int);
-int MyFree(int);
+int MyFree(void*);
 int unblock();
 void memPrinter();
 void* MyMemStats(int, int, void*);

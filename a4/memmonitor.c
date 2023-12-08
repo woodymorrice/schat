@@ -16,6 +16,7 @@
 #include <memmonitor.h>
 #include <random.h>
 #include <defs.h>
+#include <sys/time.h>
 
 /* Total memory for this simulation will be 8 gbs (8,589,934,592 or
  * 2^33 bytes), but since the minimum allocation will be 1 mb (1,048,576
@@ -29,6 +30,7 @@
 #define FFMemAvail 0
 
 static memStruct* tMem;
+/*static struct timeval start;*/
 
 int memInit() {
     memBlock* init;
@@ -45,6 +47,7 @@ int memInit() {
     tMem->freeSpace = TOTAL_MEM;
     tMem->usedSpace = 0;
     tMem->nOps = 0;
+    tMem->blSrch = 0;
 
 
     /* Create initial block of memory */
@@ -54,6 +57,9 @@ int memInit() {
     init->size = TOTAL_MEM;
 
     ListPrepend(tMem->blocks, init);
+
+    gettimeofday(&tMem->tm, NULL);
+
     return EXIT_SUCCESS;
 }
 
@@ -93,6 +99,7 @@ memBlock* bestFit(int sz) {
     best = NULL;
     iter = ListFirst(mem);
     while (iter != NULL) {
+        tMem->blSrch++;
         /* if a free block is big enough */
         if (iter->isFree == true &&
             iter->size > sz) {
@@ -144,7 +151,7 @@ memBlock* firstFit(int sz) {
     found = NULL;
     iter = ListFirst(mem);
     while (iter != NULL) {
-        iter = ListCurr(mem);
+        tMem->blSrch++;
         /* if a free block is big enough */
         if (iter->isFree == true &&
             iter->size > sz) {
@@ -177,7 +184,7 @@ memBlock* firstFit(int sz) {
     }
 }
 
-int MyFree(int address) {
+int MyFree(void* address) {
     memBlock* iterator;
     memBlock* before;
     memBlock* after;
@@ -209,7 +216,7 @@ int MyFree(int address) {
 
         iterator = ListCurr(mem);
         /* if the block to free has been found */
-        if (iterator->startAddr == address) {
+        if (iterator == address) {
             /* set it to free */
             iterator->isFree = true;
             
@@ -313,6 +320,9 @@ void memPrinter() {
 void* MyMemStats(int alg, int stat, void* statCont) {
     LIST* mem;
     memStat* cont;
+    struct timeval cur;
+    
+    gettimeofday(&cur, NULL);
 
     RttMonEnter();
     mem = tMem->blocks;
@@ -333,6 +343,7 @@ void* MyMemStats(int alg, int stat, void* statCont) {
     cont = (memStat*)statCont;
     cont->nFree = tMem->nFree;
     printf("Free blocks: %d\n", tMem->nFree);
+    printf("Gaps in memory: %d\n", tMem->nFree-1);
     cont->nUsed = tMem->nUsed;
     printf("Used blocks: %d\n", tMem->nUsed);
     printf("Total Size: %d\n", tMem->maxSize);
@@ -342,8 +353,15 @@ void* MyMemStats(int alg, int stat, void* statCont) {
     printf("Used Space: %d\n", tMem->usedSpace);
     cont->nOps = tMem->nOps;
     printf("Number of Operations: %d\n", tMem->nOps);
+    cont->blSrch = tMem->blSrch;
+    printf("Nodes Searched: %d\n", tMem->blSrch);
+    cont->tm.tv_sec -= tMem->tm.tv_sec;
+    cont->tm.tv_usec -= tMem->tm.tv_usec;
+    printf("Time: %ld.%ld seconds\n", cont->tm.tv_sec,
+            cont->tm.tv_usec);
 
     RttMonLeave();
 
     return cont;
 }
+
