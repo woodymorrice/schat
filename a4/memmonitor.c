@@ -26,7 +26,7 @@
 
 #define TOTAL_MEM 8192
 #define CONDS 1 /* number of conditions variables */
-#define MEM_AVAIL 0
+#define FFMemAvail 0
 
 static memStruct* tMem;
 
@@ -70,7 +70,7 @@ memBlock* MyMalloc(int alg, int size) {
         if (block == NULL) {
             printf("going to sleep...\n");
             memPrinter();
-            RttMonWait(MEM_AVAIL);
+            RttMonWait(FFMemAvail);
         }
     }
     tMem->nUsed++;
@@ -177,7 +177,7 @@ memBlock* firstFit(int sz) {
     }
 }
 
-int Free(int address) {
+int MyFree(int address) {
     memBlock* iterator;
     memBlock* before;
     memBlock* after;
@@ -253,7 +253,7 @@ int Free(int address) {
                 tMem->nFree += 1;
             }
 
-            RttMonSignal(MEM_AVAIL);
+            RttMonSignal(FFMemAvail);
             
             RttMonLeave();
             return EXIT_SUCCESS;
