@@ -23,6 +23,9 @@
 
 static int reqs;
 static int fin;
+static int memAlg;
+static LIST* stats;
+
 
 void sim_proc(void* num) {
     int* args;
@@ -31,6 +34,7 @@ void sim_proc(void* num) {
     int i, alloc, sz, slp, randFree, n, j;
     LIST* blocks;
     memBlock* block;
+    memStat* curStat;
 
     /* args[0] = algorithm, args[1] = proc number */
     args = (int*)num;
@@ -109,6 +113,8 @@ void sim_proc(void* num) {
     if (fin == NUM_THRDS) {
         printf("%d,%d,", NUM_THRDS, reqs); 
         memPrinter();
+        curStat = malloc(sizeof(memStat));
+        ListPrepend(stats, MyMemStats(memAlg, 0, curStat));
         exit(0);
     }
     RttExit();
@@ -117,6 +123,7 @@ void sim_proc(void* num) {
 void getInput() {
     char buf[BUF_SIZE];
     int msgLength;
+    memStat* curStat;
                                                                           
     /* unblock stdin */                                                         
     if (-1 == fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK)) {              
@@ -139,6 +146,8 @@ void getInput() {
             }
             else if (strncmp("stats\n", buf, msgLength) == 0) {
                 memPrinter();
+                curStat = malloc(sizeof(memStat));
+                ListPrepend(stats, MyMemStats(memAlg, 0, curStat));
             }                                               
         }                                                                       
     }                                                                           
@@ -295,13 +304,13 @@ int mainp(int argc, char* argv[]) {
     reqs = atoi(argv[1]);
     alg = BESTFIT; /* best fit is the default */
     rands = 1; /* yes by default */
-
     if (argc > 2) {
         alg = atoi(argv[2]);
     }
     if (argc > 3) {
         rands = atoi(argv[3]);
     }
+    memAlg = alg;
     /* generates a of random numbers for each thread in the test */
     if (rands && (gen_rands(reqs) != 0)) {
         fprintf(stderr, "gen_rands failed\n");

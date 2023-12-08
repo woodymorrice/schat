@@ -309,3 +309,41 @@ void memPrinter() {
 
     RttMonLeave();
 }
+
+void* MyMemStats(int alg, int stat, void* statCont) {
+    LIST* mem;
+    memStat* cont;
+
+    RttMonEnter();
+    mem = tMem->blocks;
+    if (ListCount(mem) < 1) {
+        fprintf(stderr, "no initial memory block\n");
+        exit(EXIT_FAILURE);
+    }
+    if (alg == 0) {
+        printf("Best fit algorithm\n");
+    }
+    else {
+        printf("First fit algorithm\n");
+    }
+    if (stat == 1) {
+        printf("All Stats:\n");
+    }
+
+    cont = (memStat*)statCont;
+    cont->nFree = tMem->nFree;
+    printf("Free blocks: %d\n", tMem->nFree);
+    cont->nUsed = tMem->nUsed;
+    printf("Used blocks: %d\n", tMem->nUsed);
+    printf("Total Size: %d\n", tMem->maxSize);
+    cont->freeSpace = tMem->freeSpace;
+    printf("Free Space: %d\n", tMem->freeSpace);
+    cont->usedSpace = tMem->usedSpace;
+    printf("Used Space: %d\n", tMem->usedSpace);
+    cont->nOps = tMem->nOps;
+    printf("Number of Operations: %d\n", tMem->nOps);
+
+    RttMonLeave();
+
+    return cont;
+}

@@ -38,5 +38,6 @@ struct memBlock* firstFit(int);
 int MyFree(int);
 int unblock();
 void memPrinter();
+void* MyMemStats(int, int, void*);
 
 #endif
