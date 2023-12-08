@@ -3,9 +3,7 @@
  * Woody Morrice - wam553 - 11071060 */
 
 #include <random.h>
- 
-#define SLPMEAN 10
-#define SLPSTDDEV 3
+#include <defs.h>
 
 double unirand() {
     return (double)rand()/(double)RAND_MAX;

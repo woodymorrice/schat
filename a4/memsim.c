@@ -19,85 +19,46 @@
 #include <monitor.h>
 #include <memmonitor.h>
 
-#define MINARGS 2
-#define MAXARGS 4
-#define MINREQS 1
-#define MAXREQS 10000
-#define THRD_NMSZ 32
-#define STKSIZE 65539
-#define BESTFIT 0
-#define FIRSTFIT 1
-#define NTHRDARGS 2
-#define INTCHRS 4
-#define MODE 0755
-#define BUF_SIZE 128
+#include <defs.h>
 
 static int reqs;
 static int fin;
 
 void sim_proc(void* num) {
     int* args;
-    char procnum[THRD_NMSZ]; /*, line[64];*/
+    char procnum[THRD_NMSZ];
     FILE* f;
     int i, alloc, sz, slp, randFree, n, j;
-    /*unsigned long id;*/
     LIST* blocks;
     memBlock* block;
 
-    blocks = ListCreate();
-
     /* args[0] = algorithm, args[1] = proc number */
     args = (int*)num;
+    blocks = ListCreate();
     
     /* get the name of the random # input file */
     if (snprintf(procnum, sizeof(procnum), "./tmp/%d.txt", args[1]) == 0) {
         fprintf(stderr, "snprintf failed in sim_proc()\n");
         exit(EXIT_FAILURE);
     }
-
     /* open its generated random nums */
     if((f = fopen(procnum, "r")) == NULL) {
         fprintf(stderr, "fopen failed in sim_proc()\n");
         exit(EXIT_FAILURE);
     }
-
     /* iterate through the random numbers */
-    for (i = 0; i < reqs*3; i++) {
+    for (i = 0; i < NRAND*reqs; i++) {
         /* read a line from the file */
         if (fscanf(f, "%d ", &n) != 1) {
             fprintf(stderr, "fscanf failed in sim_proc()\n");
             perror("");
             exit(EXIT_FAILURE);   
         }
-        /*do {
-        if (fgets(line, 64, f) == NULL) {
-            fprintf(stderr, "fgets failed in sim_proc()\n");
-            exit(EXIT_FAILURE);  
-        }
-        if (line[0] == '\n')
-            printf("bad line: %s\n", line);
-        } while (line[0] == '\n');*/
-        /* convert that line to an int */
-        /*if ((readnum = atoi(line)) == 0) {
-            fprintf(stderr, "atoi failed in sim_proc(): %s\n", line);
-            exit(EXIT_FAILURE);
-        }*/
-
-        /* get process ID */
-        /*id = RttMyThreadId().lid;*/
-
         /* alloc or free? */
-        if      (i % 3 == 0) {
-            /*alloc = atoi(line);*/
+        if      (i % NRAND == 0) {
             alloc = n;
-            /*if (alloc) {
-                printf("Proc %d Allocating\n", (int)id);
-            } else {
-                printf("Proc %d Freeing\n", (int)id); 
-            }*/
         }
-        else if (i % 3 == 1) {
-            /*sz = atoi(line);*/
+        else if (i % NRAND == 1) {
             sz = n;
             if (ListCount(blocks) < 1) {
                 alloc = 1;
@@ -129,8 +90,7 @@ void sim_proc(void* num) {
                 ListRemove(blocks);
             }
         }
-        else if (i % 3 == 2) {
-            /*slp = atoi(line);*/
+        else if (i % NRAND == 2) {
             slp = n;
             /*printf("Proc %d Sleeping for %d seconds\n", (int)id, slp);*/
             RttUSleep(((unsigned)slp)*1000);
@@ -139,21 +99,14 @@ void sim_proc(void* num) {
             fprintf(stderr, "fatal error in sim_proc()\n");
             exit(EXIT_FAILURE);
         }
-        /* test print */
-        /*printf("%d\n", readnum);*/
     }
-
     free(args); /*cant check return value :( */
     if (fclose(f) != 0) {
         fprintf(stderr, "fclose failed in sim_proc()\n");
         exit(EXIT_FAILURE); 
     }
-
-    /*printf("thread %d finished\n", (int)id);*/
     fin += 1;
-    /*memPrinter();*/
     if (fin == NUM_THRDS) {
-        /*printf("simulation finished\n");*/
         printf("%d,%d,", NUM_THRDS, reqs); 
         memPrinter();
         exit(0);
@@ -173,7 +126,6 @@ void getInput() {
     }                                                        
     for (;;) {                                                                  
         /* get input */             
-        /*printf(" are we blocking?\n");*/
         msgLength = read(0, buf, BUF_SIZE-1);                                   
         if (msgLength > 0) {                                                    
             buf[msgLength] = '\0';                                              
@@ -209,7 +161,6 @@ int init_thrds(int algo) {
     attr.deadline = RTTNODEADLINE;
 
     fin = 0;
-
     memInit();
 
     for (i = 0; i < NUM_THRDS; i++) {
@@ -218,22 +169,18 @@ int init_thrds(int algo) {
             fprintf(stderr, "snprintf failed in init_thrds()\n");
             return EXIT_FAILURE;
         }
-
         /* set args */
         thrd_args = malloc(NTHRDARGS*sizeof(int));
         thrd_args[0] = algo;
         thrd_args[1] = i;
 
-        
         /* create the thread */
         thread = RttCreate(&id, sim_proc, STKSIZE,
                            buf, (void*)thrd_args, attr, RTTUSR);
         if (thread == RTTFAILED) {
             fprintf(stderr, "RttCreate() failed on thread %d\n", i);
             exit(EXIT_FAILURE);
-        }
-
-        
+        }        
     }
 
     /* unblocker, might not be necessary */
@@ -266,27 +213,22 @@ int gen_rands(int reqs) {
     for (i = 0; i < NUM_THRDS; i++) {
         /* even lines are allocation sizes,
          * odd lines are sleep times */
-
-        /*st = {0};*/
         if (stat("tmp/", &st) != 0) {
-            if (mkdir("tmp/", 0755) != 0) {
+            if (mkdir("tmp/", MODE) != 0) {
                 fprintf(stderr, "mkdir failed in gen_rands()\n");
                 return EXIT_FAILURE; 
             }
         }
-
         /* name the file of random numbers (i) */
         if (snprintf(buf, sizeof(buf), "./tmp/%d.txt", i) == 0) {
             fprintf(stderr, "snprintf failed in gen_rands()\n");
             return EXIT_FAILURE;
         }
-
         /* open it for writing */
         if((f = fopen(buf, "w")) == NULL) {
             fprintf(stderr, "fopen failed in gen_rands()\n");
             return EXIT_FAILURE;
         }
-
         /* generate the number of requests passed in */
         for (j = 0; j < reqs; j++) {
 
@@ -315,7 +257,6 @@ int gen_rands(int reqs) {
                 fprintf(stderr, "fprintf failed in gen_rands()\n");
                 return EXIT_FAILURE;
             }
-
             /* generate a sleep time */
             slp = (int) exrand(MN_SLP);
             if (slp < MIN_SLP) {
@@ -329,7 +270,6 @@ int gen_rands(int reqs) {
                 return EXIT_FAILURE;
             }
         }
-
         if (fclose(f) != 0) {
             fprintf(stderr, "fclose failed in gen_rands()\n");
             exit(EXIT_FAILURE); 
@@ -338,8 +278,6 @@ int gen_rands(int reqs) {
     return EXIT_SUCCESS;
 }
 
-/* mainp - 
- * */
 int mainp(int argc, char* argv[]) {
     int alg, rands;
 
@@ -351,13 +289,12 @@ int mainp(int argc, char* argv[]) {
         printf("usage: %s <requests>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
-
     /* (reqs)arg1 = # of requests
      * (alg)arg2 = algorithm
      * (rands)arg3 = generate new random #s */
     reqs = atoi(argv[1]);
-    alg = 0;
-    rands = 1;
+    alg = BESTFIT; /* best fit is the default */
+    rands = 1; /* yes by default */
 
     if (argc > 2) {
         alg = atoi(argv[2]);
@@ -365,31 +302,16 @@ int mainp(int argc, char* argv[]) {
     if (argc > 3) {
         rands = atoi(argv[3]);
     }
-
-    /* testing args */
-    /*printf("%d\n", argc);
-    for (i = 0; i < argc; i++) {
-        printf("%s\n", argv[i]);
-    }*/
-
     /* generates a of random numbers for each thread in the test */
     if (rands && (gen_rands(reqs) != 0)) {
         fprintf(stderr, "gen_rands failed\n");
         exit(EXIT_FAILURE);
     }
-
     fin = 0;
     /* create threads and run best fit algorithm */
     if (init_thrds(alg) != 0) {
         fprintf(stderr, "init_thrds for Best Fit failed\n");
         exit(EXIT_FAILURE);
     }
-
-    /* create threads and run first fit algorithm */
-    /*if (init_thrds(FIRSTFIT) != 0) {
-        fprintf(stderr, "init_thrds for First Fit failed\n");
-        exit(EXIT_FAILURE);
-    }*/
-
     return EXIT_SUCCESS;
 }

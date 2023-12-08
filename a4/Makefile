@@ -13,11 +13,14 @@ LIST = -L. -llist
 
 all: memsim
 
-memsim: memsim.o random.o memmonitor.o monitor.o liblist.a
+memsim: memsim.o random.o memmonitor.o \
+	monitor.o liblist.a
 	$(CC) $(LIB1) -z noexecstack -o memsim \
-		memmonitor.o memsim.o monitor.o random.o $(LIB2) $(LIST) -lm
+		memmonitor.o memsim.o monitor.o \
+		random.o $(LIB2) $(LIST) -lm
 
-memsim.o: memsim.c memmonitor.h list.h random.h
+memsim.o: memsim.c memmonitor.h list.h \
+	random.h defs.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
         -c memsim.c -o memsim.o
 
@@ -25,25 +28,14 @@ random.o: random.c random.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -I. \
         -c random.c -o random.o
 
-memmonitor.o: memmonitor.c memmonitor.h list.h monitor.h random.h	
+memmonitor.o: memmonitor.c memmonitor.h \
+	list.h monitor.h random.h defs.h	
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
 		-c memmonitor.c -o memmonitor.o
-
-best-fit: monitor.o best-fit.o best-fit-monitor.o liblist.a 
-	$(CC) $(LIB1) -z noexecstack -o best-fit best-fit-monitor.o \
-		best-fit.o monitor.o $(LIB2) $(LIST)
- 
-best-fit.o: BestFit.c BestFitMonitor.h list.h	
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
-		-c BestFit.c -o best-fit.o
 
 monitor.o: monitor.h monitor.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
 		-c monitor.c -o monitor.o
-
-best-fit-monitor.o: BestFitMonitor.c BestFitMonitor.h list.h	
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) \
-		-c BestFitMonitor.c -o best-fit-monitor.o
 
 liblist.a: list_adders.o list_movers.o \
 	list_removers.o
@@ -68,6 +60,5 @@ list_removers.o: list_removers.c list.h
 
 clean: 
 	rm -f *.o *.a memsim \
-		  best-fit random \
-		  tmp/*
+		  random tmp/*
 	

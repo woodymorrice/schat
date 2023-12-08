@@ -7,7 +7,6 @@
  * John Miller, knp254, 11323966
  */ 
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -16,6 +15,7 @@
 #include <list.h>
 #include <memmonitor.h>
 #include <random.h>
+#include <defs.h>
 
 /* Total memory for this simulation will be 8 gbs (8,589,934,592 or
  * 2^33 bytes), but since the minimum allocation will be 1 mb (1,048,576
@@ -24,7 +24,7 @@
  * 8192 and we will use that to represent our total memory size. So 1
  * will represent 1 mb, 2 = 2 mb, and so on. */
 
-#define TOTAL_MEM 2097152
+#define TOTAL_MEM 8192
 #define CONDS 1 /* number of conditions variables */
 #define MEM_AVAIL 0
 
@@ -92,8 +92,6 @@ memBlock* bestFit(int sz) {
 
     best = NULL;
     iter = ListFirst(mem);
-    /*do {
-        iter = ListCurr(mem);*/
     while (iter != NULL) {
         /* if a free block is big enough */
         if (iter->isFree == true &&
@@ -106,8 +104,6 @@ memBlock* bestFit(int sz) {
         }
         iter = ListNext(mem);
     }
-    /*} while (ListNext(mem) != NULL);*/
-    
     if (best != NULL) {
         /* create a new block */
         new = malloc(sizeof(memBlock));
@@ -122,23 +118,18 @@ memBlock* bestFit(int sz) {
             iter = ListNext(mem);
             /*iter = ListCurr(mem);*/
         }
-
         new->startAddr = best->startAddr;
         best->startAddr += sz;
 
         ListInsert(mem, new);
 
         RttMonLeave();
-
         return new;
     }
     else {
         RttMonLeave();
         return best;
     }
-
-    RttMonLeave();
-    return best;
 }
 
 memBlock* firstFit(int sz) {
@@ -184,9 +175,6 @@ memBlock* firstFit(int sz) {
         RttMonLeave();
         return found;
     }
-
-    RttMonLeave();
-    return NULL;
 }
 
 int Free(int address) {
@@ -215,7 +203,6 @@ int Free(int address) {
     after = NULL;
 
     iterator = ListFirst(mem);
-    /*do {*/
     while (iterator != NULL) {
         bef = false;
         aft = false;
@@ -245,7 +232,6 @@ int Free(int address) {
                     ListNext(mem);
                 }
             }
-
             /* if the block after it is free */
             after = ListNext(mem);
             if (after != NULL) {
@@ -259,7 +245,6 @@ int Free(int address) {
                     free(after);
                 }
             }
-
             /* update # of free blocks */
             if (bef == true && aft == true) {
                 tMem->nFree -= 1;
@@ -271,15 +256,11 @@ int Free(int address) {
             RttMonSignal(MEM_AVAIL);
             
             RttMonLeave();
-
             return EXIT_SUCCESS;
         }
-    iterator = ListNext(mem);
+        iterator = ListNext(mem);
     }
-    /*} while (ListNext(mem) != NULL);*/
-
     RttMonLeave();
-
     return EXIT_FAILURE;
 }
 
@@ -292,7 +273,6 @@ int unblock() {
 void memPrinter() {
     /*memBlock* iter;*/
     LIST* mem;
-
 
     RttMonEnter();
     mem = tMem->blocks;
