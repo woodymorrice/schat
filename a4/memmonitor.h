@@ -34,7 +34,7 @@ typedef struct memStat {
 } memStat;
 
 int memInit();
-struct memBlock* MyMalloc(int, int);
+void* MyMalloc(int, int);
 struct memBlock* bestFit(int);
 struct memBlock* firstFit(int);
 int MyFree(void*);

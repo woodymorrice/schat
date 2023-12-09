@@ -1,0 +1,29 @@
+# CMPT332 - Group 14
+# Phong Thanh Nguyen (David) - wdz468 - 11310824
+# Woody Morrice - wam553 - 11071060
+
+Output of a Single Test
+
+This is the output of ./run 4000, which runs a test with both algorithms,
+generating a single set of random numbers that is used by both tests.
+NUM_THRDS is currently set to 8, so 8 threads running 4000 requests each
+properly results in 32000 total requests.
+
+Actual Output:
+
+Best fit algorithm
+Free blocks (gaps): 145
+Free Space: 145
+Used blocks: 790
+Used Space: 938
+Total Size: 8192
+Number of Operations: 32000
+Nodes Searched: 4569505
+First fit algorithm
+Free blocks (gaps): 160
+Free Space: 161
+Used blocks: 994
+Used Space: 1178
+Total Size: 8192
+Number of Operations: 32000
+Nodes Searched: 2087969

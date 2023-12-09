@@ -22,7 +22,7 @@
 
 /* terminal arguments to memsim */
 #define MINARGS 2
-#define MAXARGS 4
+#define MAXARGS 5
 
 /* requests for memsim */
 #define MINREQS 1

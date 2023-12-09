@@ -24,6 +24,7 @@
 static int reqs;
 static int fin;
 static int memAlg;
+static int nthrds;
 static LIST* stats;
 
 
@@ -110,8 +111,7 @@ void sim_proc(void* num) {
         exit(EXIT_FAILURE); 
     }
     fin += 1;
-    if (fin == NUM_THRDS) {
-        printf("%d,%d,", NUM_THRDS, reqs);
+    if (fin == nthrds) {
         curStat = malloc(sizeof(memStat));
         ListPrepend(stats, MyMemStats(memAlg, 0, curStat));
         exit(0);
@@ -165,7 +165,7 @@ int init_thrds(int algo) {
     fin = 0;
     memInit();
 
-    for (i = 0; i < NUM_THRDS; i++) {
+    for (i = 0; i < nthrds; i++) {
         /* threadname = same as rndm num file it will read */
         if (snprintf(buf, sizeof(buf), "%d", i) == 0) {
             fprintf(stderr, "snprintf failed in init_thrds()\n");
@@ -212,7 +212,7 @@ int gen_rands(int reqs) {
 
     srand(time(NULL));
     /* create a list of random numbers for each thread */
-    for (i = 0; i < NUM_THRDS; i++) {
+    for (i = 0; i < nthrds; i++) {
         /* even lines are allocation sizes,
          * odd lines are sleep times */
         if (stat("tmp/", &st) != 0) {
@@ -297,11 +297,15 @@ int mainp(int argc, char* argv[]) {
     reqs = atoi(argv[1]);
     alg = BESTFIT; /* best fit is the default */
     rands = 1; /* yes by default */
+    nthrds = NUM_THRDS;
     if (argc > 2) {
         alg = atoi(argv[2]);
     }
     if (argc > 3) {
         rands = atoi(argv[3]);
+    }
+    if (argc > 4) {
+        nthrds = atoi(argv[4]);
     }
     memAlg = alg;
     /* generates a of random numbers for each thread in the test */

@@ -60,7 +60,7 @@ int memInit() {
     return EXIT_SUCCESS;
 }
 
-memBlock* MyMalloc(int alg, int size) {
+void* MyMalloc(int alg, int size) {
     memBlock* block;
     memStat* stat;
     block = NULL;
@@ -270,38 +270,10 @@ int MyFree(void* address) {
     return EXIT_FAILURE;
 }
 
-/* memPrinter -- show the current state of the memory block */
-/*void memPrinter() {*/
-    /*memBlock* iter;*/
-    /*LIST* mem;
-
-    RttMonEnter();
-    mem = tMem->blocks;
- 
-    if (ListCount(mem) < 1) {
-        fprintf(stderr, "no initial memory block\n");
-        exit(EXIT_FAILURE);
-    }*/
-
-
-
-    /*printf("Free blocks: %d\n", tMem->nFree);
-    printf("Used blocks: %d\n", tMem->nUsed);
-    printf("Total Size: %d\n", tMem->maxSize);
-    printf("Free Space: %d\n", tMem->freeSpace);
-    printf("Used Space: %d\n", tMem->usedSpace);
-    printf("Number of Operations: %d\n", tMem->nOps);*/
-    /*printf("%d,%d,%d,%d,%d,"
-           "%d,%d,%d,%f\n",
-           tMem->nOps, tMem->nFree, tMem->freeSpace, tMem->nUsed,
-           tMem->usedSpace, tMem-> maxSize, MN_ALLOC, STDDEV_ALLOC, FREEPROB);
-
-    RttMonLeave();
-}*/
-
 void* MyMemStats(int alg, int stat, void* statCont) {
     LIST* mem;
     memStat* cont;
+    int last;
 
     RttMonEnter();
     mem = tMem->blocks;
@@ -319,25 +291,20 @@ void* MyMemStats(int alg, int stat, void* statCont) {
         printf("All Stats:\n");
     }
 
-    printf("Last block: %d\n", ((memBlock*)mem->tail->item)->size); 
     cont = (memStat*)statCont;
-    printf("%d,%d,%d,%d,%d,"
-           "%d,%d,%d,%f\n",
-           tMem->nOps, tMem->nFree, tMem->freeSpace, tMem->nUsed,
-           tMem->usedSpace, tMem-> maxSize, MN_ALLOC, STDDEV_ALLOC, FREEPROB);
+    last = ((memBlock*)mem->tail->item)->size; 
     cont->nFree = tMem->nFree;
-    printf("Free blocks: %d\n", tMem->nFree);
-    printf("Gaps in memory: %d\n", tMem->nFree-1);
     cont->nUsed = tMem->nUsed;
-    printf("Used blocks: %d\n", tMem->nUsed);
-    printf("Total Size: %d\n", tMem->maxSize);
     cont->freeSpace = tMem->freeSpace;
-    printf("Free Space: %d\n", tMem->freeSpace);
     cont->usedSpace = tMem->usedSpace;
-    printf("Used Space: %d\n", tMem->usedSpace);
     cont->nOps = tMem->nOps;
-    printf("Number of Operations: %d\n", tMem->nOps);
     cont->blSrch = tMem->blSrch;
+    printf("Free blocks (gaps): %d\n", tMem->nFree-1);
+    printf("Free Space: %d\n", tMem->freeSpace-last);
+    printf("Used blocks: %d\n", tMem->nUsed);
+    printf("Used Space: %d\n", tMem->usedSpace);
+    printf("Total Size: %d\n", tMem->maxSize);
+    printf("Number of Operations: %d\n", tMem->nOps);
     printf("Nodes Searched: %d\n", tMem->blSrch);
 
     RttMonLeave();
