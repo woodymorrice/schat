@@ -299,10 +299,12 @@ void* MyMemStats(int alg, int stat, void* statCont) {
     cont->usedSpace = tMem->usedSpace;
     cont->nOps = tMem->nOps;
     cont->blSrch = tMem->blSrch;
-    printf("Free blocks (gaps): %d\n", tMem->nFree-1);
-    printf("Free Space: %d\n", tMem->freeSpace-last);
+    printf("Gaps: %d\n", tMem->nFree-1);
+    printf("Total free blocks: %d\n", tMem->nFree);
+    printf("wasted space: %d\n", tMem->freeSpace-last);
+    printf("Total free space: %d\n", tMem->freeSpace);
     printf("Used blocks: %d\n", tMem->nUsed);
-    printf("Used Space: %d\n", tMem->usedSpace);
+    printf("Used space: %d\n", tMem->usedSpace);
     printf("Total Size: %d\n", tMem->maxSize);
     printf("Number of Operations: %d\n", tMem->nOps);
     printf("Nodes Searched: %d\n", tMem->blSrch);
